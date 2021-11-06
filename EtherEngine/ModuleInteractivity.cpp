@@ -1,7 +1,7 @@
 #include "ModuleInteractivity.h"
 
 
-unordered_map<int, unordered_map<int, int>> ModuleInteractivity::mapMultiEventList = {
+unordered_map<int, unordered_map<int, int>> mapMultiEventList = {
 	{	
 		SDL_WINDOWEVENT,
 		{
@@ -373,7 +373,7 @@ unordered_map<int, unordered_map<int, int>> ModuleInteractivity::mapMultiEventLi
 	}
 };
 
-unordered_map<int, int> ModuleInteractivity::mapSingleEventList = {
+unordered_map<int, int> mapSingleEventList = {
 	{ SDL_QUIT, EVENT_QUIT },
 	{ SDL_MOUSEMOTION, EVENT_MOUSEMOTION },
 	{ SDL_MOUSEWHEEL, EVENT_MOUSESCROLL },
@@ -454,13 +454,13 @@ ETHER_API updateEvent(lua_State* L)
 
 ETHER_API getEventType(lua_State * L)
 {
-	auto itorSingle = ModuleInteractivity::mapSingleEventList.find(event.type);
-	if (itorSingle != ModuleInteractivity::mapSingleEventList.end())
+	auto itorSingle = mapSingleEventList.find(event.type);
+	if (itorSingle != mapSingleEventList.end())
 		lua_pushnumber(L, itorSingle->second);
 	else
 	{
-		auto itorMutli = ModuleInteractivity::mapMultiEventList.find(event.type);
-		if (itorMutli != ModuleInteractivity::mapMultiEventList.end())
+		auto itorMutli = mapMultiEventList.find(event.type);
+		if (itorMutli != mapMultiEventList.end())
 		{
 			auto _iterator = itorMutli->second.find(Get2ndLevelValue(itorMutli->first));
 			_iterator != itorMutli->second.end() ? lua_pushnumber(L, _iterator->second) : lua_pushnil(L);

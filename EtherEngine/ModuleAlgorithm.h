@@ -83,30 +83,5 @@ ETHER_API encodeBase64(lua_State* L);
 // 1返回值：缓冲区数据（string）
 ETHER_API decodeBase64(lua_State* L);
 
-class ModuleAlgorithm : public Module<ModuleAlgorithm>
-{
-	friend class Module<ModuleAlgorithm>;
-
-private:
-	ModuleAlgorithm()
-	{
-		_vCMethods = {
-			{ "Clamp", clamp },
-			{ "CheckPointInRect", checkPointInRect },
-			{ "CheckPointInCircle", checkPointInCircle },
-			{ "CheckRectsOverlap", checkRectsOverlap },
-			{ "CheckCirclesOverlap", checkCirclesOverlap },
-			{ "GetPointsDistance", getPointsDistance },
-			{ "GetLinesDistance", getLinesDistance },
-			{ "GetPointLineDistance", getPointLineDistance },
-			{ "RGBAToHSLA", rgbaToHSLA },
-			{ "HSLAToRGBA", hslaToRGBA },
-			{ "EncodeBase64", encodeBase64 },
-			{ "DecodeBase64", decodeBase64 },
-		};
-	}
-
-};
-
 #endif // !_ALGORITHM_H_
 

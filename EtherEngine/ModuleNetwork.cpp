@@ -2,9 +2,9 @@
 
 using namespace std;
 
-size_t ModuleNetwork::_stServerIndex = 0;
+size_t _stServerIndex = 0;
 
-unordered_map < httplib::Error, int > ModuleNetwork::mapErrorList = {
+unordered_map < httplib::Error, int > mapErrorList = {
 	{ httplib::Error::Success, ERRCODE_SUCCESS },
 	{ httplib::Error::Unknown, ERRCODE_UNKNOWN },
 	{ httplib::Error::Connection, ERRCODE_CONNECTION },
@@ -23,7 +23,7 @@ unordered_map < httplib::Error, int > ModuleNetwork::mapErrorList = {
 mutex mtxServerRequest, mtxServerException;
 
 
-string ModuleNetwork::GetServerID()
+string GetServerID()
 {
 	return to_string(_stServerIndex++) + "_" + to_string(SDL_GetTicks());
 }
@@ -91,8 +91,8 @@ const char* GetRequestParamAt2ndPos(lua_State* L, RequestParam& reqParam)
 
 int ConvertErrorCodeToMacro(const Error& error)
 {
-	auto itor = ModuleNetwork::mapErrorList.find(error);
-	if (itor != ModuleNetwork::mapErrorList.end())
+	auto itor = mapErrorList.find(error);
+	if (itor != mapErrorList.end())
 		return itor->second;
 	else
 		return ERRCODE_UNKNOWN;
@@ -1160,7 +1160,7 @@ ETHER_API createServer(lua_State* L)
 	E_Server* server = new E_Server(
 		lua_isstring(L, 1)
 		? new SSLServer(lua_tostring(L, 1), luaL_checkstring(L, 2))
-		: new Server(), ModuleNetwork::GetServerID()
+		: new Server(), GetServerID()
 	);
 	E_Server** uppServer = (E_Server**)lua_newuserdata(L, sizeof(E_Server*));
 	*uppServer = server;

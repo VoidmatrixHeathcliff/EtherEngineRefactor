@@ -25,19 +25,4 @@ ETHER_API compressData(lua_State* L);
 */
 ETHER_API decompressData(lua_State* L);
 
-class ModuleCompress : public Module<ModuleCompress>
-{
-	friend class Module<ModuleCompress>;
-
-private:
-	ModuleCompress()
-	{
-		_vCMethods = {
-			{"CompressData", compressData},
-			{"DecompressData", decompressData},
-		};
-	}
-
-};
-
 #endif // !_COMPRESS_H_

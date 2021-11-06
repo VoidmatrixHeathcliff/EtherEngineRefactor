@@ -172,11 +172,11 @@ int main(int argc, char** argv)
 	*/
 	lua_getglobal(pGlobalLuaVM, "package");
 	lua_getfield(pGlobalLuaVM, -1, "preload");
-	for (const BuiltinModuleRegisterInfo& moduleInfo
-		: vecBuiltinModuleRegister)
+	for (const std::pair<std::string, lua_CFunction>& module
+		: BuiltinPackageList)
 	{
-		lua_pushstring(pGlobalLuaVM, moduleInfo.name.c_str());
-		lua_pushcfunction(pGlobalLuaVM, moduleInfo.callback_preload);
+		lua_pushstring(pGlobalLuaVM, module.first.c_str());
+		lua_pushcfunction(pGlobalLuaVM, module.second);
 		lua_settable(pGlobalLuaVM, -3);
 	}
 	lua_pop(pGlobalLuaVM, 2);

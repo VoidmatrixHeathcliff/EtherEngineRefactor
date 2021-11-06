@@ -1,6 +1,7 @@
 #ifndef _REGISTER_H_
 #define _REGISTER_H_
 
+#include "Module.h"
 #include "ModuleWindow.h"
 #include "ModuleGraphic.h"
 #include "ModuleMedia.h"
@@ -16,37 +17,1009 @@
 
 #include <lua.hpp>
 
+#include <utility>
 #include <vector>
 #include <string>
 
-struct BuiltinModuleRegisterInfo
+struct ParamEnum
 {
 	std::string name;
-	lua_CFunction callback_preload;
+	int value;
 };
 
-template <typename T>
-inline int CallbackPreloadBuiltinModule(lua_State* pLuaVM)
+struct MetaTableInfo
 {
-	T::Instance().PushMetaDataToGlobal(pLuaVM);
-	T::Instance().PushMoudleDataToStack(pLuaVM);
+	std::string name;
+	std::vector<luaL_Reg> func_list;
+	lua_CFunction gc_func;
+};
 
-	return 1;
+inline void PushPackageData(lua_State* pLuaVM, 
+	const std::vector<luaL_Reg>& func_list,
+	const std::vector<ParamEnum> enum_list = std::vector<ParamEnum>(),
+	const std::vector<MetaTableInfo>&metatable_list = std::vector<MetaTableInfo>())
+{
+	for (const MetaTableInfo& mt : metatable_list)
+	{
+		luaL_newmetatable(pLuaVM, mt.name.c_str());
+
+		lua_pushstring(pLuaVM, "__index");
+		lua_newtable(pLuaVM);
+		for (const luaL_Reg& func : mt.func_list)
+		{
+			lua_pushstring(pLuaVM, func.name);
+			lua_pushcfunction(pLuaVM, func.func);
+			lua_settable(pLuaVM, -3);
+		}
+		lua_settable(pLuaVM, -3);
+
+		lua_pushstring(pLuaVM, "__gc");
+		lua_pushcfunction(pLuaVM, mt.gc_func);
+		lua_settable(pLuaVM, -3);
+	}
+
+	lua_newtable(pLuaVM);
+
+	for (const luaL_Reg& func : func_list)
+	{
+		lua_pushstring(pLuaVM, func.name);
+		lua_pushcfunction(pLuaVM, func.func);
+		lua_settable(pLuaVM, -3);
+	}
+
+	for (const ParamEnum& pe : enum_list)
+	{
+		lua_pushstring(pLuaVM, pe.name.c_str());
+		lua_pushinteger(pLuaVM, pe.value);
+		lua_settable(pLuaVM, -3);
+	}
 }
 
-static const std::vector<BuiltinModuleRegisterInfo> vecBuiltinModuleRegister = {
-	{ "@Algorithm",		CallbackPreloadBuiltinModule<ModuleAlgorithm> },
-	{ "@Graphic",		CallbackPreloadBuiltinModule<ModuleGraphic> },
-	{ "@Interactivity", CallbackPreloadBuiltinModule<ModuleInteractivity> },
-	{ "@JSON",			CallbackPreloadBuiltinModule<ModuleJSON> },
-	{ "@Media",			CallbackPreloadBuiltinModule<ModuleMedia> },
-	{ "@Network",		CallbackPreloadBuiltinModule<ModuleNetwork> },
-	{ "@OS",			CallbackPreloadBuiltinModule<ModuleOS> },
-	{ "@String",		CallbackPreloadBuiltinModule<ModuleString> },
-	{ "@Time",			CallbackPreloadBuiltinModule<ModuleTime> },
-	{ "@Window",		CallbackPreloadBuiltinModule<ModuleWindow> },
-	{ "@Compress",		CallbackPreloadBuiltinModule<ModuleCompress> },
-	{ "@XML",			CallbackPreloadBuiltinModule<ModuleXML> },
+static const std::vector<std::pair<std::string, lua_CFunction>> BuiltinPackageList = 
+{
+	{
+		"@Algorithm",
+		[](lua_State* pLuaVM) -> int
+		{
+			std::vector<luaL_Reg> func_list = {
+				{ "Clamp", clamp },
+				{ "CheckPointInRect", checkPointInRect },
+				{ "CheckPointInCircle", checkPointInCircle },
+				{ "CheckRectsOverlap", checkRectsOverlap },
+				{ "CheckCirclesOverlap", checkCirclesOverlap },
+				{ "GetPointsDistance", getPointsDistance },
+				{ "GetLinesDistance", getLinesDistance },
+				{ "GetPointLineDistance", getPointLineDistance },
+				{ "RGBAToHSLA", rgbaToHSLA },
+				{ "HSLAToRGBA", hslaToRGBA },
+				{ "EncodeBase64", encodeBase64 },
+				{ "DecodeBase64", decodeBase64 },
+			};
+
+			PushPackageData(pLuaVM, func_list);
+
+			return 1;
+		}
+	},
+	{ 
+		"@Graphic",
+		[](lua_State* pLuaVM) -> int
+		{
+			if (!TTF_WasInit()) TTF_Init();
+			IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP);
+
+			std::vector<luaL_Reg> func_list = {
+				{ "SetCursorShow", setCursorShow },
+				{ "LoadImageFromFile", loadImageFromFile },
+				{ "LoadImageFromData", loadImageFromData },
+				{ "CreateTexture", createTexture },
+				{ "CopyTexture", copyTexture },
+				{ "CopyRotateTexture", copyRotateTexture },
+				{ "CopyReshapeTexture", copyReshapeTexture },
+				{ "CopyRotateReshapeTexture", copyRotateReshapeTexture },
+				{ "SetDrawColor", setDrawColor },
+				{ "GetDrawColor", getDrawColor },
+				{ "DrawPoint", drawPoint },
+				{ "DrawLine", drawLine },
+				{ "DrawThickLine", drawThickLine },
+				{ "DrawRectangle", drawRectangle },
+				{ "DrawFillRectangle", drawFillRectangle },
+				{ "DrawRoundRectangle", drawRoundRectangle },
+				{ "DrawFillRoundRectangle", drawFillRoundRectangle },
+				{ "DrawCircle", drawCircle },
+				{ "DrawFillCircle", drawFillCircle },
+				{ "DrawEllipse", drawEllipse },
+				{ "DrawFillEllipse", drawFillEllipse },
+				{ "DrawPie", drawPie },
+				{ "DrawFillPie", drawFillPie },
+				{ "DrawTriangle", drawTriangle },
+				{ "DrawFillTriangle", drawFillTriangle },
+				{ "LoadFontFromFile", loadFontFromFile },
+				{ "LoadFontFromData", loadFontFromData },
+				{ "GetTextSize", getTextSize },
+				{ "GetUTF8TextSize", getUTF8TextSize },
+				{ "CreateTextImageSolid", createTextImageSolid },
+				{ "CreateUTF8TextImageSolid", createUTF8TextImageSolid },
+				{ "CreateTextImageShaded", createTextImageShaded },
+				{ "CreateUTF8TextImageShaded", createUTF8TextImageShaded },
+				{ "CreateTextImageBlended", createTextImageBlended },
+				{ "CreateUTF8TextImageBlended", createUTF8TextImageBlended },
+			};
+
+			std::vector<ParamEnum> enum_list = {
+				{ "FLIP_HORIZONTAL", FLIP_HORIZONTAL },
+				{ "FLIP_VERTICAL", FLIP_VERTICAL },
+				{ "FLIP_NONE", FLIP_NONE },
+
+				{ "FONT_STYLE_BOLD", FONT_STYLE_BOLD },
+				{ "FONT_STYLE_ITALIC", FONT_STYLE_ITALIC },
+				{ "FONT_STYLE_UNDERLINE", FONT_STYLE_UNDERLINE },
+				{ "FONT_STYLE_STRIKETHROUGH", FONT_STYLE_STRIKETHROUGH },
+				{ "FONT_STYLE_NORMAL", FONT_STYLE_NORMAL },
+			};
+
+			std::vector<MetaTableInfo> metatable_list = {
+				{
+					METANAME_IMAGE,
+					{
+						{ "SetColorKey", image_SetColorKey },
+						{ "GetSize", image_GetSize },
+					},
+					__gc_Image
+				},
+				{
+					METANAME_TEXTURE,
+					{
+						{ "SetAlpha", texture_SetAlpha },
+					},
+					__gc_Texture
+				},
+				{
+					METANAME_FONT,
+					{
+						{ "GetStyle", font_GetStyle },
+						{ "SetStyle", font_SetStyle },
+						{ "GetOutlineWidth", font_GetOutlineWidth },
+						{ "SetOutlineWidth", font_SetOutlineWidth },
+						{ "GetKerning", font_GetKerning },
+						{ "SetKerning", font_SetKerning },
+						{ "GetHeight", font_GetHeight },
+					},
+					__gc_Font
+				},
+			};
+
+			PushPackageData(pLuaVM, func_list, enum_list, metatable_list);
+
+			return 1;
+		}
+	},
+	{ 
+		"@Interactivity",
+		[](lua_State* pLuaVM) -> int
+		{
+			std::vector<luaL_Reg> func_list = {
+				{ "GetCursorPosition", getCursorPosition },
+				{ "GetScrollValue", getScrollValue },
+				{ "StartTextInput", startTextInput },
+				{ "StopTextInput", stopTextInput },
+				{ "GetInputText", getInputText },
+				{ "UpdateEvent", updateEvent },
+				{ "GetEventType", getEventType },
+			};
+
+			std::vector<ParamEnum> enum_list = {
+				{ "EVENT_QUIT", EVENT_QUIT },
+
+				{ "EVENT_MOUSEMOTION", EVENT_MOUSEMOTION },
+				{ "EVENT_MOUSEBTNDOWN_LEFT", EVENT_MOUSEBTNDOWN_LEFT },
+				{ "EVENT_MOUSEBTNDOWN_RIGHT", EVENT_MOUSEBTNDOWN_RIGHT },
+				{ "EVENT_MOUSEBTNDOWN_MIDDLE", EVENT_MOUSEBTNDOWN_MIDDLE },
+				{ "EVENT_MOUSEBTNUP_LEFT", EVENT_MOUSEBTNUP_LEFT },
+				{ "EVENT_MOUSEBTNUP_RIGHT", EVENT_MOUSEBTNUP_RIGHT },
+				{ "EVENT_MOUSEBTNUP_MIDDLE", EVENT_MOUSEBTNUP_MIDDLE },
+				{ "EVENT_MOUSESCROLL", EVENT_MOUSESCROLL },
+
+				{ "EVENT_WINDOW_SHOW", EVENT_WINDOW_SHOW },
+				{ "EVENT_WINDOW_HIDE", EVENT_WINDOW_HIDE },
+				{ "EVENT_WINDOW_MOVE", EVENT_WINDOW_MOVE },
+				{ "EVENT_WINDOW_RESIZE", EVENT_WINDOW_RESIZE },
+				{ "EVENT_WINDOW_MINSIZE", EVENT_WINDOW_MINSIZE },
+				{ "EVENT_WINDOW_MAXSIZE", EVENT_WINDOW_MAXSIZE },
+				{ "EVENT_WINDOW_ENTER", EVENT_WINDOW_ENTER },
+				{ "EVENT_WINDOW_LEAVE", EVENT_WINDOW_LEAVE },
+				{ "EVENT_WINDOW_FOCUS", EVENT_WINDOW_FOCUS },
+				{ "EVENT_WINDOW_LOST", EVENT_WINDOW_LOST },
+				{ "EVENT_WINDOW_CLOSE", EVENT_WINDOW_CLOSE },
+				{ "EVENT_WINDOW_EXPOSED", EVENT_WINDOW_EXPOSED },
+
+				{ "EVENT_KEYDOWN_0", EVENT_KEYDOWN_0 },
+				{ "EVENT_KEYDOWN_00", EVENT_KEYDOWN_00 },
+				{ "EVENT_KEYDOWN_000", EVENT_KEYDOWN_000 },
+				{ "EVENT_KEYDOWN_1", EVENT_KEYDOWN_1 },
+				{ "EVENT_KEYDOWN_2", EVENT_KEYDOWN_2 },
+				{ "EVENT_KEYDOWN_3", EVENT_KEYDOWN_3 },
+				{ "EVENT_KEYDOWN_4", EVENT_KEYDOWN_4 },
+				{ "EVENT_KEYDOWN_5", EVENT_KEYDOWN_5 },
+				{ "EVENT_KEYDOWN_6", EVENT_KEYDOWN_6 },
+				{ "EVENT_KEYDOWN_7", EVENT_KEYDOWN_7 },
+				{ "EVENT_KEYDOWN_8", EVENT_KEYDOWN_8 },
+				{ "EVENT_KEYDOWN_9", EVENT_KEYDOWN_9 },
+				{ "EVENT_KEYDOWN_F1", EVENT_KEYDOWN_F1 },
+				{ "EVENT_KEYDOWN_F2", EVENT_KEYDOWN_F2 },
+				{ "EVENT_KEYDOWN_F3", EVENT_KEYDOWN_F3 },
+				{ "EVENT_KEYDOWN_F4", EVENT_KEYDOWN_F4 },
+				{ "EVENT_KEYDOWN_F5", EVENT_KEYDOWN_F5 },
+				{ "EVENT_KEYDOWN_F6", EVENT_KEYDOWN_F6 },
+				{ "EVENT_KEYDOWN_F7", EVENT_KEYDOWN_F7 },
+				{ "EVENT_KEYDOWN_F8", EVENT_KEYDOWN_F8 },
+				{ "EVENT_KEYDOWN_F9", EVENT_KEYDOWN_F9 },
+				{ "EVENT_KEYDOWN_F10", EVENT_KEYDOWN_F10 },
+				{ "EVENT_KEYDOWN_F11", EVENT_KEYDOWN_F11 },
+				{ "EVENT_KEYDOWN_F12", EVENT_KEYDOWN_F12 },
+				{ "EVENT_KEYDOWN_F13", EVENT_KEYDOWN_F13 },
+				{ "EVENT_KEYDOWN_F14", EVENT_KEYDOWN_F14 },
+				{ "EVENT_KEYDOWN_F15", EVENT_KEYDOWN_F15 },
+				{ "EVENT_KEYDOWN_F16", EVENT_KEYDOWN_F16 },
+				{ "EVENT_KEYDOWN_F17", EVENT_KEYDOWN_F17 },
+				{ "EVENT_KEYDOWN_F18", EVENT_KEYDOWN_F18 },
+				{ "EVENT_KEYDOWN_F19", EVENT_KEYDOWN_F19 },
+				{ "EVENT_KEYDOWN_F20", EVENT_KEYDOWN_F20 },
+				{ "EVENT_KEYDOWN_F21", EVENT_KEYDOWN_F21 },
+				{ "EVENT_KEYDOWN_F22", EVENT_KEYDOWN_F22 },
+				{ "EVENT_KEYDOWN_F23", EVENT_KEYDOWN_F23 },
+				{ "EVENT_KEYDOWN_F24", EVENT_KEYDOWN_F24 },
+				{ "EVENT_KEYDOWN_A", EVENT_KEYDOWN_A },
+				{ "EVENT_KEYDOWN_B", EVENT_KEYDOWN_B },
+				{ "EVENT_KEYDOWN_C", EVENT_KEYDOWN_C },
+				{ "EVENT_KEYDOWN_D", EVENT_KEYDOWN_D },
+				{ "EVENT_KEYDOWN_E", EVENT_KEYDOWN_E },
+				{ "EVENT_KEYDOWN_F", EVENT_KEYDOWN_F },
+				{ "EVENT_KEYDOWN_G", EVENT_KEYDOWN_G },
+				{ "EVENT_KEYDOWN_H", EVENT_KEYDOWN_H },
+				{ "EVENT_KEYDOWN_I", EVENT_KEYDOWN_I },
+				{ "EVENT_KEYDOWN_J", EVENT_KEYDOWN_J },
+				{ "EVENT_KEYDOWN_K", EVENT_KEYDOWN_K },
+				{ "EVENT_KEYDOWN_L", EVENT_KEYDOWN_L },
+				{ "EVENT_KEYDOWN_M", EVENT_KEYDOWN_M },
+				{ "EVENT_KEYDOWN_N", EVENT_KEYDOWN_N },
+				{ "EVENT_KEYDOWN_O", EVENT_KEYDOWN_O },
+				{ "EVENT_KEYDOWN_P", EVENT_KEYDOWN_P },
+				{ "EVENT_KEYDOWN_Q", EVENT_KEYDOWN_Q },
+				{ "EVENT_KEYDOWN_R", EVENT_KEYDOWN_R },
+				{ "EVENT_KEYDOWN_S", EVENT_KEYDOWN_S },
+				{ "EVENT_KEYDOWN_T", EVENT_KEYDOWN_T },
+				{ "EVENT_KEYDOWN_U", EVENT_KEYDOWN_U },
+				{ "EVENT_KEYDOWN_V", EVENT_KEYDOWN_V },
+				{ "EVENT_KEYDOWN_W", EVENT_KEYDOWN_W },
+				{ "EVENT_KEYDOWN_X", EVENT_KEYDOWN_X },
+				{ "EVENT_KEYDOWN_Y", EVENT_KEYDOWN_Y },
+				{ "EVENT_KEYDOWN_Z", EVENT_KEYDOWN_Z },
+				{ "EVENT_KEYDOWN_ESC", EVENT_KEYDOWN_ESC },
+				{ "EVENT_KEYDOWN_ENTER", EVENT_KEYDOWN_ENTER },
+				{ "EVENT_KEYDOWN_BACKSPACE", EVENT_KEYDOWN_BACKSPACE },
+				{ "EVENT_KEYDOWN_UP", EVENT_KEYDOWN_UP },
+				{ "EVENT_KEYDOWN_DOWN", EVENT_KEYDOWN_DOWN },
+				{ "EVENT_KEYDOWN_LEFT", EVENT_KEYDOWN_LEFT },
+				{ "EVENT_KEYDOWN_RIGHT", EVENT_KEYDOWN_RIGHT },
+				{ "EVENT_KEYDOWN_INSERT", EVENT_KEYDOWN_INSERT },
+				{ "EVENT_KEYDOWN_DELETE", EVENT_KEYDOWN_DELETE },
+				{ "EVENT_KEYDOWN_HOME", EVENT_KEYDOWN_HOME },
+				{ "EVENT_KEYDOWN_END", EVENT_KEYDOWN_END },
+				{ "EVENT_KEYDOWN_PAGEUP", EVENT_KEYDOWN_PAGEUP },
+				{ "EVENT_KEYDOWN_PAGEDOWN", EVENT_KEYDOWN_PAGEDOWN },
+				{ "EVENT_KEYDOWN_LEFTCTRL", EVENT_KEYDOWN_LEFTCTRL },
+				{ "EVENT_KEYDOWN_LEFTGUI", EVENT_KEYDOWN_LEFTGUI },
+				{ "EVENT_KEYDOWN_LEFTALT", EVENT_KEYDOWN_LEFTALT },
+				{ "EVENT_KEYDOWN_LEFTSHIFT", EVENT_KEYDOWN_LEFTSHIFT },
+				{ "EVENT_KEYDOWN_RIGHTCTRL", EVENT_KEYDOWN_RIGHTCTRL },
+				{ "EVENT_KEYDOWN_RIGHTGUI", EVENT_KEYDOWN_RIGHTGUI },
+				{ "EVENT_KEYDOWN_RIGHTALT", EVENT_KEYDOWN_RIGHTALT },
+				{ "EVENT_KEYDOWN_RIGHTSHIFT", EVENT_KEYDOWN_RIGHTSHIFT },
+				{ "EVENT_KEYDOWN_SPACE", EVENT_KEYDOWN_SPACE },
+				{ "EVENT_KEYDOWN_TAB", EVENT_KEYDOWN_TAB },
+				{ "EVENT_KEYDOWN_CAPSLOCK", EVENT_KEYDOWN_CAPSLOCK },
+				{ "EVENT_KEYDOWN_NUMLOCK", EVENT_KEYDOWN_NUMLOCK },
+				{ "EVENT_KEYDOWN_PRINTSCREEN", EVENT_KEYDOWN_PRINTSCREEN },
+				{ "EVENT_KEYDOWN_SCROLLLOCK", EVENT_KEYDOWN_SCROLLLOCK },
+				{ "EVENT_KEYDOWN_PAUSE", EVENT_KEYDOWN_PAUSE },
+				{ "EVENT_KEYDOWN_AUDIOMUTE", EVENT_KEYDOWN_AUDIOMUTE },
+				{ "EVENT_KEYDOWN_AUDIOPREV", EVENT_KEYDOWN_AUDIOPREV },
+				{ "EVENT_KEYDOWN_AUDIONEXT", EVENT_KEYDOWN_AUDIONEXT },
+				{ "EVENT_KEYDOWN_AUDIOPLAY", EVENT_KEYDOWN_AUDIOPLAY },
+				{ "EVENT_KEYDOWN_AUDIOSTOP", EVENT_KEYDOWN_AUDIOSTOP },
+				{ "EVENT_KEYDOWN_VOLUMEUP", EVENT_KEYDOWN_VOLUMEUP },
+				{ "EVENT_KEYDOWN_VOLUMEDOWN", EVENT_KEYDOWN_VOLUMEDOWN },
+				{ "EVENT_KEYDOWN_BRIGHTNESSUP", EVENT_KEYDOWN_BRIGHTNESSUP },
+				{ "EVENT_KEYDOWN_BRIGHTNESSDOWN", EVENT_KEYDOWN_BRIGHTNESSDOWN },
+				{ "EVENT_KEYDOWN_BACKQUOTE", EVENT_KEYDOWN_BACKQUOTE },
+				{ "EVENT_KEYDOWN_EXCLAM", EVENT_KEYDOWN_EXCLAM },
+				{ "EVENT_KEYDOWN_AT", EVENT_KEYDOWN_AT },
+				{ "EVENT_KEYDOWN_HASH", EVENT_KEYDOWN_HASH },
+				{ "EVENT_KEYDOWN_DOOLAR", EVENT_KEYDOWN_DOOLAR },
+				{ "EVENT_KEYDOWN_CARET", EVENT_KEYDOWN_CARET },
+				{ "EVENT_KEYDOWN_AMPERSAND", EVENT_KEYDOWN_AMPERSAND },
+				{ "EVENT_KEYDOWN_DBLAMPERSAND", EVENT_KEYDOWN_DBLAMPERSAND },
+				{ "EVENT_KEYDOWN_ASTERISK", EVENT_KEYDOWN_ASTERISK },
+				{ "EVENT_KEYDOWN_LEFTPAREN", EVENT_KEYDOWN_LEFTPAREN },
+				{ "EVENT_KEYDOWN_RIGHTPAREN", EVENT_KEYDOWN_RIGHTPAREN },
+				{ "EVENT_KEYDOWN_MINUS", EVENT_KEYDOWN_MINUS },
+				{ "EVENT_KEYDOWN_UNDERSCORE", EVENT_KEYDOWN_UNDERSCORE },
+				{ "EVENT_KEYDOWN_PLUS", EVENT_KEYDOWN_PLUS },
+				{ "EVENT_KEYDOWN_EQUALS", EVENT_KEYDOWN_EQUALS },
+				{ "EVENT_KEYDOWN_LEFTBRACKET", EVENT_KEYDOWN_LEFTBRACKET },
+				{ "EVENT_KEYDOWN_RIGHTBRACKET", EVENT_KEYDOWN_RIGHTBRACKET },
+				{ "EVENT_KEYDOWN_LEFTBRACE", EVENT_KEYDOWN_LEFTBRACE },
+				{ "EVENT_KEYDOWN_RIGHTBRACE", EVENT_KEYDOWN_RIGHTBRACE },
+				{ "EVENT_KEYDOWN_COLON", EVENT_KEYDOWN_COLON },
+				{ "EVENT_KEYDOWN_SEMICOLON", EVENT_KEYDOWN_SEMICOLON },
+				{ "EVENT_KEYDOWN_BACKSLASH", EVENT_KEYDOWN_BACKSLASH },
+				{ "EVENT_KEYDOWN_QUOTE", EVENT_KEYDOWN_QUOTE },
+				{ "EVENT_KEYDOWN_QUOTEDBL", EVENT_KEYDOWN_QUOTEDBL },
+				{ "EVENT_KEYDOWN_LESS", EVENT_KEYDOWN_LESS },
+				{ "EVENT_KEYDOWN_GREATER", EVENT_KEYDOWN_GREATER },
+				{ "EVENT_KEYDOWN_COMMA", EVENT_KEYDOWN_COMMA },
+				{ "EVENT_KEYDOWN_PERIOD", EVENT_KEYDOWN_PERIOD },
+				{ "EVENT_KEYDOWN_QUESTION", EVENT_KEYDOWN_QUESTION },
+				{ "EVENT_KEYDOWN_SLASH", EVENT_KEYDOWN_SLASH },
+				{ "EVENT_KEYDOWN_VERTICALBAR", EVENT_KEYDOWN_VERTICALBAR },
+				{ "EVENT_KEYDOWN_DBLVERTICALBAR", EVENT_KEYDOWN_DBLVERTICALBAR },
+				{ "EVENT_KEYDOWN_WWW", EVENT_KEYDOWN_WWW },
+				{ "EVENT_KEYDOWN_EMAIL", EVENT_KEYDOWN_EMAIL },
+				{ "EVENT_KEYUP_0", EVENT_KEYUP_0 },
+				{ "EVENT_KEYUP_00", EVENT_KEYUP_00 },
+				{ "EVENT_KEYUP_000", EVENT_KEYUP_000 },
+				{ "EVENT_KEYUP_1", EVENT_KEYUP_1 },
+				{ "EVENT_KEYUP_2", EVENT_KEYUP_2 },
+				{ "EVENT_KEYUP_3", EVENT_KEYUP_3 },
+				{ "EVENT_KEYUP_4", EVENT_KEYUP_4 },
+				{ "EVENT_KEYUP_5", EVENT_KEYUP_5 },
+				{ "EVENT_KEYUP_6", EVENT_KEYUP_6 },
+				{ "EVENT_KEYUP_7", EVENT_KEYUP_7 },
+				{ "EVENT_KEYUP_8", EVENT_KEYUP_8 },
+				{ "EVENT_KEYUP_9", EVENT_KEYUP_9 },
+				{ "EVENT_KEYUP_F1", EVENT_KEYUP_F1 },
+				{ "EVENT_KEYUP_F2", EVENT_KEYUP_F2 },
+				{ "EVENT_KEYUP_F3", EVENT_KEYUP_F3 },
+				{ "EVENT_KEYUP_F4", EVENT_KEYUP_F4 },
+				{ "EVENT_KEYUP_F5", EVENT_KEYUP_F5 },
+				{ "EVENT_KEYUP_F6", EVENT_KEYUP_F6 },
+				{ "EVENT_KEYUP_F7", EVENT_KEYUP_F7 },
+				{ "EVENT_KEYUP_F8", EVENT_KEYUP_F8 },
+				{ "EVENT_KEYUP_F9", EVENT_KEYUP_F9 },
+				{ "EVENT_KEYUP_F10", EVENT_KEYUP_F10 },
+				{ "EVENT_KEYUP_F11", EVENT_KEYUP_F11 },
+				{ "EVENT_KEYUP_F12", EVENT_KEYUP_F12 },
+				{ "EVENT_KEYUP_F13", EVENT_KEYUP_F13 },
+				{ "EVENT_KEYUP_F14", EVENT_KEYUP_F14 },
+				{ "EVENT_KEYUP_F15", EVENT_KEYUP_F15 },
+				{ "EVENT_KEYUP_F16", EVENT_KEYUP_F16 },
+				{ "EVENT_KEYUP_F17", EVENT_KEYUP_F17 },
+				{ "EVENT_KEYUP_F18", EVENT_KEYUP_F18 },
+				{ "EVENT_KEYUP_F19", EVENT_KEYUP_F19 },
+				{ "EVENT_KEYUP_F20", EVENT_KEYUP_F20 },
+				{ "EVENT_KEYUP_F21", EVENT_KEYUP_F21 },
+				{ "EVENT_KEYUP_F22", EVENT_KEYUP_F22 },
+				{ "EVENT_KEYUP_F23", EVENT_KEYUP_F23 },
+				{ "EVENT_KEYUP_F24", EVENT_KEYUP_F24 },
+				{ "EVENT_KEYUP_A", EVENT_KEYUP_A },
+				{ "EVENT_KEYUP_B", EVENT_KEYUP_B },
+				{ "EVENT_KEYUP_C", EVENT_KEYUP_C },
+				{ "EVENT_KEYUP_D", EVENT_KEYUP_D },
+				{ "EVENT_KEYUP_E", EVENT_KEYUP_E },
+				{ "EVENT_KEYUP_F", EVENT_KEYUP_F },
+				{ "EVENT_KEYUP_G", EVENT_KEYUP_G },
+				{ "EVENT_KEYUP_H", EVENT_KEYUP_H },
+				{ "EVENT_KEYUP_I", EVENT_KEYUP_I },
+				{ "EVENT_KEYUP_J", EVENT_KEYUP_J },
+				{ "EVENT_KEYUP_K", EVENT_KEYUP_K },
+				{ "EVENT_KEYUP_L", EVENT_KEYUP_L },
+				{ "EVENT_KEYUP_M", EVENT_KEYUP_M },
+				{ "EVENT_KEYUP_N", EVENT_KEYUP_N },
+				{ "EVENT_KEYUP_O", EVENT_KEYUP_O },
+				{ "EVENT_KEYUP_P", EVENT_KEYUP_P },
+				{ "EVENT_KEYUP_Q", EVENT_KEYUP_Q },
+				{ "EVENT_KEYUP_R", EVENT_KEYUP_R },
+				{ "EVENT_KEYUP_S", EVENT_KEYUP_S },
+				{ "EVENT_KEYUP_T", EVENT_KEYUP_T },
+				{ "EVENT_KEYUP_U", EVENT_KEYUP_U },
+				{ "EVENT_KEYUP_V", EVENT_KEYUP_V },
+				{ "EVENT_KEYUP_W", EVENT_KEYUP_W },
+				{ "EVENT_KEYUP_X", EVENT_KEYUP_X },
+				{ "EVENT_KEYUP_Y", EVENT_KEYUP_Y },
+				{ "EVENT_KEYUP_Z", EVENT_KEYUP_Z },
+				{ "EVENT_KEYUP_ESC", EVENT_KEYUP_ESC },
+				{ "EVENT_KEYUP_ENTER", EVENT_KEYUP_ENTER },
+				{ "EVENT_KEYUP_BACKSPACE", EVENT_KEYUP_BACKSPACE },
+				{ "EVENT_KEYUP_UP", EVENT_KEYUP_UP },
+				{ "EVENT_KEYUP_DOWN", EVENT_KEYUP_DOWN },
+				{ "EVENT_KEYUP_LEFT", EVENT_KEYUP_LEFT },
+				{ "EVENT_KEYUP_RIGHT", EVENT_KEYUP_RIGHT },
+				{ "EVENT_KEYUP_INSERT", EVENT_KEYUP_INSERT },
+				{ "EVENT_KEYUP_DELETE", EVENT_KEYUP_DELETE },
+				{ "EVENT_KEYUP_HOME", EVENT_KEYUP_HOME },
+				{ "EVENT_KEYUP_END", EVENT_KEYUP_END },
+				{ "EVENT_KEYUP_PAGEUP", EVENT_KEYUP_PAGEUP },
+				{ "EVENT_KEYUP_PAGEDOWN", EVENT_KEYUP_PAGEDOWN },
+				{ "EVENT_KEYUP_LEFTCTRL", EVENT_KEYUP_LEFTCTRL },
+				{ "EVENT_KEYUP_LEFTGUI", EVENT_KEYUP_LEFTGUI },
+				{ "EVENT_KEYUP_LEFTALT", EVENT_KEYUP_LEFTALT },
+				{ "EVENT_KEYUP_LEFTSHIFT", EVENT_KEYUP_LEFTSHIFT },
+				{ "EVENT_KEYUP_RIGHTCTRL", EVENT_KEYUP_RIGHTCTRL },
+				{ "EVENT_KEYUP_RIGHTGUI", EVENT_KEYUP_RIGHTGUI },
+				{ "EVENT_KEYUP_RIGHTALT", EVENT_KEYUP_RIGHTALT },
+				{ "EVENT_KEYUP_RIGHTSHIFT", EVENT_KEYUP_RIGHTSHIFT },
+				{ "EVENT_KEYUP_SPACE", EVENT_KEYUP_SPACE },
+				{ "EVENT_KEYUP_TAB", EVENT_KEYUP_TAB },
+				{ "EVENT_KEYUP_CAPSLOCK", EVENT_KEYUP_CAPSLOCK },
+				{ "EVENT_KEYUP_NUMLOCK", EVENT_KEYUP_NUMLOCK },
+				{ "EVENT_KEYUP_PRINTSCREEN", EVENT_KEYUP_PRINTSCREEN },
+				{ "EVENT_KEYUP_SCROLLLOCK", EVENT_KEYUP_SCROLLLOCK },
+				{ "EVENT_KEYUP_PAUSE", EVENT_KEYUP_PAUSE },
+				{ "EVENT_KEYUP_AUDIOMUTE", EVENT_KEYUP_AUDIOMUTE },
+				{ "EVENT_KEYUP_AUDIOPREV", EVENT_KEYUP_AUDIOPREV },
+				{ "EVENT_KEYUP_AUDIONEXT", EVENT_KEYUP_AUDIONEXT },
+				{ "EVENT_KEYUP_AUDIOPLAY", EVENT_KEYUP_AUDIOPLAY },
+				{ "EVENT_KEYUP_AUDIOSTOP", EVENT_KEYUP_AUDIOSTOP },
+				{ "EVENT_KEYUP_VOLUMEUP", EVENT_KEYUP_VOLUMEUP },
+				{ "EVENT_KEYUP_VOLUMEDOWN", EVENT_KEYUP_VOLUMEDOWN },
+				{ "EVENT_KEYUP_BRIGHTNESSUP", EVENT_KEYUP_BRIGHTNESSUP },
+				{ "EVENT_KEYUP_BRIGHTNESSDOWN", EVENT_KEYUP_BRIGHTNESSDOWN },
+				{ "EVENT_KEYUP_BACKQUOTE", EVENT_KEYUP_BACKQUOTE },
+				{ "EVENT_KEYUP_EXCLAM", EVENT_KEYUP_EXCLAM },
+				{ "EVENT_KEYUP_AT", EVENT_KEYUP_AT },
+				{ "EVENT_KEYUP_HASH", EVENT_KEYUP_HASH },
+				{ "EVENT_KEYUP_DOOLAR", EVENT_KEYUP_DOOLAR },
+				{ "EVENT_KEYUP_CARET", EVENT_KEYUP_CARET },
+				{ "EVENT_KEYUP_AMPERSAND", EVENT_KEYUP_AMPERSAND },
+				{ "EVENT_KEYUP_DBLAMPERSAND", EVENT_KEYUP_DBLAMPERSAND },
+				{ "EVENT_KEYUP_ASTERISK", EVENT_KEYUP_ASTERISK },
+				{ "EVENT_KEYUP_LEFTPAREN", EVENT_KEYUP_LEFTPAREN },
+				{ "EVENT_KEYUP_RIGHTPAREN", EVENT_KEYUP_RIGHTPAREN },
+				{ "EVENT_KEYUP_MINUS", EVENT_KEYUP_MINUS },
+				{ "EVENT_KEYUP_UNDERSCORE", EVENT_KEYUP_UNDERSCORE },
+				{ "EVENT_KEYUP_PLUS", EVENT_KEYUP_PLUS },
+				{ "EVENT_KEYUP_EQUALS", EVENT_KEYUP_EQUALS },
+				{ "EVENT_KEYUP_LEFTBRACKET", EVENT_KEYUP_LEFTBRACKET },
+				{ "EVENT_KEYUP_RIGHTBRACKET", EVENT_KEYUP_RIGHTBRACKET },
+				{ "EVENT_KEYUP_LEFTBRACE", EVENT_KEYUP_LEFTBRACE },
+				{ "EVENT_KEYUP_RIGHTBRACE", EVENT_KEYUP_RIGHTBRACE },
+				{ "EVENT_KEYUP_COLON", EVENT_KEYUP_COLON },
+				{ "EVENT_KEYUP_SEMICOLON", EVENT_KEYUP_SEMICOLON },
+				{ "EVENT_KEYUP_BACKSLASH", EVENT_KEYUP_BACKSLASH },
+				{ "EVENT_KEYUP_QUOTE", EVENT_KEYUP_QUOTE },
+				{ "EVENT_KEYUP_QUOTEDBL", EVENT_KEYUP_QUOTEDBL },
+				{ "EVENT_KEYUP_LESS", EVENT_KEYUP_LESS },
+				{ "EVENT_KEYUP_GREATER", EVENT_KEYUP_GREATER },
+				{ "EVENT_KEYUP_COMMA", EVENT_KEYUP_COMMA },
+				{ "EVENT_KEYUP_PERIOD", EVENT_KEYUP_PERIOD },
+				{ "EVENT_KEYUP_QUESTION", EVENT_KEYUP_QUESTION },
+				{ "EVENT_KEYUP_SLASH", EVENT_KEYUP_SLASH },
+				{ "EVENT_KEYUP_VERTICALBAR", EVENT_KEYUP_VERTICALBAR },
+				{ "EVENT_KEYUP_DBLVERTICALBAR", EVENT_KEYUP_DBLVERTICALBAR },
+				{ "EVENT_KEYUP_WWW", EVENT_KEYUP_WWW },
+				{ "EVENT_KEYUP_EMAIL", EVENT_KEYUP_EMAIL },
+
+				{ "EVENT_TEXTINPUT", EVENT_TEXTINPUT },
+			};
+
+			PushPackageData(pLuaVM, func_list, enum_list);
+
+			return 1;
+		}
+	},
+	{ 
+		"@JSON",			
+		[](lua_State* pLuaVM) -> int
+		{
+			std::vector<luaL_Reg> func_list = {
+				{ "LoadJSON", loadJSON },
+				{ "LoadJSONFromFile", loadJSONFromFile },
+				{ "DumpJSON", dumpJSON },
+				{ "DumpJSONToFile", dumpJSONToFile },
+			};
+
+			PushPackageData(pLuaVM, func_list);
+
+			return 1;
+		}
+	},
+	{ 
+		"@Media",			
+		[](lua_State* pLuaVM) -> int
+		{
+			Mix_Init(MIX_INIT_FLAC | MIX_INIT_MOD | MIX_INIT_MP3 | MIX_INIT_OGG);
+			Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+
+			std::vector<luaL_Reg> func_list = {
+				{ "LoadMusic", loadMusic },
+				{ "PlayMusic", playMusic },
+				{ "PlayMusicWithFadeIn", playMusicWithFadeIn },
+				{ "SetMusicPosition", setMusicPosition },
+				{ "SetMusicVolume", setMusicVolume },
+				{ "GetMusicVolume", getMusicVolume },
+				{ "StopMusic", stopMusic },
+				{ "StopMusicWithFadeOut", stopMusicWithFadeOut },
+				{ "PauseMusic", pauseMusic },
+				{ "ResumeMusic", resumeMusic },
+				{ "RewindMusic", rewindMusic },
+				{ "CheckMusicPlaying", checkMusicPlaying },
+				{ "CheckMusicPaused", checkMusicPaused },
+				{ "GetMusicFadingType", getMusicFadingType },
+				{ "LoadSoundFromFile", loadSoundFromFile },
+				{ "LoadSoundFromData", loadSoundFromData },
+			};
+
+			std::vector<ParamEnum> enum_list = {
+				{ "MUSIC_TYPE_WAV", MUSIC_TYPE_WAV },
+				{ "MUSIC_TYPE_MP3", MUSIC_TYPE_MP3 },
+				{ "MUSIC_TYPE_OGG", MUSIC_TYPE_OGG },
+				{ "MUSIC_TYPE_CMD", MUSIC_TYPE_CMD },
+				{ "MUSIC_TYPE_MOD", MUSIC_TYPE_MOD },
+				{ "MUSIC_TYPE_MID", MUSIC_TYPE_MID },
+				{ "MUSIC_TYPE_UNKONWN", MUSIC_TYPE_UNKONWN },
+			};
+
+			std::vector<MetaTableInfo> metatable_list = {
+				{
+					METANAME_MUSIC,
+					{
+						{ "GetType", music_GetType },
+					},
+					__gc_Music
+				},
+				{
+					METANAME_SOUND,
+					{
+						{ "Play", sound_Play },
+						{ "SetVolume", sound_SetVolume },
+					},
+					__gc_Sound
+				},
+			};
+
+			PushPackageData(pLuaVM, func_list, enum_list, metatable_list);
+
+			return 1;
+		}
+	},
+	{ 
+		"@Network",		
+		[](lua_State* pLuaVM) -> int
+		{
+			std::vector<luaL_Reg> func_list = {
+				{ "CreateClient", createClient },
+				{ "CreateServer", createServer },
+				{ "SplitLink", splitLink },
+			};
+
+			std::vector<ParamEnum> enum_list = {
+				{ "ERRCODE_SUCCESS", ERRCODE_SUCCESS },
+				{ "ERRCODE_UNKNOWN", ERRCODE_UNKNOWN },
+				{ "ERRCODE_CONNECTION", ERRCODE_CONNECTION },
+				{ "ERRCODE_BINDIPADDRESS", ERRCODE_BINDIPADDRESS },
+				{ "ERRCODE_READ", ERRCODE_READ },
+				{ "ERRCODE_WRITE", ERRCODE_WRITE },
+				{ "ERRCODE_EXCEEDREDRICTCOUNT", ERRCODE_EXCEEDREDRICTCOUNT },
+				{ "ERRCODE_CANCELED", ERRCODE_CANCELED },
+				{ "ERRCODE_SSLCONNECTION", ERRCODE_SSLCONNECTION },
+				{ "ERRCODE_SSLLOADINGCERTS", ERRCODE_SSLLOADINGCERTS },
+				{ "ERRCODE_SSLSERVERVERIFY", ERRCODE_SSLSERVERVERIFY },
+				{ "ERRCODE_UNSUPPORTEDMBC", ERRCODE_UNSUPPORTEDMBC },
+				{ "ERRCODE_COMPRESSION", ERRCODE_COMPRESSION },
+			};
+
+			std::vector<MetaTableInfo> metatable_list = {
+				{
+					METANAME_CLIENT,
+					{
+						{ "CheckValid", client_CheckValid },
+						{ "Get", client_Get },
+						{ "Post", client_Post },
+						{ "Put", client_Put },
+						{ "Patch", client_Patch },
+						{ "Delete", client_Delete },
+						{ "Options", client_Options },
+						{ "SetDefaultHeaders", client_SetDefaultHeaders },
+						{ "SetConnectTimeout", client_SetConnectTimeout },
+						{ "SetReadTimeout", client_SetReadTimeout },
+						{ "SetWriteTimeout", client_SetWriteTimeout },
+						{ "SetKeepAlive", client_SetKeepAlive },
+						{ "SetFollowRedirect", client_SetFollowRedirect },
+						{ "SetCompressRequest", client_SetCompressRequest },
+						{ "SetCompressResponse", client_SetCompressResponse },
+						{ "SetCACertPath", client_SetCACertPath },
+						{ "SetProxy", client_SetProxy },
+					},
+					__gc_Client
+				},
+				{
+					METANAME_SERVER,
+					{
+						{ "CheckValid", server_CheckValid },
+						{ "CheckRunning", server_CheckRunning },
+						{ "Get", server_Get },
+						{ "Post", server_Post },
+						{ "Put", server_Put },
+						{ "Patch", server_Patch },
+						{ "Delete", server_Delete },
+						{ "Options", server_Options },
+						{ "SetMountPoint", server_SetMountPoint },
+						{ "RemoveMountPoint", server_RemoveMountPoint },
+						{ "SetFileExtMapToMIMEType", server_SetFileExtMapToMIMEType },
+						{ "SetExceptionHandler", server_SetExceptionHandler },
+						{ "SetMaxKeepAliveCount", server_SetMaxKeepAliveCount },
+						{ "SetKeepAliveTimeout", server_SetKeepAliveTimeout },
+						{ "SetReadTimeout", server_SetReadTimeout },
+						{ "SetWriteTimeout", server_SetWriteTimeout },
+						{ "SetIdleInterval", server_SetIdleInterval },
+						{ "SetMaxRequestLength", server_SetMaxRequestLength },
+						{ "BindToAnyPort", server_BindToAnyPort },
+						{ "ListenAfterBind", server_ListenAfterBind },
+						{ "Listen", server_Listen },
+						{ "Stop", server_Stop },
+					},
+					__gc_Server
+				},
+				{
+					METANAME_SERVER_REQ,
+					{
+						{ "GetMethod", request_GetMethod },
+						{ "GetRoute", request_GetRoute },
+						{ "GetHeaders", request_GetHeaders },
+						{ "GetBody", request_GetBody },
+						{ "GetRemoteAddress", request_GetRemoteAddress },
+						{ "GetRemotePort", request_GetRemotePort },
+						{ "GetVersion", request_GetVersion },
+						{ "GetParams", request_GetParams },
+						{ "CheckHeaderKeyExist", request_CheckHeaderKeyExist },
+						{ "GetHeaderValue", request_GetHeaderValue },
+						{ "GetHeaderValueCount", request_GetHeaderValueCount },
+						{ "CheckParamKeyExist", request_CheckParamKeyExist },
+						{ "GetParamValue", request_GetParamValue },
+						{ "GetParamValueCount", request_GetParamValueCount },
+					}
+				},
+				{
+					METANAME_SERVER_RES,
+					{
+						{ "SetVersion", response_SetVersion },
+						{ "SetStatus", response_SetStatus },
+						{ "GetHeaders", response_GetHeaders },
+						{ "SetBody", response_SetBody },
+						{ "CheckHeaderKeyExist", response_CheckHeaderKeyExist },
+						{ "GetHeaderValue", response_GetHeaderValue },
+						{ "GetHeaderValueCount", response_GetHeaderValueCount },
+						{ "SetHeaderValue", response_SetHeaderValue },
+						{ "SetHeaders", response_SetHeaders },
+						{ "SetRedirect", response_SetRedirect },
+						{ "SetContent", response_SetContent },
+					}
+				}
+			};
+
+			PushPackageData(pLuaVM, func_list, enum_list, metatable_list);
+
+			return 1;
+		}
+	},
+	{ 
+		"@OS",			
+		[](lua_State* pLuaVM) -> int
+		{
+			std::vector<luaL_Reg> func_list = {
+				{ "GetBasePath", getBasePath },
+				{ "SetClipboardText", setClipboardText },
+				{ "GetClipboardText", getClipboardText },
+				{ "GetPlatformType", getPlatformType },
+				{ "GetCPUCount", getCPUCount },
+				{ "GetSystemTotalRAM", getSystemTotalRAM },
+				{ "GetAppStorageDirectory", getAppStorageDirectory },
+				{ "GetSpecialPath", getSpecialPath },
+				{ "GetPowerInfo", getPowerInfo },
+				{ "ListDirectory", listDirectory },
+				{ "CheckPathExist", checkPathExist },
+				{ "GetPathInfo", getPathInfo },
+				{ "JoinPath", joinPath },
+				{ "SplitPath", splitPath },
+			};
+
+			std::vector<ParamEnum> enum_list = {
+				{ "FILEATTRIB_ARCH", FILEATTRIB_ARCH },
+				{ "FILEATTRIB_HIDDEN", FILEATTRIB_HIDDEN },
+				{ "FILEATTRIB_NORMAL", FILEATTRIB_NORMAL },
+				{ "FILEATTRIB_RDONLY", FILEATTRIB_RDONLY },
+				{ "FILEATTRIB_SUBDIR", FILEATTRIB_SUBDIR },
+				{ "FILEATTRIB_SYSTEM", FILEATTRIB_SYSTEM },
+
+				{ "PATHMODE_FILE", PATHMODE_FILE },
+				{ "PATHMODE_DIR", PATHMODE_DIR },
+				{ "PATHMODE_FILEANDDIR", PATHMODE_FILEANDDIR },
+
+				{ "POWERSTATE_UNKOWN", POWERSTATE_UNKOWN },
+				{ "POWERSTATE_ONBATTERY", POWERSTATE_ONBATTERY },
+				{ "POWERSTATE_NOBATTERY", POWERSTATE_NOBATTERY },
+				{ "POWERSTATE_CHARGING", POWERSTATE_CHARGING },
+				{ "POWERSTATE_CHARGEDN", POWERSTATE_CHARGEDN },
+
+				{ "PATHATTRIB_DESKTOP", PATHATTRIB_DESKTOP },
+				{ "PATHATTRIB_INTERNET", PATHATTRIB_INTERNET },
+				{ "PATHATTRIB_PROGRAMS", PATHATTRIB_PROGRAMS },
+				{ "PATHATTRIB_CONTROLS", PATHATTRIB_CONTROLS },
+				{ "PATHATTRIB_PRINTERS", PATHATTRIB_PRINTERS },
+				{ "PATHATTRIB_DOCUMENTS", PATHATTRIB_DOCUMENTS },
+				{ "PATHATTRIB_FAVORITES", PATHATTRIB_FAVORITES },
+				{ "PATHATTRIB_STARTUP", PATHATTRIB_STARTUP },
+				{ "PATHATTRIB_RECENT", PATHATTRIB_RECENT },
+				{ "PATHATTRIB_SENDTO", PATHATTRIB_SENDTO },
+				{ "PATHATTRIB_RECYCLEBIN", PATHATTRIB_RECYCLEBIN },
+				{ "PATHATTRIB_STARTMENU", PATHATTRIB_STARTMENU },
+				{ "PATHATTRIB_MUSIC", PATHATTRIB_MUSIC },
+				{ "PATHATTRIB_VIDEO", PATHATTRIB_VIDEO },
+				{ "PATHATTRIB_DRIVES", PATHATTRIB_DRIVES },
+				{ "PATHATTRIB_NETWORK", PATHATTRIB_NETWORK },
+				{ "PATHATTRIB_NETHOOD", PATHATTRIB_NETHOOD },
+				{ "PATHATTRIB_FONTS", PATHATTRIB_FONTS },
+				{ "PATHATTRIB_TEMPLATES", PATHATTRIB_TEMPLATES },
+				{ "PATHATTRIB_COMMON_STARTMENU", PATHATTRIB_COMMON_STARTMENU },
+				{ "PATHATTRIB_COMMON_PROGRAMS", PATHATTRIB_COMMON_PROGRAMS },
+				{ "PATHATTRIB_COMMON_STARTUP", PATHATTRIB_COMMON_STARTUP },
+				{ "PATHATTRIB_COMMON_DESKTOP", PATHATTRIB_COMMON_DESKTOP },
+				{ "PATHATTRIB_APPDATA", PATHATTRIB_APPDATA },
+				{ "PATHATTRIB_PRINTHOOD", PATHATTRIB_PRINTHOOD },
+				{ "PATHATTRIB_LOCAL_APPDATA", PATHATTRIB_LOCAL_APPDATA },
+				{ "PATHATTRIB_COMMON_FAVORITES", PATHATTRIB_COMMON_FAVORITES },
+				{ "PATHATTRIB_INTERNET_CACHE", PATHATTRIB_INTERNET_CACHE },
+				{ "PATHATTRIB_COOKIES", PATHATTRIB_COOKIES },
+				{ "PATHATTRIB_HISTORY", PATHATTRIB_HISTORY },
+				{ "PATHATTRIB_COMMON_APPDATA", PATHATTRIB_COMMON_APPDATA },
+				{ "PATHATTRIB_WINDOWS", PATHATTRIB_WINDOWS },
+				{ "PATHATTRIB_SYSTEM", PATHATTRIB_SYSTEM },
+				{ "PATHATTRIB_PROGRAM_FILES", PATHATTRIB_PROGRAM_FILES },
+				{ "PATHATTRIB_PICTURES", PATHATTRIB_PICTURES },
+				{ "PATHATTRIB_PROFILE", PATHATTRIB_PROFILE },
+				{ "PATHATTRIB_SYSTEMX86", PATHATTRIB_SYSTEMX86 },
+				{ "PATHATTRIB_PROGRAM_FILESX86", PATHATTRIB_PROGRAM_FILESX86 },
+				{ "PATHATTRIB_PROGRAM_FILES_COMMON", PATHATTRIB_PROGRAM_FILES_COMMON },
+				{ "PATHATTRIB_PROGRAM_FILES_COMMONX86", PATHATTRIB_PROGRAM_FILES_COMMONX86 },
+				{ "PATHATTRIB_COMMON_TEMPLATES", PATHATTRIB_COMMON_TEMPLATES },
+				{ "PATHATTRIB_COMMON_DOCUMENTS", PATHATTRIB_COMMON_DOCUMENTS },
+				{ "PATHATTRIB_COMMON_ADMINTOOLS", PATHATTRIB_COMMON_ADMINTOOLS },
+				{ "PATHATTRIB_ADMINTOOLS", PATHATTRIB_ADMINTOOLS },
+				{ "PATHATTRIB_CONNECTIONS", PATHATTRIB_CONNECTIONS },
+				{ "PATHATTRIB_COMMON_MUSIC", PATHATTRIB_COMMON_MUSIC },
+				{ "PATHATTRIB_COMMON_PICTURES", PATHATTRIB_COMMON_PICTURES },
+				{ "PATHATTRIB_COMMON_VIDEO", PATHATTRIB_COMMON_VIDEO },
+				{ "PATHATTRIB_RESOURCES", PATHATTRIB_RESOURCES },
+				{ "PATHATTRIB_RESOURCES_LOCALIZED", PATHATTRIB_RESOURCES_LOCALIZED },
+				{ "PATHATTRIB_COMMON_OEM_LINKS", PATHATTRIB_COMMON_OEM_LINKS },
+				{ "PATHATTRIB_CDBURN_AREA", PATHATTRIB_CDBURN_AREA },
+				{ "PATHATTRIB_COMPUTERSNEARME", PATHATTRIB_COMPUTERSNEARME },
+			};
+
+			PushPackageData(pLuaVM, func_list, enum_list);
+
+			return 1;
+		}
+	},
+	{ 
+		"@String",		
+		[](lua_State* pLuaVM) -> int
+		{
+			std::vector<luaL_Reg> func_list = {
+				{ "GBKToUTF8", gbkToUTF8 },
+				{ "UTF8ToGBK", utf8ToGBK },
+				{ "SubStrUTF8", subStrUTF8 },
+				{ "LenUTF8", lenUTF8 },
+			};
+
+			PushPackageData(pLuaVM, func_list);
+
+			return 1;
+		}
+	},
+	{ 
+		"@Time",			
+		[](lua_State* pLuaVM) -> int
+		{
+			std::vector<luaL_Reg> func_list = {
+				{ "Pause", pause },
+				{ "Sleep", sleep },
+				{ "DynamicSleep", dynamicSleep },
+				{ "GetInitTime", getInitTime },
+				{ "GetAccurateCount", getAccurateCount },
+				{ "GetCounterFrequency", getCounterFrequency },
+			};
+
+			PushPackageData(pLuaVM, func_list);
+
+			return 1;
+		}
+	},
+	{ 
+		"@Window",		
+		[](lua_State* pLuaVM) -> int
+		{
+			std::vector<luaL_Reg> func_list = {
+				{ "ShowMessageBox", showMessageBox},
+				{ "ShowConfirmMessageBox", showConfirmMessageBox},
+				{ "ShowFolderSelector", showFolderSelector},
+				{ "CreateWindow", createWindow },
+				{ "CloseWindow", closeWindow },
+				{ "SetWindowTitle", setWindowTitle },
+				{ "GetWindowTitle", getWindowTitle },
+				{ "SetWindowMode", setWindowMode },
+				{ "SetWindowOpacity", setWindowOpacity },
+				{ "SetWindowSize", setWindowSize },
+				{ "GetWindowSize", getWindowSize },
+				{ "GetWindowDrawableSize", getWindowDrawableSize },
+				{ "SetWindowMaxSize", setWindowMaxSize },
+				{ "GetWindowMaxSize", getWindowMaxSize },
+				{ "SetWindowMinSize", setWindowMinSize },
+				{ "GetWindowMinSize", getWindowMinSize },
+				{ "SetWindowPosition", setWindowPosition },
+				{ "GetWindowPosition", getWindowPosition },
+				{ "SetWindowIcon", setWindowIcon },
+				{ "ClearWindow", clearWindow },
+				{ "UpdateWindow", updateWindow },
+			};
+
+			std::vector<ParamEnum> enum_list = {
+				{ "WINDOW_POSITION_DEFAULT", WINDOW_POSITION_DEFAULT },
+
+				{ "MSGBOX_ERROR", MSGBOX_ERROR },
+				{ "MSGBOX_WARNING", MSGBOX_WARNING },
+				{ "MSGBOX_INFO", MSGBOX_INFO },
+
+				{ "WINDOW_FULLSCREEN", WINDOW_FULLSCREEN },
+				{ "WINDOW_FULLSCREEN_DESKTOP", WINDOW_FULLSCREEN_DESKTOP },
+				{ "WINDOW_BORDERLESS", WINDOW_BORDERLESS },
+				{ "WINDOW_RESIZABLE", WINDOW_RESIZABLE },
+				{ "WINDOW_MAXIMIZED", WINDOW_MAXIMIZED },
+				{ "WINDOW_MINIMIZED", WINDOW_MINIMIZED },
+
+				{ "WINDOW_MODE_WINDOWED", WINDOW_MODE_WINDOWED },
+				{ "WINDOW_MODE_FULLSCREEN", WINDOW_MODE_FULLSCREEN },
+				{ "WINDOW_MODE_FULLSCREEN_DESKTOP", WINDOW_MODE_FULLSCREEN_DESKTOP },
+				{ "WINDOW_MODE_BORDERLESS", WINDOW_MODE_BORDERLESS },
+				{ "WINDOW_MODE_BORDERED", WINDOW_MODE_BORDERED },
+				{ "WINDOW_MODE_RESIZABLE", WINDOW_MODE_RESIZABLE },
+				{ "WINDOW_MODE_SIZEFIXED", WINDOW_MODE_SIZEFIXED },
+			};
+
+			PushPackageData(pLuaVM, func_list, enum_list);
+
+			return 1;
+		}
+	},
+	{ 
+		"@Compress",		
+		[](lua_State* pLuaVM) -> int
+		{
+			std::vector<luaL_Reg> func_list = {
+				{"CompressData", compressData},
+				{"DecompressData", decompressData},
+			};
+
+			PushPackageData(pLuaVM, func_list);
+
+			return 1;
+		}
+	},
+	{
+		"@XML",
+		[](lua_State* pLuaVM) -> int
+		{
+			std::vector<luaL_Reg> func_list = {
+				{ "CreateEmpty", createEmpty },
+				{ "LoadXML", loadXMLFromString },
+				{ "LoadXMLFromFile", loadXMLFromFile },
+				{ "LoadXMLFromData", loadXMLFromData },
+			};
+
+			std::vector<ParamEnum> enum_list = {
+				{ "NODETYPE_EMPTY", NODETYPE_EMPTY },
+				{ "NODETYPE_DOCUMENT", NODETYPE_DOCUMENT },
+				{ "NODETYPE_ELEMENT", NODETYPE_ELEMENT },
+				{ "NODETYPE_PLAINCHARADATA", NODETYPE_PLAINCHARADATA },
+				{ "NODETYPE_CHARADATA", NODETYPE_CHARADATA },
+				{ "NODETYPE_COMMENT", NODETYPE_COMMENT },
+				{ "NODETYPE_PROCESSINS", NODETYPE_PROCESSINS },
+				{ "NODETYPE_DECLARATION", NODETYPE_DECLARATION },
+				{ "NODETYPE_DOCTYPE", NODETYPE_DOCTYPE },
+			};
+
+			std::vector<MetaTableInfo> metatable_list = {
+				{
+					METANAME_DOCUMENT,
+					{
+						{ "GetChild", document_GetChild },
+						{ "AppendChild", document_AppendChild },
+						{ "SaveAsFile", document_SaveAsFile },
+						{ "Traverse", document_Traverse },
+						{ "Print", document_Print },
+					},
+					__gc_Document
+				},
+				{
+					METANAME_NODE,
+					{
+						{ "GetRoot", node_GetRoot },
+						{ "GetParent", node_GetParent },
+						{ "GetNextSibling", node_GetNextSibling },
+						{ "GetPreviousSibling", node_GetPreviousSibling },
+						{ "GetChild", node_GetChild },
+						{ "GetFirstChild", node_GetFirstChild },
+						{ "GetLastChild", node_GetLastChild },
+						{ "GetChildren", node_GetChildren },
+						{ "GetName", node_GetName },
+						{ "GetValue", node_GetValue },
+						{ "GetChildValue", node_GetChildValue },
+						{ "GetType", node_GetType },
+						{ "GetText", node_GetText },
+						{ "GetTextAsInteger", node_GetTextAsInteger },
+						{ "GetTextAsNumber", node_GetTextAsNumber },
+						{ "GetTextAsBoolean", node_GetTextAsBoolean },
+						{ "GetAttribute", node_GetAttribute },
+						{ "GetFirstAttribute", node_GetFirstAttribute },
+						{ "GetLastAttribute", node_GetLastAttribute },
+						{ "GetAttributes", node_GetAttributes },
+						{ "SetName", node_SetName },
+						{ "SetValue", node_SetValue },
+						{ "SetText", node_SetText },
+						{ "SetTextAsInteger", node_SetTextAsInteger },
+						{ "SetTextAsNumber", node_SetTextAsNumber },
+						{ "SetTextAsBoolean", node_SetTextAsBoolean },
+						{ "AppendAttribute", node_AppendAttribute },
+						{ "PrependAttribute", node_PrependAttribute },
+						{ "InsertAttributeAfter", node_InsertAttributeAfter },
+						{ "InsertAttributeBefore", node_InsertAttributeBefore },
+						{ "AppendAttributeCopy", node_AppendAttributeCopy },
+						{ "PrependAttributeCopy", node_PrependAttributeCopy },
+						{ "InsertAttributeCopyAfter", node_InsertAttributeCopyAfter },
+						{ "InsertAttributeCopyBefore", node_InsertAttributeCopyBefore },
+						{ "AppendChild", node_AppendChild },
+						{ "MoveNodeToChildAppend", node_MoveNodeToChildAppend },
+						{ "MoveNodeToChildPrepend", node_MoveNodeToChildPrepend },
+						{ "MoveNodeToChildInsertAfter", node_MoveNodeToChildInsertAfter },
+						{ "MoveNodeToChildInsertBefore", node_MoveNodeToChildInsertBefore },
+						{ "RemoveAttribute", node_RemoveAttribute },
+						{ "RemoveAttributes", node_RemoveAttributes },
+						{ "RemoveChild", node_RemoveChild },
+						{ "RemoveChildren", node_RemoveChildren },
+						{ "FindDirectChild", node_FindDirectChild },
+						{ "FindDescendedChild", node_FindDescendedChild },
+						{ "FindAttribute", node_FindAttribute },
+						{ "Traverse", node_Traverse },
+						{ "Print", node_Print },
+					},
+					__gc_Node
+				},
+				{
+					METANAME_ATTRIBUTE,
+					{
+						{ "GetName", attribute_GetName },
+						{ "GetValue", attribute_GetValue },
+						{ "GetValueAsInteger", attribute_GetValueAsInteger },
+						{ "GetValueAsNumber", attribute_GetValueAsNumber },
+						{ "GetValueAsBoolean", attribute_GetValueAsBoolean },
+						{ "SetName", attribute_SetName },
+						{ "SetValue", attribute_SetValue },
+						{ "SetIntegerValue", attribute_SetIntegerValue },
+						{ "SetNumberValue", attribute_SetNumberValue },
+						{ "SetBooleanValue", attribute_SetBooleanValue },
+						{ "GetNextAttribute", attribute_GetNextAttribute },
+						{ "GetPreviousAttribute", attribute_GetPreviousAttribute },
+					},
+					__gc_Attribute
+				}
+			};
+
+			PushPackageData(pLuaVM, func_list, enum_list, metatable_list);
+
+			return 1;
+		}
+	},
 };
 
 #endif // !_REGISTER_H_

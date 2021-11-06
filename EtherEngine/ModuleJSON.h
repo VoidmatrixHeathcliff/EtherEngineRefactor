@@ -71,21 +71,4 @@ ETHER_API dumpJSON(lua_State* L);
 */
 ETHER_API dumpJSONToFile(lua_State* L);
 
-class ModuleJSON : public Module<ModuleJSON>
-{
-	friend class Module<ModuleJSON>;
-
-private:
-	ModuleJSON()
-	{
-		_vCMethods = {
-			{ "LoadJSON", loadJSON },
-			{ "LoadJSONFromFile", loadJSONFromFile },
-			{ "DumpJSON", dumpJSON },
-			{ "DumpJSONToFile", dumpJSONToFile },
-		};
-	}
-
-};
-
 #endif // !_JSON_H_

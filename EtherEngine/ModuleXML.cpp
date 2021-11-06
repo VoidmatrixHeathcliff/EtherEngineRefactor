@@ -1,7 +1,7 @@
 #include "ModuleXML.h"
 
 
-unordered_map<int, int> ModuleXML::mapNodeType = {
+unordered_map<int, int> mapNodeType = {
 	{ node_null, NODETYPE_EMPTY },
 	{ node_document, NODETYPE_DOCUMENT },
 	{ node_element, NODETYPE_ELEMENT },
@@ -12,6 +12,7 @@ unordered_map<int, int> ModuleXML::mapNodeType = {
 	{ node_declaration, NODETYPE_DECLARATION },
 	{ node_doctype, NODETYPE_DOCTYPE },
 };
+
 
 
 ETHER_API attribute_GetName(lua_State* L)
@@ -358,8 +359,8 @@ ETHER_API node_GetType(lua_State* L)
 #ifdef _ETHER_DEBUG_
 	CheckNodeData(node, 1);
 #endif
-	auto itorType = ModuleXML::mapNodeType.find(node->type());
-	if (itorType != ModuleXML::mapNodeType.end())
+	auto itorType = mapNodeType.find(node->type());
+	if (itorType != mapNodeType.end())
 		lua_pushinteger(L, itorType->second);
 	else
 		lua_pushinteger(L, NODETYPE_EMPTY);

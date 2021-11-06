@@ -37,23 +37,4 @@ ETHER_API getAccurateCount(lua_State* L);
 // 1返回值：计数器频率（number，单位：赫兹）
 ETHER_API getCounterFrequency(lua_State* L);
 
-class ModuleTime : public Module<ModuleTime>
-{
-	friend class Module<ModuleTime>;
-
-private:
-	ModuleTime()
-	{
-		_vCMethods = {
-		{ "Pause", pause },
-		{ "Sleep", sleep },
-		{ "DynamicSleep", dynamicSleep },
-		{ "GetInitTime", getInitTime },
-		{ "GetAccurateCount", getAccurateCount },
-		{ "GetCounterFrequency", getCounterFrequency },
-		};
-	}
-
-};
-
 #endif // !_TIME_H_

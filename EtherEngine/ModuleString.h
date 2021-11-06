@@ -35,21 +35,4 @@ ETHER_API subStrUTF8(lua_State* L);
 */
 ETHER_API lenUTF8(lua_State* L);
 
-class ModuleString : public Module<ModuleString>
-{
-	friend class Module<ModuleString>;
-
-private:
-	ModuleString()
-	{
-		_vCMethods = {
-			{ "GBKToUTF8", gbkToUTF8 },
-			{ "UTF8ToGBK", utf8ToGBK },
-			{ "SubStrUTF8", subStrUTF8 },
-			{ "LenUTF8", lenUTF8 },
-		};
-	}
-
-};
-
 #endif // !_STRING_H_
