@@ -17,9 +17,11 @@
 
 #include <lua.hpp>
 
-#include <utility>
 #include <vector>
 #include <string>
+#include <functional>
+
+typedef std::function<void()> OnExitCallBack;
 
 struct ParamEnum
 {
@@ -27,19 +29,26 @@ struct ParamEnum
 	int value;
 };
 
-struct MetaTableInfo
+struct MetaTableData
 {
 	std::string name;
 	std::vector<luaL_Reg> func_list;
 	lua_CFunction gc_func;
 };
 
-inline void PushPackageData(lua_State* pLuaVM, 
+struct BuiltinPackageData
+{
+	std::string name;
+	lua_CFunction on_load;
+	OnExitCallBack on_exit;
+};
+
+inline void PushBuiltinPackageData(lua_State* pLuaVM, 
 	const std::vector<luaL_Reg>& func_list,
 	const std::vector<ParamEnum> enum_list = std::vector<ParamEnum>(),
-	const std::vector<MetaTableInfo>&metatable_list = std::vector<MetaTableInfo>())
+	const std::vector<MetaTableData>&metatable_list = std::vector<MetaTableData>())
 {
-	for (const MetaTableInfo& mt : metatable_list)
+	for (const MetaTableData& mt : metatable_list)
 	{
 		luaL_newmetatable(pLuaVM, mt.name.c_str());
 
@@ -75,7 +84,7 @@ inline void PushPackageData(lua_State* pLuaVM,
 	}
 }
 
-static const std::vector<std::pair<std::string, lua_CFunction>> BuiltinPackageList = 
+static std::vector<BuiltinPackageData> BuiltinPackageList =
 {
 	{
 		"@Algorithm",
@@ -96,7 +105,7 @@ static const std::vector<std::pair<std::string, lua_CFunction>> BuiltinPackageLi
 				{ "DecodeBase64", decodeBase64 },
 			};
 
-			PushPackageData(pLuaVM, func_list);
+			PushBuiltinPackageData(pLuaVM, func_list);
 
 			return 1;
 		}
@@ -158,7 +167,7 @@ static const std::vector<std::pair<std::string, lua_CFunction>> BuiltinPackageLi
 				{ "FONT_STYLE_NORMAL", FONT_STYLE_NORMAL },
 			};
 
-			std::vector<MetaTableInfo> metatable_list = {
+			std::vector<MetaTableData> metatable_list = {
 				{
 					METANAME_IMAGE,
 					{
@@ -189,9 +198,23 @@ static const std::vector<std::pair<std::string, lua_CFunction>> BuiltinPackageLi
 				},
 			};
 
-			PushPackageData(pLuaVM, func_list, enum_list, metatable_list);
+			PushBuiltinPackageData(pLuaVM, func_list, enum_list, metatable_list);
 
 			return 1;
+		},
+		[]() -> void
+		{
+			TTF_Quit(); IMG_Quit();
+			if (pGlobalRenderer)
+			{
+				SDL_DestroyRenderer(pGlobalRenderer);
+				pGlobalRenderer = nullptr;
+			}
+			if (pGlobalWindow)
+			{
+				SDL_DestroyWindow(pGlobalWindow);
+				pGlobalWindow = nullptr;
+			}
 		}
 	},
 	{ 
@@ -503,7 +526,7 @@ static const std::vector<std::pair<std::string, lua_CFunction>> BuiltinPackageLi
 				{ "EVENT_TEXTINPUT", EVENT_TEXTINPUT },
 			};
 
-			PushPackageData(pLuaVM, func_list, enum_list);
+			PushBuiltinPackageData(pLuaVM, func_list, enum_list);
 
 			return 1;
 		}
@@ -519,7 +542,7 @@ static const std::vector<std::pair<std::string, lua_CFunction>> BuiltinPackageLi
 				{ "DumpJSONToFile", dumpJSONToFile },
 			};
 
-			PushPackageData(pLuaVM, func_list);
+			PushBuiltinPackageData(pLuaVM, func_list);
 
 			return 1;
 		}
@@ -560,7 +583,7 @@ static const std::vector<std::pair<std::string, lua_CFunction>> BuiltinPackageLi
 				{ "MUSIC_TYPE_UNKONWN", MUSIC_TYPE_UNKONWN },
 			};
 
-			std::vector<MetaTableInfo> metatable_list = {
+			std::vector<MetaTableData> metatable_list = {
 				{
 					METANAME_MUSIC,
 					{
@@ -578,9 +601,14 @@ static const std::vector<std::pair<std::string, lua_CFunction>> BuiltinPackageLi
 				},
 			};
 
-			PushPackageData(pLuaVM, func_list, enum_list, metatable_list);
+			PushBuiltinPackageData(pLuaVM, func_list, enum_list, metatable_list);
 
 			return 1;
+		},
+		[]() -> void
+		{
+			Mix_CloseAudio(); Mix_Quit();
+			printf("exit\n");
 		}
 	},
 	{ 
@@ -609,7 +637,7 @@ static const std::vector<std::pair<std::string, lua_CFunction>> BuiltinPackageLi
 				{ "ERRCODE_COMPRESSION", ERRCODE_COMPRESSION },
 			};
 
-			std::vector<MetaTableInfo> metatable_list = {
+			std::vector<MetaTableData> metatable_list = {
 				{
 					METANAME_CLIENT,
 					{
@@ -698,12 +726,12 @@ static const std::vector<std::pair<std::string, lua_CFunction>> BuiltinPackageLi
 				}
 			};
 
-			PushPackageData(pLuaVM, func_list, enum_list, metatable_list);
+			PushBuiltinPackageData(pLuaVM, func_list, enum_list, metatable_list);
 
 			return 1;
 		}
 	},
-	{ 
+	{
 		"@OS",			
 		[](lua_State* pLuaVM) -> int
 		{
@@ -797,7 +825,7 @@ static const std::vector<std::pair<std::string, lua_CFunction>> BuiltinPackageLi
 				{ "PATHATTRIB_COMPUTERSNEARME", PATHATTRIB_COMPUTERSNEARME },
 			};
 
-			PushPackageData(pLuaVM, func_list, enum_list);
+			PushBuiltinPackageData(pLuaVM, func_list, enum_list);
 
 			return 1;
 		}
@@ -813,7 +841,7 @@ static const std::vector<std::pair<std::string, lua_CFunction>> BuiltinPackageLi
 				{ "LenUTF8", lenUTF8 },
 			};
 
-			PushPackageData(pLuaVM, func_list);
+			PushBuiltinPackageData(pLuaVM, func_list);
 
 			return 1;
 		}
@@ -831,7 +859,7 @@ static const std::vector<std::pair<std::string, lua_CFunction>> BuiltinPackageLi
 				{ "GetCounterFrequency", getCounterFrequency },
 			};
 
-			PushPackageData(pLuaVM, func_list);
+			PushBuiltinPackageData(pLuaVM, func_list);
 
 			return 1;
 		}
@@ -887,7 +915,7 @@ static const std::vector<std::pair<std::string, lua_CFunction>> BuiltinPackageLi
 				{ "WINDOW_MODE_SIZEFIXED", WINDOW_MODE_SIZEFIXED },
 			};
 
-			PushPackageData(pLuaVM, func_list, enum_list);
+			PushBuiltinPackageData(pLuaVM, func_list, enum_list);
 
 			return 1;
 		}
@@ -901,7 +929,7 @@ static const std::vector<std::pair<std::string, lua_CFunction>> BuiltinPackageLi
 				{"DecompressData", decompressData},
 			};
 
-			PushPackageData(pLuaVM, func_list);
+			PushBuiltinPackageData(pLuaVM, func_list);
 
 			return 1;
 		}
@@ -929,7 +957,7 @@ static const std::vector<std::pair<std::string, lua_CFunction>> BuiltinPackageLi
 				{ "NODETYPE_DOCTYPE", NODETYPE_DOCTYPE },
 			};
 
-			std::vector<MetaTableInfo> metatable_list = {
+			std::vector<MetaTableData> metatable_list = {
 				{
 					METANAME_DOCUMENT,
 					{
@@ -1015,7 +1043,7 @@ static const std::vector<std::pair<std::string, lua_CFunction>> BuiltinPackageLi
 				}
 			};
 
-			PushPackageData(pLuaVM, func_list, enum_list, metatable_list);
+			PushBuiltinPackageData(pLuaVM, func_list, enum_list, metatable_list);
 
 			return 1;
 		}

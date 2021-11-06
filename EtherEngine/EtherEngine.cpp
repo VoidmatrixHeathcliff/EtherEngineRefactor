@@ -155,7 +155,7 @@ int main(int argc, char** argv)
 	}
 	lua_setglobal(pGlobalLuaVM, "_ARGV");
 	std::vector<std::string>().swap(vCommandList);
-
+	
 	lua_newtable(pGlobalLuaVM);
 	for (int i = 0; environ[i]; i++)
 	{
@@ -168,18 +168,20 @@ int main(int argc, char** argv)
 	lua_setglobal(pGlobalLuaVM, "_ENVP");
 
 	/*
-		设置 Built-in 模块预加载器
+		设置 Built-in Package 数据
 	*/
+	std::vector<function<void()>> vecOnExitCallback;
 	lua_getglobal(pGlobalLuaVM, "package");
 	lua_getfield(pGlobalLuaVM, -1, "preload");
-	for (const std::pair<std::string, lua_CFunction>& module
-		: BuiltinPackageList)
+	for (const BuiltinPackageData& pkg : BuiltinPackageList)
 	{
-		lua_pushstring(pGlobalLuaVM, module.first.c_str());
-		lua_pushcfunction(pGlobalLuaVM, module.second);
+		lua_pushstring(pGlobalLuaVM, pkg.name.c_str());
+		lua_pushcfunction(pGlobalLuaVM, pkg.on_load);
 		lua_settable(pGlobalLuaVM, -3);
+		if (pkg.on_exit) vecOnExitCallback.push_back(pkg.on_exit);
 	}
 	lua_pop(pGlobalLuaVM, 2);
+	std::vector<BuiltinPackageData>().swap(BuiltinPackageList);
 
 	/*
 		设置引擎版本号
@@ -218,18 +220,8 @@ int main(int argc, char** argv)
 	/*
 		释放引擎资源
 	*/
-	TTF_Quit(); IMG_Quit();
-	Mix_CloseAudio(); Mix_Quit();
-	if (pGlobalRenderer)
-	{
-		SDL_DestroyRenderer(pGlobalRenderer);
-		pGlobalRenderer = nullptr;
-	}
-	if (pGlobalWindow)
-	{
-		SDL_DestroyWindow(pGlobalWindow);
-		pGlobalWindow = nullptr;
-	}
+	for (const OnExitCallBack& cb : vecOnExitCallback) cb();
+
 	SDL_Quit();
 
 	return 0;
