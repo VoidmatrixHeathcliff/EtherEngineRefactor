@@ -24,14 +24,10 @@ Window.Create(
         y = Window.DEFAULT_POSITION,
         w = 1280,
         h = 720
-    },
-    {
-        Window.RESIZABLE,
-        Window.MAXIMIZED
     }
 )
 
-print(Window.GetHandle())
+print(Window.GetWindowHandle())
 
 while true do end
 

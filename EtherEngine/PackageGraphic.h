@@ -18,13 +18,7 @@
 
 #define FLIP_HORIZONTAL						1010
 #define FLIP_VERTICAL						1011
-#define FLIP_NONE							1012
-
-#define METANAME_IMAGE						"Graphic.Image"
-#define METANAME_TEXTURE					"Graphic.Texture"
-#define METANAME_FONT						"Graphic.Font"
-
-#define METANAME_HANDLERENDERER				"<SDL_Renderer>-2.0.16"
+#define FLIP_NONE							1012	
 
 #define GetImageDataAt1stPos()				(SDL_Surface*)(*(void**)luaL_checkudata(L, 1, METANAME_IMAGE))
 #define GetTextureDataAt1stPos()			(SDL_Texture*)(*(void**)luaL_checkudata(L, 1, METANAME_TEXTURE))

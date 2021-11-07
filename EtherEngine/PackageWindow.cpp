@@ -11,9 +11,16 @@ static const SDL_MessageBoxColorScheme MsgBoxColorScheme =
 	}
 };
 
-ETHER_API int EAPI_Window_GetHandle(lua_State* pLuaVM)
+ETHER_API int EAPI_Window_GetWindowHandle(lua_State* pLuaVM)
 {
 	EE_PushUserdata<SDL_Window>(pLuaVM, pGlobalWindow, METANAME_HANDLEWINDOW);
+
+	return 1;
+}
+
+ETHER_API int EAPI_Window_GetRendererHandle(lua_State* pLuaVM)
+{
+	EE_PushUserdata<SDL_Renderer>(pLuaVM, pGlobalRenderer, METANAME_HANDLERENDERER);
 
 	return 1;
 }
@@ -66,7 +73,7 @@ ETHER_API int EAPI_Window_ConfirmBox(lua_State* pLuaVM)
 	};
 	SDL_MessageBoxData _msgboxData = 
 	{
-		_flag, pGlobalWindow,
+		(Uint32)_flag, pGlobalWindow,
 		luaL_checkstring(pLuaVM, 2),
 		luaL_checkstring(pLuaVM, 3),
 		2, _btnData, &MsgBoxColorScheme
@@ -88,24 +95,29 @@ ETHER_API int EAPI_Window_Create(lua_State* pLuaVM)
 	EE_CheckRect(pLuaVM, 2, _rect);
 
 	int _flags = SDL_WINDOW_SHOWN;
-	EE_TraverseTable(
-		pLuaVM, 3,
-		[&]() -> bool
-		{
-			switch ((int)lua_tointeger(pLuaVM, -1))
+	if (lua_gettop(pLuaVM) > 2)
+	{
+		luaL_argexpected(pLuaVM, lua_istable(pLuaVM, 3), 3, LUA_TABLIBNAME);
+		EE_TraverseTable(
+			pLuaVM, 3,
+			[&]() -> bool
 			{
-			case WINDOW_FULLSCREEN: _flags |= SDL_WINDOW_FULLSCREEN_DESKTOP; break;
-			case WINDOW_RESIZABLE:	_flags |= SDL_WINDOW_RESIZABLE; break;
-			case WINDOW_MAXIMIZED:	_flags |= SDL_WINDOW_MAXIMIZED; break;
-			case WINDOW_MINIMIZED:	_flags |= SDL_WINDOW_MINIMIZED; break;
-			case WINDOW_WINDOWED:	break;
-			case WINDOW_FIXED:		break;
-			case WINDOW_BORDERED:	break;
-			default:				luaL_argerror(pLuaVM, 3, ERRMSG_INVALIDENUM); break;
+				switch ((int)lua_tointeger(pLuaVM, -1))
+				{
+				case WINDOW_FULLSCREEN: _flags |= SDL_WINDOW_FULLSCREEN_DESKTOP; break;
+				case WINDOW_RESIZABLE:	_flags |= SDL_WINDOW_RESIZABLE; break;
+				case WINDOW_MAXIMIZED:	_flags |= SDL_WINDOW_MAXIMIZED; break;
+				case WINDOW_MINIMIZED:	_flags |= SDL_WINDOW_MINIMIZED; break;
+				case WINDOW_BORDERLESS:	_flags |= SDL_WINDOW_BORDERLESS; break;
+				case WINDOW_WINDOWED:	break;
+				case WINDOW_FIXED:		break;
+				case WINDOW_BORDERED:	break;
+				default:				luaL_argerror(pLuaVM, 3, ERRMSG_INVALIDENUM); break;
+				}
+				return true;
 			}
-			return true;
-		}
-	);
+		);
+	}
 
 	pGlobalWindow = SDL_CreateWindow(
 		luaL_checkstring(pLuaVM, 1), 
@@ -121,8 +133,7 @@ ETHER_API int EAPI_Window_Create(lua_State* pLuaVM)
 	return 0;
 }
 
-
-ETHER_API int EAPI_Window_Close(lua_State* L)
+ETHER_API int EAPI_Window_Close(lua_State* pLuaVM)
 {
 	if (pGlobalRenderer)
 	{
@@ -138,252 +149,143 @@ ETHER_API int EAPI_Window_Close(lua_State* L)
 	return 0;
 }
 
-
-ETHER_API int EAPI_Window_SetTitle(lua_State* L)
+ETHER_API int EAPI_Window_SetTitle(lua_State* pLuaVM)
 {
-	SDL_SetWindowTitle(pGlobalWindow, luaL_checkstring(L, 1));
+	SDL_SetWindowTitle(pGlobalWindow, luaL_checkstring(pLuaVM, 1));
 
 	return 0;
 }
 
-
-ETHER_API int getWindowTitle(lua_State* L)
+ETHER_API int EAPI_Window_GetTitle(lua_State* pLuaVM)
 {
-#ifdef _ETHER_DEBUG_
-	if (!pGlobalWindow)
-		luaL_error(L, "title operation must be done after the window created");
-#endif
+	lua_pushstring(pLuaVM, SDL_GetWindowTitle(pGlobalWindow));
 
-	lua_pushstring(L, SDL_GetWindowTitle(pGlobalWindow));
 	return 1;
 }
 
-
-ETHER_API int setWindowMode(lua_State* L)
+ETHER_API int EAPI_Window_SetStyle(lua_State* pLuaVM)
 {
-#ifdef _ETHER_DEBUG_
-	if (!pGlobalWindow)
-		luaL_error(L, "mode operation must be done after the window created");
-#endif
-
-	switch ((int)luaL_checknumber(L, 1))
+	switch ((int)luaL_checkinteger(pLuaVM, 1))
 	{
-	case WINDOW_WINDOWED:
-		SDL_SetWindowFullscreen(pGlobalWindow, 0);
-		break;
-	case WINDOW_FULLSCREEN:
-		SDL_SetWindowFullscreen(pGlobalWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
-		break;
-	case WINDOW_BORDERLESS:
-		SDL_SetWindowBordered(pGlobalWindow, SDL_FALSE);
-		break;
-	case WINDOW_BORDERED:
-		SDL_SetWindowFullscreen(pGlobalWindow, SDL_TRUE);
-		break;
-	case WINDOW_RESIZABLE:
-		SDL_SetWindowResizable(pGlobalWindow, SDL_TRUE);
-		break;
-	case WINDOW_FIXED:
-		SDL_SetWindowResizable(pGlobalWindow, SDL_FALSE);
-		break;
-	default:
-		luaL_error(L, "bad argument #1 to 'SetWindowMode' (number-MACRO expected, got %s)", luaL_typename(L, -1));
-		break;
+	case WINDOW_WINDOWED:	SDL_SetWindowFullscreen(pGlobalWindow, 0); break;
+	case WINDOW_FULLSCREEN: SDL_SetWindowFullscreen(pGlobalWindow, SDL_WINDOW_FULLSCREEN_DESKTOP); break;
+	case WINDOW_BORDERLESS: SDL_SetWindowBordered(pGlobalWindow, SDL_FALSE); break;
+	case WINDOW_BORDERED:	SDL_SetWindowFullscreen(pGlobalWindow, SDL_TRUE); break;
+	case WINDOW_RESIZABLE:	SDL_SetWindowResizable(pGlobalWindow, SDL_TRUE); break;
+	case WINDOW_MAXIMIZED:	SDL_MaximizeWindow(pGlobalWindow); break;
+	case WINDOW_MINIMIZED:	SDL_MinimizeWindow(pGlobalWindow); break;
+	case WINDOW_FIXED:		SDL_SetWindowResizable(pGlobalWindow, SDL_FALSE); break;
+	default:				luaL_argerror(pLuaVM, 1, ERRMSG_INVALIDENUM); break;
 	}
 
 	return 0;
 }
 
-
-ETHER_API int setWindowOpacity(lua_State* L)
+ETHER_API int EAPI_Window_SetOpacity(lua_State* pLuaVM)
 {
-#ifdef _ETHER_DEBUG_
-	if (!pGlobalWindow)
-		luaL_error(L, "opacity operation must be done after the window created");
-#endif
-
-	SDL_SetWindowOpacity(pGlobalWindow, luaL_checknumber(L, 1));
+	SDL_SetWindowOpacity(pGlobalWindow, (float)luaL_checknumber(pLuaVM, 1));
 
 	return 0;
 }
 
-
-ETHER_API int setWindowSize(lua_State* L)
+ETHER_API int EAPI_Window_SetSize(lua_State* pLuaVM)
 {
-#ifdef _ETHER_DEBUG_
-	if (!pGlobalWindow)
-		luaL_error(L, "size operation must be done after the window created");
-#endif
-
-	SDL_SetWindowSize(pGlobalWindow, luaL_checknumber(L, 1), luaL_checknumber(L, 2));
+	SDL_SetWindowSize(pGlobalWindow, (int)luaL_checknumber(pLuaVM, 1), 
+		(int)luaL_checknumber(pLuaVM, 2));
 
 	return 0;
 }
 
-
-ETHER_API int getWindowSize(lua_State* L)
+ETHER_API int EAPI_Window_GetSize(lua_State* pLuaVM)
 {
-#ifdef _ETHER_DEBUG_
-	if (!pGlobalWindow)
-		luaL_error(L, "size operation must be done after the window created");
-#endif
-
-	int width = 0, height = 0;
-	SDL_GetWindowSize(pGlobalWindow, &width, &height);
-	lua_pushnumber(L, width);
-	lua_pushnumber(L, height);
+	int _width = 0, _height = 0;
+	SDL_GetWindowSize(pGlobalWindow, &_width, &_height);
+	lua_pushinteger(pLuaVM, _width); lua_pushinteger(pLuaVM, _height);
 
 	return 2;
 }
 
-
-ETHER_API int getWindowDrawableSize(lua_State* L)
+ETHER_API int EAPI_Window_GetDrawableSize(lua_State* pLuaVM)
 {
-#ifdef _ETHER_DEBUG_
-	if (!pGlobalWindow)
-		luaL_error(L, "size operation must be done after the window created");
-#endif
-
-	int width = 0, height = 0;
-	SDL_GetRendererOutputSize(pGlobalRenderer, &width, &height);
-	lua_pushnumber(L, width);
-	lua_pushnumber(L, height);
+	int _width = 0, _height = 0;
+	SDL_GetRendererOutputSize(pGlobalRenderer, &_width, &_height);
+	lua_pushinteger(pLuaVM, _width); lua_pushinteger(pLuaVM, _height);
 
 	return 2;
 }
 
-
-ETHER_API int setWindowMaxSize(lua_State* L)
+ETHER_API int EAPI_Window_SetMaxSize(lua_State* pLuaVM)
 {
-#ifdef _ETHER_DEBUG_
-	if (!pGlobalWindow)
-		luaL_error(L, "size operation must be done after the window created");
-#endif
-
-	SDL_SetWindowMaximumSize(pGlobalWindow, luaL_checknumber(L, 1), luaL_checknumber(L, 2));
+	SDL_SetWindowMaximumSize(pGlobalWindow, (int)luaL_checknumber(pLuaVM, 1), 
+		(int)luaL_checknumber(pLuaVM, 2));
 
 	return 0;
 }
 
-
-ETHER_API int getWindowMaxSize(lua_State* L)
+ETHER_API int EAPI_Window_GetMaxSize(lua_State* pLuaVM)
 {
-#ifdef _ETHER_DEBUG_
-	if (!pGlobalWindow)
-		luaL_error(L, "size operation must be done after the window created");
-#endif
-
-	int width = 0, height = 0;
-	SDL_GetWindowMaximumSize(pGlobalWindow, &width, &height);
-	lua_pushnumber(L, width);
-	lua_pushnumber(L, height);
+	int _width = 0, _height = 0;
+	SDL_GetWindowMaximumSize(pGlobalWindow, &_width, &_height);
+	lua_pushnumber(pLuaVM, _width); lua_pushnumber(pLuaVM, _height);
 
 	return 2;
 }
 
-
-ETHER_API int setWindowMinSize(lua_State* L)
+ETHER_API int EAPI_Window_SetMinSize(lua_State* pLuaVM)
 {
-#ifdef _ETHER_DEBUG_
-	if (!pGlobalWindow)
-		luaL_error(L, "size operation must be done after the window created");
-#endif
-
-	SDL_SetWindowMinimumSize(pGlobalWindow, luaL_checknumber(L, 1), luaL_checknumber(L, 2));
+	SDL_SetWindowMinimumSize(pGlobalWindow, (int)luaL_checknumber(pLuaVM, 1),
+		(int)luaL_checknumber(pLuaVM, 2));
 
 	return 0;
 }
 
-
-ETHER_API int getWindowMinSize(lua_State* L)
+ETHER_API int EAPI_Window_GetMinSize(lua_State* pLuaVM)
 {
-#ifdef _ETHER_DEBUG_
-	if (!pGlobalWindow)
-		luaL_error(L, "size operation must be done after the window created");
-#endif
-
-	int width = 0, height = 0;
-	SDL_GetWindowMinimumSize(pGlobalWindow, &width, &height);
-	lua_pushnumber(L, width);
-	lua_pushnumber(L, height);
+	int _width = 0, _height = 0;
+	SDL_GetWindowMinimumSize(pGlobalWindow, &_width, &_height);
+	lua_pushnumber(pLuaVM, _width); lua_pushnumber(pLuaVM, _height);
 
 	return 2;
 }
 
-
-ETHER_API int setWindowPosition(lua_State* L)
+ETHER_API int EAPI_Window_SetPosition(lua_State* pLuaVM)
 {
-#ifdef _ETHER_DEBUG_
-	if (!pGlobalWindow)
-		luaL_error(L, "position operation must be done after the window created");
-#endif
-
-	SDL_Point point;
-#ifdef _ETHER_DEBUG_
-	CheckPointParam(L, 1, point);
-#else
-	EE_CheckPoint(L, 1, point);
-#endif
-	SDL_SetWindowPosition(pGlobalWindow, point.x, point.y);
+	SDL_SetWindowPosition(pGlobalWindow, (int)luaL_checknumber(pLuaVM, 1), 
+		(int)luaL_checknumber(pLuaVM, 2));
 
 	return 0;
 }
 
 
-ETHER_API int getWindowPosition(lua_State* L)
+ETHER_API int EAPI_Window_GetPosition(lua_State* pLuaVM)
 {
-#ifdef _ETHER_DEBUG_
-	if (!pGlobalWindow)
-		luaL_error(L, "position operation must be done after the window created");
-#endif
+	int _x = 0, _y = 0;
+	SDL_GetWindowPosition(pGlobalWindow, &_x, &_y);
+	lua_pushnumber(pLuaVM, _x); lua_pushnumber(pLuaVM, _y);
 
-	SDL_Point point;
-	SDL_GetWindowPosition(pGlobalWindow, &point.x, &point.y);
-	lua_newtable(L);
-	lua_pushstring(L, "x");
-	lua_pushnumber(L, point.x);
-	lua_settable(L, -3);
-	lua_pushstring(L, "y");
-	lua_pushnumber(L, point.y);
-	lua_settable(L, -3);
-
-	return 1;
+	return 2;
 }
 
-ETHER_API int setWindowIcon(lua_State* L)
+ETHER_API int EAPI_Window_SetIcon(lua_State* pLuaVM)
 {
-#ifdef _ETHER_DEBUG_
-	if (!pGlobalWindow)
-		luaL_error(L, "icon operation must be done after the window created");
-#endif
+	SDL_Surface* _surface = EE_ToUserdata<SDL_Surface>(pLuaVM, 1, METANAME_IMAGE);
 
-	SDL_Surface* surface = (SDL_Surface*)(*(void**)luaL_checkudata(L, 1, METANAME_IMAGE));
-	SDL_SetWindowIcon(pGlobalWindow, surface);
+	SDL_SetWindowIcon(pGlobalWindow, _surface);
 
 	return 0;
 }
 
 
-ETHER_API int clearWindow(lua_State* L)
+ETHER_API int EAPI_Window_Clear(lua_State* pLuaVM)
 {
-#ifdef _ETHER_DEBUG_
-	if (!pGlobalWindow)
-		luaL_error(L, "clear operation must be done after the window created");
-#endif
-
 	SDL_RenderClear(pGlobalRenderer);
 
 	return 0;
 }
 
 
-ETHER_API int updateWindow(lua_State* L)
+ETHER_API int EAPI_Window_Update(lua_State* pLuaVM)
 {
-#ifdef _ETHER_DEBUG_
-	if (!pGlobalWindow)
-		luaL_error(L, "update operation must be done after the window created");
-#endif
-
 	SDL_RenderPresent(pGlobalRenderer);
 
 	return 0;
