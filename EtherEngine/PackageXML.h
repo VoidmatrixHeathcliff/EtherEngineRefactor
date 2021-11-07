@@ -1,8 +1,7 @@
 #ifndef _MODULE_XML_H_
 #define _MODULE_XML_H_
 
-#include "Module.h"
-#include "Macros.h"
+#include "Config.h"
 
 #include <lua.hpp>
 #include <pugixml.hpp>
@@ -118,150 +117,150 @@ struct XML_Writer : xml_writer
 	}
 };
 
-ETHER_API attribute_GetName(lua_State* L);
+ETHER_API int attribute_GetName(lua_State* L);
 
-ETHER_API attribute_GetValue(lua_State* L);
+ETHER_API int attribute_GetValue(lua_State* L);
 
-ETHER_API attribute_GetValueAsInteger(lua_State* L);
+ETHER_API int attribute_GetValueAsInteger(lua_State* L);
 
-ETHER_API attribute_GetValueAsNumber(lua_State* L);
+ETHER_API int attribute_GetValueAsNumber(lua_State* L);
 
-ETHER_API attribute_GetValueAsBoolean(lua_State* L);
+ETHER_API int attribute_GetValueAsBoolean(lua_State* L);
 
-ETHER_API attribute_SetName(lua_State* L);
+ETHER_API int attribute_SetName(lua_State* L);
 
-ETHER_API attribute_SetValue(lua_State* L);
+ETHER_API int attribute_SetValue(lua_State* L);
 
-ETHER_API attribute_SetIntegerValue(lua_State* L);
+ETHER_API int attribute_SetIntegerValue(lua_State* L);
 
-ETHER_API attribute_SetNumberValue(lua_State* L);
+ETHER_API int attribute_SetNumberValue(lua_State* L);
 
-ETHER_API attribute_SetBooleanValue(lua_State* L);
+ETHER_API int attribute_SetBooleanValue(lua_State* L);
 
-ETHER_API attribute_GetNextAttribute(lua_State* L);
+ETHER_API int attribute_GetNextAttribute(lua_State* L);
 
-ETHER_API attribute_GetPreviousAttribute(lua_State* L);
+ETHER_API int attribute_GetPreviousAttribute(lua_State* L);
 
-ETHER_API __gc_Attribute(lua_State* L);
+ETHER_API int __gc_Attribute(lua_State* L);
 
-ETHER_API node_GetRoot(lua_State* L);
+ETHER_API int node_GetRoot(lua_State* L);
 
-ETHER_API node_GetParent(lua_State* L);
+ETHER_API int node_GetParent(lua_State* L);
 
-ETHER_API node_GetNextSibling(lua_State* L);
+ETHER_API int node_GetNextSibling(lua_State* L);
 
-ETHER_API node_GetPreviousSibling(lua_State* L);
+ETHER_API int node_GetPreviousSibling(lua_State* L);
 
-ETHER_API node_GetChild(lua_State* L);
+ETHER_API int node_GetChild(lua_State* L);
 
-ETHER_API node_GetChildByAttribute(lua_State* L);
+ETHER_API int node_GetChildByAttribute(lua_State* L);
 
-ETHER_API node_GetFirstChild(lua_State* L);
+ETHER_API int node_GetFirstChild(lua_State* L);
 
-ETHER_API node_GetLastChild(lua_State* L);
+ETHER_API int node_GetLastChild(lua_State* L);
 
-ETHER_API node_GetChildren(lua_State* L);
+ETHER_API int node_GetChildren(lua_State* L);
 
-ETHER_API node_GetName(lua_State* L);
+ETHER_API int node_GetName(lua_State* L);
 
-ETHER_API node_GetValue(lua_State* L);
+ETHER_API int node_GetValue(lua_State* L);
 
-ETHER_API node_GetChildValue(lua_State* L);
+ETHER_API int node_GetChildValue(lua_State* L);
 
-ETHER_API node_GetType(lua_State* L);
+ETHER_API int node_GetType(lua_State* L);
 
-ETHER_API node_GetText(lua_State* L);
+ETHER_API int node_GetText(lua_State* L);
 
-ETHER_API node_GetTextAsInteger(lua_State* L);
+ETHER_API int node_GetTextAsInteger(lua_State* L);
 
-ETHER_API node_GetTextAsNumber(lua_State* L);
+ETHER_API int node_GetTextAsNumber(lua_State* L);
 
-ETHER_API node_GetTextAsBoolean(lua_State* L);
+ETHER_API int node_GetTextAsBoolean(lua_State* L);
 
-ETHER_API node_GetAttribute(lua_State* L);
+ETHER_API int node_GetAttribute(lua_State* L);
 
-ETHER_API node_GetFirstAttribute(lua_State* L);
+ETHER_API int node_GetFirstAttribute(lua_State* L);
 
-ETHER_API node_GetLastAttribute(lua_State* L);
+ETHER_API int node_GetLastAttribute(lua_State* L);
 
-ETHER_API node_GetAttributes(lua_State* L);
+ETHER_API int node_GetAttributes(lua_State* L);
 
-ETHER_API node_SetName(lua_State* L);
+ETHER_API int node_SetName(lua_State* L);
 
-ETHER_API node_SetValue(lua_State* L);
+ETHER_API int node_SetValue(lua_State* L);
 
-ETHER_API node_SetText(lua_State* L);
+ETHER_API int node_SetText(lua_State* L);
 
-ETHER_API node_SetTextAsInteger(lua_State* L);
+ETHER_API int node_SetTextAsInteger(lua_State* L);
 
-ETHER_API node_SetTextAsNumber(lua_State* L);
+ETHER_API int node_SetTextAsNumber(lua_State* L);
 
-ETHER_API node_SetTextAsBoolean(lua_State* L);
+ETHER_API int node_SetTextAsBoolean(lua_State* L);
 
-ETHER_API node_AppendAttribute(lua_State* L);
+ETHER_API int node_AppendAttribute(lua_State* L);
 
-ETHER_API node_PrependAttribute(lua_State* L);
+ETHER_API int node_PrependAttribute(lua_State* L);
 
-ETHER_API node_InsertAttributeAfter(lua_State* L);
+ETHER_API int node_InsertAttributeAfter(lua_State* L);
 
-ETHER_API node_InsertAttributeBefore(lua_State* L);
+ETHER_API int node_InsertAttributeBefore(lua_State* L);
 
-ETHER_API node_AppendAttributeCopy(lua_State* L);
+ETHER_API int node_AppendAttributeCopy(lua_State* L);
 
-ETHER_API node_PrependAttributeCopy(lua_State* L);
+ETHER_API int node_PrependAttributeCopy(lua_State* L);
 
-ETHER_API node_InsertAttributeCopyAfter(lua_State* L);
+ETHER_API int node_InsertAttributeCopyAfter(lua_State* L);
 
-ETHER_API node_InsertAttributeCopyBefore(lua_State* L);
+ETHER_API int node_InsertAttributeCopyBefore(lua_State* L);
 
-ETHER_API node_AppendChild(lua_State* L);
+ETHER_API int node_AppendChild(lua_State* L);
 
-ETHER_API node_MoveNodeToChildAppend(lua_State* L);
+ETHER_API int node_MoveNodeToChildAppend(lua_State* L);
 
-ETHER_API node_MoveNodeToChildPrepend(lua_State* L);
+ETHER_API int node_MoveNodeToChildPrepend(lua_State* L);
 
-ETHER_API node_MoveNodeToChildInsertAfter(lua_State* L);
+ETHER_API int node_MoveNodeToChildInsertAfter(lua_State* L);
 
-ETHER_API node_MoveNodeToChildInsertBefore(lua_State* L);
+ETHER_API int node_MoveNodeToChildInsertBefore(lua_State* L);
 
-ETHER_API node_RemoveAttribute(lua_State* L);
+ETHER_API int node_RemoveAttribute(lua_State* L);
 
-ETHER_API node_RemoveAttributes(lua_State* L);
+ETHER_API int node_RemoveAttributes(lua_State* L);
 
-ETHER_API node_RemoveChild(lua_State* L);
+ETHER_API int node_RemoveChild(lua_State* L);
 
-ETHER_API node_RemoveChildren(lua_State* L);
+ETHER_API int node_RemoveChildren(lua_State* L);
 
-ETHER_API node_FindDirectChild(lua_State* L);
+ETHER_API int node_FindDirectChild(lua_State* L);
 
-ETHER_API node_FindDescendedChild(lua_State* L);
+ETHER_API int node_FindDescendedChild(lua_State* L);
 
-ETHER_API node_FindAttribute(lua_State* L);
+ETHER_API int node_FindAttribute(lua_State* L);
 
-ETHER_API node_Traverse(lua_State* L);
+ETHER_API int node_Traverse(lua_State* L);
 
-ETHER_API node_Print(lua_State* L);
+ETHER_API int node_Print(lua_State* L);
 
-ETHER_API __gc_Node(lua_State* L);
+ETHER_API int __gc_Node(lua_State* L);
 
-ETHER_API document_GetChild(lua_State* L);
+ETHER_API int document_GetChild(lua_State* L);
 
-ETHER_API document_AppendChild(lua_State* L);
+ETHER_API int document_AppendChild(lua_State* L);
 
-ETHER_API document_SaveAsFile(lua_State* L);
+ETHER_API int document_SaveAsFile(lua_State* L);
 
-ETHER_API document_Traverse(lua_State* L);
+ETHER_API int document_Traverse(lua_State* L);
 
-ETHER_API document_Print(lua_State* L);
+ETHER_API int document_Print(lua_State* L);
 
-ETHER_API __gc_Document(lua_State* L);
+ETHER_API int __gc_Document(lua_State* L);
 
-ETHER_API createEmpty(lua_State* L);
+ETHER_API int createEmpty(lua_State* L);
 
-ETHER_API loadXMLFromString(lua_State* L);
+ETHER_API int loadXMLFromString(lua_State* L);
 
-ETHER_API loadXMLFromFile(lua_State* L);
+ETHER_API int loadXMLFromFile(lua_State* L);
 
-ETHER_API loadXMLFromData(lua_State* L);
+ETHER_API int loadXMLFromData(lua_State* L);
 
 #endif // !_MODULE_XML_H_

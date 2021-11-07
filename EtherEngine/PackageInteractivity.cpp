@@ -1,4 +1,4 @@
-#include "ModuleInteractivity.h"
+#include "PackageInteractivity.h"
 
 
 unordered_map<int, unordered_map<int, int>> mapMultiEventList = {
@@ -399,7 +399,7 @@ int Get2ndLevelValue(int firstLevelKey)
 }
 
 
-ETHER_API getCursorPosition(lua_State * L)
+ETHER_API int getCursorPosition(lua_State * L)
 {
 	lua_newtable(L);
 	lua_pushstring(L, "x");
@@ -412,7 +412,7 @@ ETHER_API getCursorPosition(lua_State * L)
 }
 
 
-ETHER_API getScrollValue(lua_State * L)
+ETHER_API int getScrollValue(lua_State * L)
 {
 	lua_pushnumber(L, event.wheel.x);
 	lua_pushnumber(L, event.wheel.y);
@@ -420,28 +420,28 @@ ETHER_API getScrollValue(lua_State * L)
 }
 
 
-ETHER_API startTextInput(lua_State* L)
+ETHER_API int startTextInput(lua_State* L)
 {
 	SDL_StartTextInput();
 	return 0;
 }
 
 
-ETHER_API stopTextInput(lua_State* L)
+ETHER_API int stopTextInput(lua_State* L)
 {
 	SDL_StopTextInput();
 	return 0;
 }
 
 
-ETHER_API getInputText(lua_State* L)
+ETHER_API int getInputText(lua_State* L)
 {
 	lua_pushstring(L, event.text.text);
 	return 1;
 }
 
 
-ETHER_API updateEvent(lua_State* L)
+ETHER_API int updateEvent(lua_State* L)
 {
 	lua_pushboolean(L, SDL_PollEvent(&event));
 
@@ -452,7 +452,7 @@ ETHER_API updateEvent(lua_State* L)
 }
 
 
-ETHER_API getEventType(lua_State * L)
+ETHER_API int getEventType(lua_State * L)
 {
 	auto itorSingle = mapSingleEventList.find(event.type);
 	if (itorSingle != mapSingleEventList.end())

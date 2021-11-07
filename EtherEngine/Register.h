@@ -1,19 +1,19 @@
 #ifndef _REGISTER_H_
 #define _REGISTER_H_
 
-#include "Module.h"
-#include "ModuleWindow.h"
-#include "ModuleGraphic.h"
-#include "ModuleMedia.h"
-#include "ModuleInteractivity.h"
-#include "ModuleTime.h"
-#include "ModuleOS.h"
-#include "ModuleAlgorithm.h"
-#include "ModuleNetwork.h"
-#include "ModuleString.h"
-#include "ModuleJSON.h"
-#include "ModuleCompress.h"
-#include "ModuleXML.h"
+#include "PackageWindow.h"
+#include "PackageGraphic.h"
+#include "PackageMedia.h"
+#include "PackageInteractivity.h"
+#include "PackageTime.h"
+#include "PackageOS.h"
+#include "PackageAlgorithm.h"
+#include "PackageNetwork.h"
+#include "PackageString.h"
+#include "PackageJSON.h"
+#include "PackageCompress.h"
+#include "PackageXML.h"
+#include "PackageDebug.h"
 
 #include <lua.hpp>
 
@@ -43,7 +43,7 @@ struct BuiltinPackageData
 	OnExitCallBack on_exit;
 };
 
-inline void PushBuiltinPackageData(lua_State* pLuaVM, 
+inline void EE_PushBuiltinPackageData(lua_State* pLuaVM, 
 	const std::vector<luaL_Reg>& func_list,
 	const std::vector<ParamEnum> enum_list = std::vector<ParamEnum>(),
 	const std::vector<MetaTableData>&metatable_list = std::vector<MetaTableData>())
@@ -52,19 +52,25 @@ inline void PushBuiltinPackageData(lua_State* pLuaVM,
 	{
 		luaL_newmetatable(pLuaVM, mt.name.c_str());
 
-		lua_pushstring(pLuaVM, "__index");
-		lua_newtable(pLuaVM);
-		for (const luaL_Reg& func : mt.func_list)
+		if (!mt.func_list.empty())
 		{
-			lua_pushstring(pLuaVM, func.name);
-			lua_pushcfunction(pLuaVM, func.func);
+			lua_pushstring(pLuaVM, "__index");
+			lua_newtable(pLuaVM);
+			for (const luaL_Reg& func : mt.func_list)
+			{
+				lua_pushstring(pLuaVM, func.name);
+				lua_pushcfunction(pLuaVM, func.func);
+				lua_settable(pLuaVM, -3);
+			}
 			lua_settable(pLuaVM, -3);
 		}
-		lua_settable(pLuaVM, -3);
-
-		lua_pushstring(pLuaVM, "__gc");
-		lua_pushcfunction(pLuaVM, mt.gc_func);
-		lua_settable(pLuaVM, -3);
+		
+		if (mt.gc_func)
+		{
+			lua_pushstring(pLuaVM, "__gc");
+			lua_pushcfunction(pLuaVM, mt.gc_func);
+			lua_settable(pLuaVM, -3);
+		}
 	}
 
 	lua_newtable(pLuaVM);
@@ -105,7 +111,7 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 				{ "DecodeBase64", decodeBase64 },
 			};
 
-			PushBuiltinPackageData(pLuaVM, func_list);
+			EE_PushBuiltinPackageData(pLuaVM, func_list);
 
 			return 1;
 		}
@@ -198,23 +204,14 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 				},
 			};
 
-			PushBuiltinPackageData(pLuaVM, func_list, enum_list, metatable_list);
+			EE_PushBuiltinPackageData(pLuaVM, func_list, enum_list, metatable_list);
 
 			return 1;
 		},
 		[]() -> void
 		{
-			TTF_Quit(); IMG_Quit();
-			if (pGlobalRenderer)
-			{
-				SDL_DestroyRenderer(pGlobalRenderer);
-				pGlobalRenderer = nullptr;
-			}
-			if (pGlobalWindow)
-			{
-				SDL_DestroyWindow(pGlobalWindow);
-				pGlobalWindow = nullptr;
-			}
+			TTF_Quit(); 
+			IMG_Quit();
 		}
 	},
 	{ 
@@ -526,7 +523,7 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 				{ "EVENT_TEXTINPUT", EVENT_TEXTINPUT },
 			};
 
-			PushBuiltinPackageData(pLuaVM, func_list, enum_list);
+			EE_PushBuiltinPackageData(pLuaVM, func_list, enum_list);
 
 			return 1;
 		}
@@ -542,7 +539,7 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 				{ "DumpJSONToFile", dumpJSONToFile },
 			};
 
-			PushBuiltinPackageData(pLuaVM, func_list);
+			EE_PushBuiltinPackageData(pLuaVM, func_list);
 
 			return 1;
 		}
@@ -601,14 +598,13 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 				},
 			};
 
-			PushBuiltinPackageData(pLuaVM, func_list, enum_list, metatable_list);
+			EE_PushBuiltinPackageData(pLuaVM, func_list, enum_list, metatable_list);
 
 			return 1;
 		},
 		[]() -> void
 		{
 			Mix_CloseAudio(); Mix_Quit();
-			printf("exit\n");
 		}
 	},
 	{ 
@@ -726,7 +722,7 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 				}
 			};
 
-			PushBuiltinPackageData(pLuaVM, func_list, enum_list, metatable_list);
+			EE_PushBuiltinPackageData(pLuaVM, func_list, enum_list, metatable_list);
 
 			return 1;
 		}
@@ -825,7 +821,7 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 				{ "PATHATTRIB_COMPUTERSNEARME", PATHATTRIB_COMPUTERSNEARME },
 			};
 
-			PushBuiltinPackageData(pLuaVM, func_list, enum_list);
+			EE_PushBuiltinPackageData(pLuaVM, func_list, enum_list);
 
 			return 1;
 		}
@@ -841,7 +837,7 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 				{ "LenUTF8", lenUTF8 },
 			};
 
-			PushBuiltinPackageData(pLuaVM, func_list);
+			EE_PushBuiltinPackageData(pLuaVM, func_list);
 
 			return 1;
 		}
@@ -859,22 +855,22 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 				{ "GetCounterFrequency", getCounterFrequency },
 			};
 
-			PushBuiltinPackageData(pLuaVM, func_list);
+			EE_PushBuiltinPackageData(pLuaVM, func_list);
 
 			return 1;
 		}
 	},
 	{ 
-		"@Window",		
+		"@Window",
 		[](lua_State* pLuaVM) -> int
 		{
 			std::vector<luaL_Reg> func_list = {
-				{ "ShowMessageBox", showMessageBox},
-				{ "ShowConfirmMessageBox", showConfirmMessageBox},
-				{ "ShowFolderSelector", showFolderSelector},
-				{ "CreateWindow", createWindow },
-				{ "CloseWindow", closeWindow },
-				{ "SetWindowTitle", setWindowTitle },
+				{ "GetHandle",	EAPI_Window_GetHandle},
+				{ "MessageBox", EAPI_Window_MessageBox},
+				{ "ConfirmBox", EAPI_Window_ConfirmBox},
+				{ "Create",		EAPI_Window_Create },
+				{ "Close",		EAPI_Window_Close },
+				{ "SetTitle",	EAPI_Window_SetTitle },
 				{ "GetWindowTitle", getWindowTitle },
 				{ "SetWindowMode", setWindowMode },
 				{ "SetWindowOpacity", setWindowOpacity },
@@ -893,31 +889,43 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 			};
 
 			std::vector<ParamEnum> enum_list = {
-				{ "WINDOW_POSITION_DEFAULT", WINDOW_POSITION_DEFAULT },
+				{ "DEFAULT_POSITION", WINDOW_POSDEFAULT },
 
-				{ "MSGBOX_ERROR", MSGBOX_ERROR },
-				{ "MSGBOX_WARNING", MSGBOX_WARNING },
-				{ "MSGBOX_INFO", MSGBOX_INFO },
+				{ "ERROR",		MSGBOX_ERROR },
+				{ "WARNING",	MSGBOX_WARNING },
+				{ "INFO",		MSGBOX_INFO },
 
-				{ "WINDOW_FULLSCREEN", WINDOW_FULLSCREEN },
-				{ "WINDOW_FULLSCREEN_DESKTOP", WINDOW_FULLSCREEN_DESKTOP },
-				{ "WINDOW_BORDERLESS", WINDOW_BORDERLESS },
-				{ "WINDOW_RESIZABLE", WINDOW_RESIZABLE },
-				{ "WINDOW_MAXIMIZED", WINDOW_MAXIMIZED },
-				{ "WINDOW_MINIMIZED", WINDOW_MINIMIZED },
-
-				{ "WINDOW_MODE_WINDOWED", WINDOW_MODE_WINDOWED },
-				{ "WINDOW_MODE_FULLSCREEN", WINDOW_MODE_FULLSCREEN },
-				{ "WINDOW_MODE_FULLSCREEN_DESKTOP", WINDOW_MODE_FULLSCREEN_DESKTOP },
-				{ "WINDOW_MODE_BORDERLESS", WINDOW_MODE_BORDERLESS },
-				{ "WINDOW_MODE_BORDERED", WINDOW_MODE_BORDERED },
-				{ "WINDOW_MODE_RESIZABLE", WINDOW_MODE_RESIZABLE },
-				{ "WINDOW_MODE_SIZEFIXED", WINDOW_MODE_SIZEFIXED },
+				{ "FULLSCREEN", WINDOW_FULLSCREEN },
+				{ "BORDERLESS", WINDOW_BORDERLESS },
+				{ "RESIZABLE",	WINDOW_RESIZABLE },
+				{ "MAXIMIZED",	WINDOW_MAXIMIZED },
+				{ "MINIMIZED",	WINDOW_MINIMIZED },
+				{ "WINDOWED",	WINDOW_WINDOWED },
+				{ "FIXED",		WINDOW_FIXED },
 			};
 
-			PushBuiltinPackageData(pLuaVM, func_list, enum_list);
+			std::vector<MetaTableData> metatable_list = {
+				{
+					METANAME_HANDLEWINDOW
+				}
+			};
+
+			EE_PushBuiltinPackageData(pLuaVM, func_list, enum_list, metatable_list);
 
 			return 1;
+		},
+		[]() -> void
+		{
+			if (pGlobalRenderer)
+			{
+				SDL_DestroyRenderer(pGlobalRenderer);
+				pGlobalRenderer = nullptr;
+			}
+			if (pGlobalWindow)
+			{
+				SDL_DestroyWindow(pGlobalWindow);
+				pGlobalWindow = nullptr;
+			}
 		}
 	},
 	{ 
@@ -925,11 +933,11 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 		[](lua_State* pLuaVM) -> int
 		{
 			std::vector<luaL_Reg> func_list = {
-				{"CompressData", compressData},
-				{"DecompressData", decompressData},
+				{ "CompressData", compressData },
+				{ "DecompressData", decompressData },
 			};
 
-			PushBuiltinPackageData(pLuaVM, func_list);
+			EE_PushBuiltinPackageData(pLuaVM, func_list);
 
 			return 1;
 		}
@@ -1043,11 +1051,24 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 				}
 			};
 
-			PushBuiltinPackageData(pLuaVM, func_list, enum_list, metatable_list);
+			EE_PushBuiltinPackageData(pLuaVM, func_list, enum_list, metatable_list);
 
 			return 1;
 		}
 	},
+	{
+		"@Debug",
+		[](lua_State* pLuaVM) -> int
+		{
+			std::vector<luaL_Reg> func_list = {
+				{ "GetCoreError", EAPI_Debug_GetCoreError },
+			};
+
+			EE_PushBuiltinPackageData(pLuaVM, func_list);
+
+			return 1;
+		}
+	}
 };
 
 #endif // !_REGISTER_H_

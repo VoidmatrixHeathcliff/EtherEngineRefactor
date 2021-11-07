@@ -1,6 +1,12 @@
-#include "EtherEngine.h"
-
+#include "Config.h"
 #include "Register.h"
+
+#include <lua.hpp>
+#include <cJSON.h>
+
+#ifndef __WINDOWS__
+extern char** environ;
+#endif	// !__WINDOWS__
 
 SDL_Event event;
 

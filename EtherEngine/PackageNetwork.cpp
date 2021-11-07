@@ -1,4 +1,4 @@
-#include "ModuleNetwork.h"
+#include "PackageNetwork.h"
 
 using namespace std;
 
@@ -130,7 +130,7 @@ void PushResponseToStack(lua_State* L, const Result& res)
 }
 
 
-ETHER_API client_CheckValid(lua_State* L)
+ETHER_API int client_CheckValid(lua_State* L)
 {
 	Client* client = GetClientDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -142,7 +142,7 @@ ETHER_API client_CheckValid(lua_State* L)
 }
 
 
-ETHER_API client_Get(lua_State* L)
+ETHER_API int client_Get(lua_State* L)
 {
 	Client* client = GetClientDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -162,7 +162,7 @@ ETHER_API client_Get(lua_State* L)
 }
 
 
-ETHER_API client_Post(lua_State* L)
+ETHER_API int client_Post(lua_State* L)
 {
 	Client* client = GetClientDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -188,7 +188,7 @@ ETHER_API client_Post(lua_State* L)
 }
 
 
-ETHER_API client_Put(lua_State* L)
+ETHER_API int client_Put(lua_State* L)
 {
 	Client* client = GetClientDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -214,7 +214,7 @@ ETHER_API client_Put(lua_State* L)
 }
 
 
-ETHER_API client_Patch(lua_State* L)
+ETHER_API int client_Patch(lua_State* L)
 {
 	Client* client = GetClientDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -236,7 +236,7 @@ ETHER_API client_Patch(lua_State* L)
 }
 
 
-ETHER_API client_Delete(lua_State* L)
+ETHER_API int client_Delete(lua_State* L)
 {
 	Client* client = GetClientDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -258,7 +258,7 @@ ETHER_API client_Delete(lua_State* L)
 }
 
 
-ETHER_API client_Options(lua_State* L)
+ETHER_API int client_Options(lua_State* L)
 {
 	Client* client = GetClientDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -278,7 +278,7 @@ ETHER_API client_Options(lua_State* L)
 }
 
 
-ETHER_API client_SetDefaultHeaders(lua_State* L)
+ETHER_API int client_SetDefaultHeaders(lua_State* L)
 {
 	Client* client = GetClientDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -306,7 +306,7 @@ ETHER_API client_SetDefaultHeaders(lua_State* L)
 }
 
 
-ETHER_API client_SetConnectTimeout(lua_State* L)
+ETHER_API int client_SetConnectTimeout(lua_State* L)
 {
 	Client* client = GetClientDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -319,7 +319,7 @@ ETHER_API client_SetConnectTimeout(lua_State* L)
 }
 
 
-ETHER_API client_SetReadTimeout(lua_State* L)
+ETHER_API int client_SetReadTimeout(lua_State* L)
 {
 	Client* client = GetClientDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -332,7 +332,7 @@ ETHER_API client_SetReadTimeout(lua_State* L)
 }
 
 
-ETHER_API client_SetWriteTimeout(lua_State* L)
+ETHER_API int client_SetWriteTimeout(lua_State* L)
 {
 	Client* client = GetClientDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -345,7 +345,7 @@ ETHER_API client_SetWriteTimeout(lua_State* L)
 }
 
 
-ETHER_API client_SetKeepAlive(lua_State* L)
+ETHER_API int client_SetKeepAlive(lua_State* L)
 {
 	Client* client = GetClientDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -358,7 +358,7 @@ ETHER_API client_SetKeepAlive(lua_State* L)
 }
 
 
-ETHER_API client_SetFollowRedirect(lua_State* L)
+ETHER_API int client_SetFollowRedirect(lua_State* L)
 {
 	Client* client = GetClientDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -371,7 +371,7 @@ ETHER_API client_SetFollowRedirect(lua_State* L)
 }
 
 
-ETHER_API client_SetCompressRequest(lua_State* L)
+ETHER_API int client_SetCompressRequest(lua_State* L)
 {
 	Client* client = GetClientDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -384,7 +384,7 @@ ETHER_API client_SetCompressRequest(lua_State* L)
 }
 
 
-ETHER_API client_SetCompressResponse(lua_State* L)
+ETHER_API int client_SetCompressResponse(lua_State* L)
 {
 	Client* client = GetClientDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -397,7 +397,7 @@ ETHER_API client_SetCompressResponse(lua_State* L)
 }
 
 
-ETHER_API client_SetCACertPath(lua_State* L)
+ETHER_API int client_SetCACertPath(lua_State* L)
 {
 	Client* client = GetClientDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -410,7 +410,7 @@ ETHER_API client_SetCACertPath(lua_State* L)
 }
 
 
-ETHER_API client_SetProxy(lua_State* L)
+ETHER_API int client_SetProxy(lua_State* L)
 {
 	Client* client = GetClientDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -423,7 +423,7 @@ ETHER_API client_SetProxy(lua_State* L)
 }
 
 
-ETHER_API createClient(lua_State* L)
+ETHER_API int createClient(lua_State* L)
 {
 	string host = luaL_checkstring(L, 1);
 	if (host.back() == '\\' || host.back() == '/')
@@ -438,7 +438,7 @@ ETHER_API createClient(lua_State* L)
 }
 
 
-ETHER_API __gc_Client(lua_State* L)
+ETHER_API int __gc_Client(lua_State* L)
 {
 	Client* client = GetClientDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -479,7 +479,7 @@ void CallExceptionHandler(const Request& req, Response& res, lua_State* L, const
 }
 
 
-ETHER_API request_GetMethod(lua_State* L)
+ETHER_API int request_GetMethod(lua_State* L)
 {
 	Request* req = GetServerReqDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -491,7 +491,7 @@ ETHER_API request_GetMethod(lua_State* L)
 }
 
 
-ETHER_API request_GetRoute(lua_State* L)
+ETHER_API int request_GetRoute(lua_State* L)
 {
 	Request* req = GetServerReqDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -503,7 +503,7 @@ ETHER_API request_GetRoute(lua_State* L)
 }
 
 
-ETHER_API request_GetHeaders(lua_State* L)
+ETHER_API int request_GetHeaders(lua_State* L)
 {
 	Request* req = GetServerReqDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -521,7 +521,7 @@ ETHER_API request_GetHeaders(lua_State* L)
 }
 
 
-ETHER_API request_GetBody(lua_State* L)
+ETHER_API int request_GetBody(lua_State* L)
 {
 	Request* req = GetServerReqDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -533,7 +533,7 @@ ETHER_API request_GetBody(lua_State* L)
 }
 
 
-ETHER_API request_GetRemoteAddress(lua_State* L)
+ETHER_API int request_GetRemoteAddress(lua_State* L)
 {
 	Request* req = GetServerReqDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -545,7 +545,7 @@ ETHER_API request_GetRemoteAddress(lua_State* L)
 }
 
 
-ETHER_API request_GetRemotePort(lua_State* L)
+ETHER_API int request_GetRemotePort(lua_State* L)
 {
 	Request* req = GetServerReqDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -557,7 +557,7 @@ ETHER_API request_GetRemotePort(lua_State* L)
 }
 
 
-ETHER_API request_GetVersion(lua_State* L)
+ETHER_API int request_GetVersion(lua_State* L)
 {
 	Request* req = GetServerReqDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -569,7 +569,7 @@ ETHER_API request_GetVersion(lua_State* L)
 }
 
 
-ETHER_API request_GetParams(lua_State* L)
+ETHER_API int request_GetParams(lua_State* L)
 {
 	Request* req = GetServerReqDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -587,7 +587,7 @@ ETHER_API request_GetParams(lua_State* L)
 }
 
 
-ETHER_API request_CheckHeaderKeyExist(lua_State* L)
+ETHER_API int request_CheckHeaderKeyExist(lua_State* L)
 {
 	Request* req = GetServerReqDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -599,7 +599,7 @@ ETHER_API request_CheckHeaderKeyExist(lua_State* L)
 }
 
 
-ETHER_API request_GetHeaderValue(lua_State* L)
+ETHER_API int request_GetHeaderValue(lua_State* L)
 {
 	Request* req = GetServerReqDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -612,7 +612,7 @@ ETHER_API request_GetHeaderValue(lua_State* L)
 }
 
 
-ETHER_API request_GetHeaderValueCount(lua_State* L)
+ETHER_API int request_GetHeaderValueCount(lua_State* L)
 {
 	Request* req = GetServerReqDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -624,7 +624,7 @@ ETHER_API request_GetHeaderValueCount(lua_State* L)
 }
 
 
-ETHER_API request_CheckParamKeyExist(lua_State* L)
+ETHER_API int request_CheckParamKeyExist(lua_State* L)
 {
 	Request* req = GetServerReqDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -636,7 +636,7 @@ ETHER_API request_CheckParamKeyExist(lua_State* L)
 }
 
 
-ETHER_API request_GetParamValue(lua_State* L)
+ETHER_API int request_GetParamValue(lua_State* L)
 {
 	Request* req = GetServerReqDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -648,7 +648,7 @@ ETHER_API request_GetParamValue(lua_State* L)
 }
 
 
-ETHER_API request_GetParamValueCount(lua_State* L)
+ETHER_API int request_GetParamValueCount(lua_State* L)
 {
 	Request* req = GetServerReqDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -660,7 +660,7 @@ ETHER_API request_GetParamValueCount(lua_State* L)
 }
 
 
-ETHER_API response_SetVersion(lua_State* L)
+ETHER_API int response_SetVersion(lua_State* L)
 {
 	Response* res = GetServerResDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -672,7 +672,7 @@ ETHER_API response_SetVersion(lua_State* L)
 }
 
 
-ETHER_API response_SetStatus(lua_State* L)
+ETHER_API int response_SetStatus(lua_State* L)
 {
 	Response* res = GetServerResDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -684,7 +684,7 @@ ETHER_API response_SetStatus(lua_State* L)
 }
 
 
-ETHER_API response_GetHeaders(lua_State* L)
+ETHER_API int response_GetHeaders(lua_State* L)
 {
 	Response* res = GetServerResDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -702,7 +702,7 @@ ETHER_API response_GetHeaders(lua_State* L)
 }
 
 
-ETHER_API response_SetBody(lua_State* L)
+ETHER_API int response_SetBody(lua_State* L)
 {
 	Response* res = GetServerResDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -716,7 +716,7 @@ ETHER_API response_SetBody(lua_State* L)
 }
 
 
-ETHER_API response_CheckHeaderKeyExist(lua_State* L)
+ETHER_API int response_CheckHeaderKeyExist(lua_State* L)
 {
 	Response* res = GetServerResDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -728,7 +728,7 @@ ETHER_API response_CheckHeaderKeyExist(lua_State* L)
 }
 
 
-ETHER_API response_GetHeaderValue(lua_State* L)
+ETHER_API int response_GetHeaderValue(lua_State* L)
 {
 	Response* res = GetServerResDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -740,7 +740,7 @@ ETHER_API response_GetHeaderValue(lua_State* L)
 }
 
 
-ETHER_API response_GetHeaderValueCount(lua_State* L)
+ETHER_API int response_GetHeaderValueCount(lua_State* L)
 {
 	Response* res = GetServerResDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -752,7 +752,7 @@ ETHER_API response_GetHeaderValueCount(lua_State* L)
 }
 
 
-ETHER_API response_SetHeaderValue(lua_State* L)
+ETHER_API int response_SetHeaderValue(lua_State* L)
 {
 	Response* res = GetServerResDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -764,7 +764,7 @@ ETHER_API response_SetHeaderValue(lua_State* L)
 }
 
 
-ETHER_API response_SetHeaders(lua_State* L)
+ETHER_API int response_SetHeaders(lua_State* L)
 {
 	Response* res = GetServerResDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -789,7 +789,7 @@ ETHER_API response_SetHeaders(lua_State* L)
 }
 
 
-ETHER_API response_SetRedirect(lua_State* L)
+ETHER_API int response_SetRedirect(lua_State* L)
 {
 	Response* res = GetServerResDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -801,7 +801,7 @@ ETHER_API response_SetRedirect(lua_State* L)
 }
 
 
-ETHER_API response_SetContent(lua_State* L)
+ETHER_API int response_SetContent(lua_State* L)
 {
 	Response* res = GetServerResDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -814,7 +814,7 @@ ETHER_API response_SetContent(lua_State* L)
 }
 
 
-ETHER_API server_CheckValid(lua_State* L)
+ETHER_API int server_CheckValid(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -826,7 +826,7 @@ ETHER_API server_CheckValid(lua_State* L)
 }
 
 
-ETHER_API server_CheckRunning(lua_State* L)
+ETHER_API int server_CheckRunning(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -838,7 +838,7 @@ ETHER_API server_CheckRunning(lua_State* L)
 }
 
 
-ETHER_API server_Get(lua_State* L)
+ETHER_API int server_Get(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -861,7 +861,7 @@ ETHER_API server_Get(lua_State* L)
 }
 
 
-ETHER_API server_Post(lua_State* L)
+ETHER_API int server_Post(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -884,7 +884,7 @@ ETHER_API server_Post(lua_State* L)
 }
 
 
-ETHER_API server_Put(lua_State* L)
+ETHER_API int server_Put(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -907,7 +907,7 @@ ETHER_API server_Put(lua_State* L)
 }
 
 
-ETHER_API server_Patch(lua_State* L)
+ETHER_API int server_Patch(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -930,7 +930,7 @@ ETHER_API server_Patch(lua_State* L)
 }
 
 
-ETHER_API server_Delete(lua_State* L)
+ETHER_API int server_Delete(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -953,7 +953,7 @@ ETHER_API server_Delete(lua_State* L)
 }
 
 
-ETHER_API server_Options(lua_State* L)
+ETHER_API int server_Options(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -976,7 +976,7 @@ ETHER_API server_Options(lua_State* L)
 }
 
 
-ETHER_API server_SetMountPoint(lua_State* L)
+ETHER_API int server_SetMountPoint(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -990,7 +990,7 @@ ETHER_API server_SetMountPoint(lua_State* L)
 }
 
 
-ETHER_API server_RemoveMountPoint(lua_State* L)
+ETHER_API int server_RemoveMountPoint(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -1004,7 +1004,7 @@ ETHER_API server_RemoveMountPoint(lua_State* L)
 }
 
 
-ETHER_API server_SetFileExtMapToMIMEType(lua_State* L)
+ETHER_API int server_SetFileExtMapToMIMEType(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -1016,7 +1016,7 @@ ETHER_API server_SetFileExtMapToMIMEType(lua_State* L)
 }
 
 
-ETHER_API server_SetExceptionHandler(lua_State* L)
+ETHER_API int server_SetExceptionHandler(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -1035,7 +1035,7 @@ ETHER_API server_SetExceptionHandler(lua_State* L)
 }
 
 
-ETHER_API server_SetMaxKeepAliveCount(lua_State* L)
+ETHER_API int server_SetMaxKeepAliveCount(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -1047,7 +1047,7 @@ ETHER_API server_SetMaxKeepAliveCount(lua_State* L)
 }
 
 
-ETHER_API server_SetKeepAliveTimeout(lua_State* L)
+ETHER_API int server_SetKeepAliveTimeout(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -1059,7 +1059,7 @@ ETHER_API server_SetKeepAliveTimeout(lua_State* L)
 }
 
 
-ETHER_API server_SetReadTimeout(lua_State* L)
+ETHER_API int server_SetReadTimeout(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -1071,7 +1071,7 @@ ETHER_API server_SetReadTimeout(lua_State* L)
 }
 
 
-ETHER_API server_SetWriteTimeout(lua_State* L)
+ETHER_API int server_SetWriteTimeout(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -1083,7 +1083,7 @@ ETHER_API server_SetWriteTimeout(lua_State* L)
 }
 
 
-ETHER_API server_SetIdleInterval(lua_State* L)
+ETHER_API int server_SetIdleInterval(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -1095,7 +1095,7 @@ ETHER_API server_SetIdleInterval(lua_State* L)
 }
 
 
-ETHER_API server_SetMaxRequestLength(lua_State* L)
+ETHER_API int server_SetMaxRequestLength(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -1107,7 +1107,7 @@ ETHER_API server_SetMaxRequestLength(lua_State* L)
 }
 
 
-ETHER_API server_BindToAnyPort(lua_State* L)
+ETHER_API int server_BindToAnyPort(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -1119,7 +1119,7 @@ ETHER_API server_BindToAnyPort(lua_State* L)
 }
 
 
-ETHER_API server_ListenAfterBind(lua_State* L)
+ETHER_API int server_ListenAfterBind(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -1131,7 +1131,7 @@ ETHER_API server_ListenAfterBind(lua_State* L)
 }
 
 
-ETHER_API server_Listen(lua_State* L)
+ETHER_API int server_Listen(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -1143,7 +1143,7 @@ ETHER_API server_Listen(lua_State* L)
 }
 
 
-ETHER_API server_Stop(lua_State* L)
+ETHER_API int server_Stop(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -1155,7 +1155,7 @@ ETHER_API server_Stop(lua_State* L)
 }
 
 
-ETHER_API createServer(lua_State* L)
+ETHER_API int createServer(lua_State* L)
 {
 	E_Server* server = new E_Server(
 		lua_isstring(L, 1)
@@ -1171,7 +1171,7 @@ ETHER_API createServer(lua_State* L)
 }
 
 
-ETHER_API __gc_Server(lua_State* L)
+ETHER_API int __gc_Server(lua_State* L)
 {
 	E_Server* server = GetServerDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -1190,7 +1190,7 @@ ETHER_API __gc_Server(lua_State* L)
 }
 
 
-ETHER_API splitLink(lua_State* L)
+ETHER_API int splitLink(lua_State* L)
 {
 	string link = luaL_checkstring(L, 1), domain, route, param;
 

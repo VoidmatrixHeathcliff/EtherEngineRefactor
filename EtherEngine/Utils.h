@@ -1,7 +1,7 @@
 #ifndef _UTILS_H_
 #define _UTILS_H_
 
-#include "Macros.h"
+#include "Config.h"
 
 #include <lua.hpp>
 #include <SDL.h>
@@ -9,12 +9,121 @@
 #include <codecvt>
 #include <locale>
 #include <string>
+#include <functional>
 
 #define CheckPointParam(L, index, point)	luaL_argcheck(L, !GetPointParam(L, index, point), index, "table point expected") 
 #define CheckRectParam(L, index, rect)		luaL_argcheck(L, !GetRectParam(L, index, rect), index, "table rect expected") 
 #define CheckColorParam(L, index, color)	luaL_argcheck(L, !GetColorParam(L, index, color), index, "table color expected") 
 
 #define CheckTableParam(L, index)			luaL_argcheck(L, lua_istable(L, index), index, "table expected") 
+
+void EE_CheckPoint(lua_State* pLuaVM, int idx, SDL_Point& point);
+void EE_CheckRect(lua_State* pLuaVM, int idx, SDL_Rect& rect);
+void EE_CheckColor(lua_State* pLuaVM, int idx, SDL_Color& color);
+
+template <class T>
+inline T* EE_ToUserdata(lua_State* pLuaVM, int idx, 
+	const char* type_name)
+{
+	return (T*)(*(void**)luaL_checkudata(pLuaVM, idx, type_name));
+}
+
+template <class T>
+inline void EE_PushUserdata(lua_State* pLuaVM, T* obj, 
+	const char* type_name)
+{
+	T** ppUserdata = (T**)lua_newuserdata(pLuaVM, sizeof(T*));
+	*ppUserdata = obj;
+	luaL_getmetatable(pLuaVM, type_name);
+	lua_setmetatable(pLuaVM, -2);
+}
+
+inline void EE_CheckPoint(lua_State* pLuaVM, int idx, SDL_Point& point)
+{
+	luaL_argexpected(pLuaVM, lua_istable(pLuaVM, idx), idx, LUA_TABLIBNAME);
+
+	lua_getfield(pLuaVM, idx, "x");
+	luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1),
+		idx, std::string(ERRMSG_INVALIDMEMBER).append(":x").c_str());
+	point.x = (int)lua_tointeger(pLuaVM, -1);
+	lua_pop(pLuaVM, 1);
+
+	lua_getfield(pLuaVM, idx, "y");
+	luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1),
+		idx, std::string(ERRMSG_INVALIDMEMBER).append(":y").c_str());
+	point.y = (int)lua_tointeger(pLuaVM, -1);
+	lua_pop(pLuaVM, 1);
+}
+
+inline void EE_CheckRect(lua_State* pLuaVM, int idx, SDL_Rect& rect)
+{
+	luaL_argexpected(pLuaVM, lua_istable(pLuaVM, idx), idx, LUA_TABLIBNAME);
+
+	lua_getfield(pLuaVM, idx, "x");
+	luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1),
+		idx, std::string(ERRMSG_INVALIDMEMBER).append(":x").c_str());
+	rect.x = (int)lua_tointeger(pLuaVM, -1);
+	lua_pop(pLuaVM, 1);
+
+	lua_getfield(pLuaVM, idx, "y");
+	luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1),
+		idx, std::string(ERRMSG_INVALIDMEMBER).append(":y").c_str());
+	rect.y = (int)lua_tointeger(pLuaVM, -1);
+	lua_pop(pLuaVM, 1);
+
+	lua_getfield(pLuaVM, idx, "w");
+	luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1),
+		idx, std::string(ERRMSG_INVALIDMEMBER).append(":w").c_str());
+	rect.w = (int)lua_tointeger(pLuaVM, -1);
+	lua_pop(pLuaVM, 1);
+
+	lua_getfield(pLuaVM, idx, "h");
+	luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1),
+		idx, std::string(ERRMSG_INVALIDMEMBER).append(":h").c_str());
+	rect.h = (int)lua_tointeger(pLuaVM, -1);
+	lua_pop(pLuaVM, 1);
+}
+
+inline void EE_CheckColor(lua_State* pLuaVM, int idx, SDL_Color& color)
+{
+	luaL_argexpected(pLuaVM, lua_istable(pLuaVM, idx), idx, LUA_TABLIBNAME);
+
+	lua_getfield(pLuaVM, idx, "r");
+	luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1),
+		idx, std::string(ERRMSG_INVALIDMEMBER).append(":r").c_str());
+	color.r = (int)lua_tointeger(pLuaVM, -1);
+	lua_pop(pLuaVM, 1);
+
+	lua_getfield(pLuaVM, idx, "g");
+	luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1),
+		idx, std::string(ERRMSG_INVALIDMEMBER).append(":g").c_str());
+	color.g = (int)lua_tointeger(pLuaVM, -1);
+	lua_pop(pLuaVM, 1);
+
+	lua_getfield(pLuaVM, idx, "b");
+	luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1),
+		idx, std::string(ERRMSG_INVALIDMEMBER).append(":b").c_str());
+	color.b = (int)lua_tointeger(pLuaVM, -1);
+	lua_pop(pLuaVM, 1);
+
+	lua_getfield(pLuaVM, idx, "a");
+	luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1),
+		idx, std::string(ERRMSG_INVALIDMEMBER).append(":a").c_str());
+	color.a = (int)lua_tointeger(pLuaVM, -1);
+	lua_pop(pLuaVM, 1);
+}
+
+// 'key' at index - 2 and 'value' at index - 1
+inline void EE_TraverseTable(lua_State* pLuaVM, int idx, 
+	std::function<bool()> callback)
+{
+	bool _flag = true;
+	lua_pushnil(pLuaVM);
+	while (_flag && lua_next(pLuaVM, idx)) {
+		_flag = callback();
+		lua_pop(pLuaVM, 1);
+	}
+}
 
 class EncodingConversion
 {
@@ -44,33 +153,6 @@ private:
 private:
 	static const char* GBK_LOCALE_NAME;
 };
-
-/// <summary>
-/// 获取描述点位置的表的参数
-/// </summary>
-/// <param name="L">当前Lua虚拟机环境</param>
-/// <param name="index">参数位置</param>
-/// <param name="point">点位置</param>
-/// <returns>是否成功</returns>
-int GetPointParam(lua_State* L, int index, SDL_Point& point);
-
-/// <summary>
-/// 获取描述矩形位置和大小的表的参数
-/// </summary>
-/// <param name="L">当前Lua虚拟机环境</param>
-/// <param name="index">参数位置</param>
-/// <param name="rect">矩形位置和大小</param>
-/// <returns>是否成功</returns>
-int GetRectParam(lua_State* L, int index, SDL_Rect& rect);
-
-/// <summary>
-/// 获取描述颜色的表的参数
-/// </summary>
-/// <param name="L">当前Lua虚拟机环境</param>
-/// <param name="index">参数位置</param>
-/// <param name="funName">颜色</param>
-/// <returns>是否成功</returns>
-int GetColorParam(lua_State* L, int index, SDL_Color& color);
 
 #endif // !_UTILS_H_
 

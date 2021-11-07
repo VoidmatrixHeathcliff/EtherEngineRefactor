@@ -1,14 +1,14 @@
-#include "ModuleGraphic.h"
+#include "PackageGraphic.h"
 
 
-ETHER_API setCursorShow(lua_State * L)
+ETHER_API int setCursorShow(lua_State * L)
 {
 	SDL_ShowCursor(lua_toboolean(L, 1) ? SDL_ENABLE : SDL_DISABLE);
 
 	return 0;
 }
 
-ETHER_API loadImageFromFile(lua_State * L)
+ETHER_API int loadImageFromFile(lua_State * L)
 {
 	SDL_Surface* pSurface = IMG_Load(luaL_checkstring(L, 1));
 #ifdef _ETHER_DEBUG_
@@ -23,7 +23,7 @@ ETHER_API loadImageFromFile(lua_State * L)
 }
 
 
-ETHER_API loadImageFromData(lua_State* L)
+ETHER_API int loadImageFromData(lua_State* L)
 {
 	size_t size = 0;
 	SDL_Surface* pSurface = IMG_Load_RW(SDL_RWFromMem((void*)luaL_checklstring(L, 1, &size), size), 1);
@@ -39,7 +39,7 @@ ETHER_API loadImageFromData(lua_State* L)
 }
 
 
-ETHER_API image_SetColorKey(lua_State * L)
+ETHER_API int image_SetColorKey(lua_State * L)
 {
 	SDL_Surface* surface = GetImageDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -49,7 +49,7 @@ ETHER_API image_SetColorKey(lua_State * L)
 #ifdef _ETHER_DEBUG_
 	CheckColorParam(L, 3, color);
 #else
-	GetColorParam(L, 3, color);
+	EE_CheckColor(L, 3, color);
 #endif
 	SDL_SetColorKey(surface, lua_toboolean(L, 2), SDL_MapRGBA(surface->format, color.r, color.g, color.b, color.a));
 
@@ -57,7 +57,7 @@ ETHER_API image_SetColorKey(lua_State * L)
 }
 
 
-ETHER_API __gc_Image(lua_State * L)
+ETHER_API int __gc_Image(lua_State * L)
 {
 	SDL_Surface* surface = GetImageDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -70,7 +70,7 @@ ETHER_API __gc_Image(lua_State * L)
 }
 
 
-ETHER_API createTexture(lua_State * L)
+ETHER_API int createTexture(lua_State * L)
 {
 	SDL_Surface* surface = GetImageDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -91,7 +91,7 @@ ETHER_API createTexture(lua_State * L)
 }
 
 
-ETHER_API __gc_Texture(lua_State * L)
+ETHER_API int __gc_Texture(lua_State * L)
 {
 	SDL_Texture* texture = GetTextureDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -104,7 +104,7 @@ ETHER_API __gc_Texture(lua_State * L)
 }
 
 
-ETHER_API texture_SetAlpha(lua_State * L)
+ETHER_API int texture_SetAlpha(lua_State * L)
 {
 	SDL_Texture* texture = GetTextureDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -117,7 +117,7 @@ ETHER_API texture_SetAlpha(lua_State * L)
 }
 
 
-ETHER_API image_GetSize(lua_State * L)
+ETHER_API int image_GetSize(lua_State * L)
 {
 	SDL_Surface* surface = GetImageDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -130,7 +130,7 @@ ETHER_API image_GetSize(lua_State * L)
 }
 
 
-ETHER_API copyTexture(lua_State * L)
+ETHER_API int copyTexture(lua_State * L)
 {
 	SDL_Texture* texture = GetTextureDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -140,7 +140,7 @@ ETHER_API copyTexture(lua_State * L)
 #ifdef _ETHER_DEBUG_
 	CheckRectParam(L, 2, rect);
 #else
-	GetRectParam(L, 2, rect);
+	EE_CheckRect(L, 2, rect);
 #endif
 	SDL_RenderCopy(pGlobalRenderer, texture, nullptr, &rect);
 
@@ -148,7 +148,7 @@ ETHER_API copyTexture(lua_State * L)
 }
 
 
-ETHER_API copyRotateTexture(lua_State * L)
+ETHER_API int copyRotateTexture(lua_State * L)
 {
 	SDL_Texture* texture = GetTextureDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -160,8 +160,8 @@ ETHER_API copyRotateTexture(lua_State * L)
 	CheckPointParam(L, 3, flipCenter);
 	CheckRectParam(L, 5, showRect);
 #else
-	GetPointParam(L, 3, flipCenter);
-	GetRectParam(L, 5, showRect);
+	EE_CheckPoint(L, 3, flipCenter);
+	EE_CheckRect(L, 5, showRect);
 #endif
 	SDL_RendererFlip flip = SDL_FLIP_NONE;
 #ifdef _ETHER_DEBUG_
@@ -202,7 +202,7 @@ ETHER_API copyRotateTexture(lua_State * L)
 }
 
 
-ETHER_API copyReshapeTexture(lua_State * L)
+ETHER_API int copyReshapeTexture(lua_State * L)
 {
 	SDL_Texture* texture = GetTextureDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -213,8 +213,8 @@ ETHER_API copyReshapeTexture(lua_State * L)
 	CheckRectParam(L, 2, reshapeRect);
 	CheckRectParam(L, 3, showRect);
 #else
-	GetRectParam(L, 2, reshapeRect);
-	GetRectParam(L, 3, showRect);
+	EE_CheckRect(L, 2, reshapeRect);
+	EE_CheckRect(L, 3, showRect);
 #endif
 
 	SDL_RenderCopy(pGlobalRenderer, texture, &reshapeRect, &showRect);
@@ -223,7 +223,7 @@ ETHER_API copyReshapeTexture(lua_State * L)
 }
 
 
-ETHER_API copyRotateReshapeTexture(lua_State * L)
+ETHER_API int copyRotateReshapeTexture(lua_State * L)
 {
 	SDL_Texture* texture = GetTextureDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -236,9 +236,9 @@ ETHER_API copyRotateReshapeTexture(lua_State * L)
 	CheckRectParam(L, 5, reshapeRect);
 	CheckRectParam(L, 6, showRect);
 #else
-	GetPointParam(L, 3, flipCenter);
-	GetRectParam(L, 5, reshapeRect);
-	GetRectParam(L, 6, showRect);
+	EE_CheckPoint(L, 3, flipCenter);
+	EE_CheckRect(L, 5, reshapeRect);
+	EE_CheckRect(L, 6, showRect);
 #endif
 
 	SDL_RendererFlip flip = SDL_FLIP_NONE;
@@ -280,13 +280,13 @@ ETHER_API copyRotateReshapeTexture(lua_State * L)
 }
 
 
-ETHER_API setDrawColor(lua_State * L)
+ETHER_API int setDrawColor(lua_State * L)
 {
 	SDL_Color color;
 #ifdef _ETHER_DEBUG_
 	CheckColorParam(L, 1, color);
 #else
-	GetColorParam(L, 1, color);
+	EE_CheckColor(L, 1, color);
 #endif
 
 	SDL_SetRenderDrawBlendMode(pGlobalRenderer, SDL_BLENDMODE_BLEND);
@@ -296,7 +296,7 @@ ETHER_API setDrawColor(lua_State * L)
 }
 
 
-ETHER_API getDrawColor(lua_State * L)
+ETHER_API int getDrawColor(lua_State * L)
 {
 	SDL_Color color;
 	SDL_GetRenderDrawColor(pGlobalRenderer, &(color.r), &(color.g), &(color.b), &(color.a));
@@ -319,13 +319,13 @@ ETHER_API getDrawColor(lua_State * L)
 }
 
 
-ETHER_API drawPoint(lua_State * L)
+ETHER_API int drawPoint(lua_State * L)
 {
 	SDL_Point point;
 #ifdef _ETHER_DEBUG_
 	CheckPointParam(L, 1, point);
 #else
-	GetPointParam(L, 1, point);
+	EE_CheckPoint(L, 1, point);
 #endif
 
 	SDL_RenderDrawPoint(pGlobalRenderer, point.x, point.y);
@@ -334,15 +334,15 @@ ETHER_API drawPoint(lua_State * L)
 }
 
 
-ETHER_API drawLine(lua_State * L)
+ETHER_API int drawLine(lua_State * L)
 {
 	SDL_Point startPoint, endPoint;
 #ifdef _ETHER_DEBUG_
 	CheckPointParam(L, 1, startPoint);
 	CheckPointParam(L, 2, endPoint);
 #else
-	GetPointParam(L, 1, startPoint);
-	GetPointParam(L, 2, endPoint);
+	EE_CheckPoint(L, 1, startPoint);
+	EE_CheckPoint(L, 2, endPoint);
 #endif
 
 	SDL_Color color;
@@ -353,15 +353,15 @@ ETHER_API drawLine(lua_State * L)
 }
 
 
-ETHER_API drawThickLine(lua_State * L)
+ETHER_API int drawThickLine(lua_State * L)
 {
 	SDL_Point startPoint, endPoint;
 #ifdef _ETHER_DEBUG_
 	CheckPointParam(L, 1, startPoint);
 	CheckPointParam(L, 2, endPoint);
 #else
-	GetPointParam(L, 1, startPoint);
-	GetPointParam(L, 2, endPoint);
+	EE_CheckPoint(L, 1, startPoint);
+	EE_CheckPoint(L, 2, endPoint);
 #endif
 
 	SDL_Color color;
@@ -372,13 +372,13 @@ ETHER_API drawThickLine(lua_State * L)
 }
 
 
-ETHER_API drawRectangle(lua_State * L)
+ETHER_API int drawRectangle(lua_State * L)
 {
 	SDL_Rect rect;
 #ifdef _ETHER_DEBUG_
 	CheckRectParam(L, 1, rect);
 #else
-	GetRectParam(L, 1, rect);
+	EE_CheckRect(L, 1, rect);
 #endif
 	SDL_RenderDrawRect(pGlobalRenderer, &rect);
 
@@ -386,13 +386,13 @@ ETHER_API drawRectangle(lua_State * L)
 }
 
 
-ETHER_API drawFillRectangle(lua_State * L)
+ETHER_API int drawFillRectangle(lua_State * L)
 {
 	SDL_Rect rect;
 #ifdef _ETHER_DEBUG_
 	CheckRectParam(L, 1, rect);
 #else
-	GetRectParam(L, 1, rect);
+	EE_CheckRect(L, 1, rect);
 #endif
 	SDL_RenderFillRect(pGlobalRenderer, &rect);
 
@@ -400,13 +400,13 @@ ETHER_API drawFillRectangle(lua_State * L)
 }
 
 
-ETHER_API drawRoundRectangle(lua_State * L)
+ETHER_API int drawRoundRectangle(lua_State * L)
 {
 	SDL_Rect rect;
 #ifdef _ETHER_DEBUG_
 	CheckRectParam(L, 1, rect);
 #else
-	GetRectParam(L, 1, rect);
+	EE_CheckRect(L, 1, rect);
 #endif
 	SDL_Color color;
 	SDL_GetRenderDrawColor(pGlobalRenderer, &(color.r), &(color.g), &(color.b), &(color.a));
@@ -416,13 +416,13 @@ ETHER_API drawRoundRectangle(lua_State * L)
 }
 
 
-ETHER_API drawFillRoundRectangle(lua_State * L)
+ETHER_API int drawFillRoundRectangle(lua_State * L)
 {
 	SDL_Rect rect;
 #ifdef _ETHER_DEBUG_
 	CheckRectParam(L, 1, rect);
 #else
-	GetRectParam(L, 1, rect);
+	EE_CheckRect(L, 1, rect);
 #endif
 	SDL_Color color;
 	SDL_GetRenderDrawColor(pGlobalRenderer, &(color.r), &(color.g), &(color.b), &(color.a));
@@ -432,13 +432,13 @@ ETHER_API drawFillRoundRectangle(lua_State * L)
 }
 
 
-ETHER_API drawCircle(lua_State * L)
+ETHER_API int drawCircle(lua_State * L)
 {
 	SDL_Point point;
 #ifdef _ETHER_DEBUG_
 	CheckPointParam(L, 1, point);
 #else
-	GetPointParam(L, 1, point);
+	EE_CheckPoint(L, 1, point);
 #endif
 	SDL_Color color;
 	SDL_GetRenderDrawColor(pGlobalRenderer, &(color.r), &(color.g), &(color.b), &(color.a));
@@ -448,13 +448,13 @@ ETHER_API drawCircle(lua_State * L)
 }
 
 
-ETHER_API drawFillCircle(lua_State * L)
+ETHER_API int drawFillCircle(lua_State * L)
 {
 	SDL_Point point;
 #ifdef _ETHER_DEBUG_
 	CheckPointParam(L, 1, point);
 #else
-	GetPointParam(L, 1, point);
+	EE_CheckPoint(L, 1, point);
 #endif
 	SDL_Color color;
 	SDL_GetRenderDrawColor(pGlobalRenderer, &(color.r), &(color.g), &(color.b), &(color.a));
@@ -464,13 +464,13 @@ ETHER_API drawFillCircle(lua_State * L)
 }
 
 
-ETHER_API drawEllipse(lua_State * L)
+ETHER_API int drawEllipse(lua_State * L)
 {
 	SDL_Point point;
 #ifdef _ETHER_DEBUG_
 	CheckPointParam(L, 1, point);
 #else
-	GetPointParam(L, 1, point);
+	EE_CheckPoint(L, 1, point);
 #endif
 	SDL_Color color;
 	SDL_GetRenderDrawColor(pGlobalRenderer, &(color.r), &(color.g), &(color.b), &(color.a));
@@ -480,13 +480,13 @@ ETHER_API drawEllipse(lua_State * L)
 }
 
 
-ETHER_API drawFillEllipse(lua_State * L)
+ETHER_API int drawFillEllipse(lua_State * L)
 {
 	SDL_Point point;
 #ifdef _ETHER_DEBUG_
 	CheckPointParam(L, 1, point);
 #else
-	GetPointParam(L, 1, point);
+	EE_CheckPoint(L, 1, point);
 #endif
 	SDL_Color color;
 	SDL_GetRenderDrawColor(pGlobalRenderer, &(color.r), &(color.g), &(color.b), &(color.a));
@@ -495,13 +495,13 @@ ETHER_API drawFillEllipse(lua_State * L)
 	return 0;
 }
 
-ETHER_API drawPie(lua_State * L)
+ETHER_API int drawPie(lua_State * L)
 {
 	SDL_Point point;
 #ifdef _ETHER_DEBUG_
 	CheckPointParam(L, 1, point);
 #else
-	GetPointParam(L, 1, point);
+	EE_CheckPoint(L, 1, point);
 #endif
 	SDL_Color color;
 	SDL_GetRenderDrawColor(pGlobalRenderer, &(color.r), &(color.g), &(color.b), &(color.a));
@@ -510,13 +510,13 @@ ETHER_API drawPie(lua_State * L)
 	return 0;
 }
 
-ETHER_API drawFillPie(lua_State * L)
+ETHER_API int drawFillPie(lua_State * L)
 {
 	SDL_Point point;
 #ifdef _ETHER_DEBUG_
 	CheckPointParam(L, 1, point);
 #else
-	GetPointParam(L, 1, point);
+	EE_CheckPoint(L, 1, point);
 #endif
 	SDL_Color color;
 	SDL_GetRenderDrawColor(pGlobalRenderer, &(color.r), &(color.g), &(color.b), &(color.a));
@@ -525,7 +525,7 @@ ETHER_API drawFillPie(lua_State * L)
 	return 0;
 }
 
-ETHER_API drawTriangle(lua_State * L)
+ETHER_API int drawTriangle(lua_State * L)
 {
 	SDL_Point point_1, point_2, point_3;
 #ifdef _ETHER_DEBUG_
@@ -533,9 +533,9 @@ ETHER_API drawTriangle(lua_State * L)
 	CheckPointParam(L, 2, point_2);
 	CheckPointParam(L, 3, point_3);
 #else
-	GetPointParam(L, 1, point_1);
-	GetPointParam(L, 2, point_2);
-	GetPointParam(L, 3, point_3);
+	EE_CheckPoint(L, 1, point_1);
+	EE_CheckPoint(L, 2, point_2);
+	EE_CheckPoint(L, 3, point_3);
 #endif
 	SDL_Color color;
 	SDL_GetRenderDrawColor(pGlobalRenderer, &(color.r), &(color.g), &(color.b), &(color.a));
@@ -544,7 +544,7 @@ ETHER_API drawTriangle(lua_State * L)
 	return 0;
 }
 
-ETHER_API drawFillTriangle(lua_State * L)
+ETHER_API int drawFillTriangle(lua_State * L)
 {
 	SDL_Point point_1, point_2, point_3;
 #ifdef _ETHER_DEBUG_
@@ -552,9 +552,9 @@ ETHER_API drawFillTriangle(lua_State * L)
 	CheckPointParam(L, 2, point_2);
 	CheckPointParam(L, 3, point_3);
 #else
-	GetPointParam(L, 1, point_1);
-	GetPointParam(L, 2, point_2);
-	GetPointParam(L, 3, point_3);
+	EE_CheckPoint(L, 1, point_1);
+	EE_CheckPoint(L, 2, point_2);
+	EE_CheckPoint(L, 3, point_3);
 #endif
 	SDL_Color color;
 	SDL_GetRenderDrawColor(pGlobalRenderer, &(color.r), &(color.g), &(color.b), &(color.a));
@@ -564,7 +564,7 @@ ETHER_API drawFillTriangle(lua_State * L)
 }
 
 
-ETHER_API loadFontFromFile(lua_State * L)
+ETHER_API int loadFontFromFile(lua_State * L)
 {
 	TTF_Font* pFont = TTF_OpenFont(luaL_checkstring(L, 1), luaL_checknumber(L, 2));
 #ifdef _ETHER_DEBUG_
@@ -579,7 +579,7 @@ ETHER_API loadFontFromFile(lua_State * L)
 }
 
 
-ETHER_API loadFontFromData(lua_State* L)
+ETHER_API int loadFontFromData(lua_State* L)
 {
 	size_t size = 0;
 	TTF_Font* pFont = TTF_OpenFontRW(SDL_RWFromMem((void*)luaL_checklstring(L, 1, &size), size), 1, luaL_checknumber(L, 2));
@@ -595,7 +595,7 @@ ETHER_API loadFontFromData(lua_State* L)
 }
 
 
-ETHER_API __gc_Font(lua_State * L)
+ETHER_API int __gc_Font(lua_State * L)
 {
 	TTF_Font* font = GetFontDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -608,7 +608,7 @@ ETHER_API __gc_Font(lua_State * L)
 }
 
 
-ETHER_API font_GetStyle(lua_State * L)
+ETHER_API int font_GetStyle(lua_State * L)
 {
 	TTF_Font* font = GetFontDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -659,7 +659,7 @@ ETHER_API font_GetStyle(lua_State * L)
 }
 
 
-ETHER_API font_SetStyle(lua_State * L)
+ETHER_API int font_SetStyle(lua_State * L)
 {
 	TTF_Font* font = GetFontDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -706,7 +706,7 @@ ETHER_API font_SetStyle(lua_State * L)
 }
 
 
-ETHER_API font_GetOutlineWidth(lua_State * L)
+ETHER_API int font_GetOutlineWidth(lua_State * L)
 {
 	TTF_Font* font = GetFontDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -718,7 +718,7 @@ ETHER_API font_GetOutlineWidth(lua_State * L)
 }
 
 
-ETHER_API font_SetOutlineWidth(lua_State * L)
+ETHER_API int font_SetOutlineWidth(lua_State * L)
 {
 	TTF_Font* font = GetFontDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -730,7 +730,7 @@ ETHER_API font_SetOutlineWidth(lua_State * L)
 }
 
 
-ETHER_API font_GetKerning(lua_State * L)
+ETHER_API int font_GetKerning(lua_State * L)
 {
 	TTF_Font* font = GetFontDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -742,7 +742,7 @@ ETHER_API font_GetKerning(lua_State * L)
 }
 
 
-ETHER_API font_SetKerning(lua_State * L)
+ETHER_API int font_SetKerning(lua_State * L)
 {
 	TTF_Font* font = GetFontDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -754,7 +754,7 @@ ETHER_API font_SetKerning(lua_State * L)
 }
 
 
-ETHER_API font_GetHeight(lua_State * L)
+ETHER_API int font_GetHeight(lua_State * L)
 {
 	TTF_Font* font = GetFontDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -766,7 +766,7 @@ ETHER_API font_GetHeight(lua_State * L)
 }
 
 
-ETHER_API getTextSize(lua_State * L)
+ETHER_API int getTextSize(lua_State * L)
 {
 	TTF_Font* font = GetFontDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -781,7 +781,7 @@ ETHER_API getTextSize(lua_State * L)
 }
 
 
-ETHER_API getUTF8TextSize(lua_State * L)
+ETHER_API int getUTF8TextSize(lua_State * L)
 {
 	TTF_Font* font = GetFontDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -796,7 +796,7 @@ ETHER_API getUTF8TextSize(lua_State * L)
 }
 
 
-ETHER_API createTextImageSolid(lua_State * L)
+ETHER_API int createTextImageSolid(lua_State * L)
 {
 	TTF_Font* font = GetFontDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -806,7 +806,7 @@ ETHER_API createTextImageSolid(lua_State * L)
 #ifdef _ETHER_DEBUG_
 	CheckColorParam(L, 3, color);
 #else
-	GetColorParam(L, 3, color);
+	EE_CheckColor(L, 3, color);
 #endif
 	SDL_Surface* pSurface = TTF_RenderText_Solid(font, luaL_checkstring(L, 2), color);
 #ifdef _ETHER_DEBUG_
@@ -821,7 +821,7 @@ ETHER_API createTextImageSolid(lua_State * L)
 }
 
 
-ETHER_API createUTF8TextImageSolid(lua_State * L)
+ETHER_API int createUTF8TextImageSolid(lua_State * L)
 {
 	TTF_Font* font = GetFontDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -831,7 +831,7 @@ ETHER_API createUTF8TextImageSolid(lua_State * L)
 #ifdef _ETHER_DEBUG_
 	CheckColorParam(L, 3, color);
 #else
-	GetColorParam(L, 3, color);
+	EE_CheckColor(L, 3, color);
 #endif
 	SDL_Surface* pSurface = TTF_RenderUTF8_Solid(font, luaL_checkstring(L, 2), color);
 #ifdef _ETHER_DEBUG_
@@ -846,7 +846,7 @@ ETHER_API createUTF8TextImageSolid(lua_State * L)
 }
 
 
-ETHER_API createTextImageShaded(lua_State * L)
+ETHER_API int createTextImageShaded(lua_State * L)
 {
 	TTF_Font* font = GetFontDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -857,8 +857,8 @@ ETHER_API createTextImageShaded(lua_State * L)
 	CheckColorParam(L, 3, fgColor);
 	CheckColorParam(L, 4, bgColor);
 #else
-	GetColorParam(L, 3, fgColor);
-	GetColorParam(L, 4, bgColor);
+	EE_CheckColor(L, 3, fgColor);
+	EE_CheckColor(L, 4, bgColor);
 #endif
 	SDL_Surface* pSurface = TTF_RenderText_Shaded(font, luaL_checkstring(L, 2), fgColor, bgColor);
 #ifdef _ETHER_DEBUG_
@@ -873,7 +873,7 @@ ETHER_API createTextImageShaded(lua_State * L)
 }
 
 
-ETHER_API createUTF8TextImageShaded(lua_State * L)
+ETHER_API int createUTF8TextImageShaded(lua_State * L)
 {
 	TTF_Font* font = GetFontDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -884,8 +884,8 @@ ETHER_API createUTF8TextImageShaded(lua_State * L)
 	CheckColorParam(L, 3, fgColor);
 	CheckColorParam(L, 4, bgColor);
 #else
-	GetColorParam(L, 3, fgColor);
-	GetColorParam(L, 4, bgColor);
+	EE_CheckColor(L, 3, fgColor);
+	EE_CheckColor(L, 4, bgColor);
 #endif
 	SDL_Surface* pSurface = TTF_RenderUTF8_Shaded(font, luaL_checkstring(L, 2), fgColor, bgColor);
 #ifdef _ETHER_DEBUG_
@@ -900,7 +900,7 @@ ETHER_API createUTF8TextImageShaded(lua_State * L)
 }
 
 
-ETHER_API createTextImageBlended(lua_State * L)
+ETHER_API int createTextImageBlended(lua_State * L)
 {
 	TTF_Font* font = GetFontDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -910,7 +910,7 @@ ETHER_API createTextImageBlended(lua_State * L)
 #ifdef _ETHER_DEBUG_
 	CheckColorParam(L, 3, color);
 #else
-	GetColorParam(L, 3, color);
+	EE_CheckColor(L, 3, color);
 #endif
 	SDL_Surface* pSurface = TTF_RenderText_Blended(font, luaL_checkstring(L, 2), color);
 #ifdef _ETHER_DEBUG_
@@ -925,7 +925,7 @@ ETHER_API createTextImageBlended(lua_State * L)
 }
 
 
-ETHER_API createUTF8TextImageBlended(lua_State * L)
+ETHER_API int createUTF8TextImageBlended(lua_State * L)
 {
 	TTF_Font* font = GetFontDataAt1stPos();
 #ifdef _ETHER_DEBUG_
@@ -935,7 +935,7 @@ ETHER_API createUTF8TextImageBlended(lua_State * L)
 #ifdef _ETHER_DEBUG_
 	CheckColorParam(L, 3, color);
 #else
-	GetColorParam(L, 3, color);
+	EE_CheckColor(L, 3, color);
 #endif
 	SDL_Surface* pSurface = TTF_RenderUTF8_Blended(font, luaL_checkstring(L, 2), color);
 #ifdef _ETHER_DEBUG_

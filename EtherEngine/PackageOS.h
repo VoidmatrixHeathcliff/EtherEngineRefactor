@@ -1,8 +1,7 @@
 #ifndef _OS_H_
 #define _OS_H_
 
-#include "Module.h"
-#include "Macros.h"
+#include "Config.h"
 
 #include <lua.hpp>
 #include <SDL.h>
@@ -93,42 +92,42 @@ using namespace std;
 // 获取程序运行的目录
 // 0参数
 // 1返回值：程序运行目录（string）
-ETHER_API getBasePath(lua_State* L);
+ETHER_API int getBasePath(lua_State* L);
 
 // 设置剪切板文本
 // 1参数：剪切板文本（string）
 // 0返回值
-ETHER_API setClipboardText(lua_State* L);
+ETHER_API int setClipboardText(lua_State* L);
 
 // 获取剪切板文本
 // 0参数
 // 1返回值：剪切板文本（string）
-ETHER_API getClipboardText(lua_State* L);
+ETHER_API int getClipboardText(lua_State* L);
 
 // 获取平台类型
 // 0参数
 // 1返回值：平台类型（string）
-ETHER_API getPlatformType(lua_State* L);
+ETHER_API int getPlatformType(lua_State* L);
 
 // 获取 CPU 逻辑核心数
 // 0参数
 // 1返回值：CPU 逻辑核心数（number）
-ETHER_API getCPUCount(lua_State* L);
+ETHER_API int getCPUCount(lua_State* L);
 
 // 获取系统总内存大小
 // 0参数
 // 1返回值：系统内存大小（number，单位为MB）
-ETHER_API getSystemTotalRAM(lua_State* L);
+ETHER_API int getSystemTotalRAM(lua_State* L);
 
 // 获取应用在当前系统用户下的存储目录，如果不存在则创建
 // 2参数：组织名（string），应用名（string）
 // 1返回值：数据文件夹路径（string）
-ETHER_API getAppStorageDirectory(lua_State* L);
+ETHER_API int getAppStorageDirectory(lua_State* L);
 
 // 获取系统特殊路径
 // 1参数：路径标识（Macro number）
 // 1参数：完整路径（string）
-ETHER_API getSpecialPath(lua_State* L);
+ETHER_API int getSpecialPath(lua_State* L);
 
 /*
 * 获取设备当前电源信息
@@ -140,21 +139,21 @@ ETHER_API getSpecialPath(lua_State* L);
 		remain_percentage：成功则返回剩余电量百分比（number），取值范围为 0 - 100，失败则为 -1（number）
 	}
 */
-ETHER_API getPowerInfo(lua_State* L);
+ETHER_API int getPowerInfo(lua_State* L);
 
 /*
 * 获取指定目录下文件列表
 * 1参数：目录路径（string）
 * 1返回值：文件列表（table）
 */
-ETHER_API listDirectory(lua_State* L);
+ETHER_API int listDirectory(lua_State* L);
 
 /*
 * 判断指定路径是否存在
 * 1或2参数：目录或文件所在的路径（string），【可选】判断模式（Macro number）
 * 1返回值：是否存在（boolean）
 */
-ETHER_API checkPathExist(lua_State* L);
+ETHER_API int checkPathExist(lua_State* L);
 
 /*
 * 获取指定路径的信息
@@ -172,20 +171,20 @@ ETHER_API checkPathExist(lua_State* L);
 	}
 * ，失败则返回nil
 */
-ETHER_API getPathInfo(lua_State* L);
+ETHER_API int getPathInfo(lua_State* L);
 
 /*
 * 合并目录和文件名为完整路径
 * 2参数：目录（string），文件名（string）
 * 1返回值：完整路径（string）
 */
-ETHER_API joinPath(lua_State* L);
+ETHER_API int joinPath(lua_State* L);
 
 /*
 * 将路径分割为文件夹路径和文件名
 * 1参数：路径（string）
 * 2返回值：文件夹路径（string），文件名（string）
 */
-ETHER_API splitPath(lua_State* L);
+ETHER_API int splitPath(lua_State* L);
 
 #endif // !_OS_H_

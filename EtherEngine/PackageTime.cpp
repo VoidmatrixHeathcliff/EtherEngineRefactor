@@ -1,21 +1,21 @@
-#include "ModuleTime.h"
+#include "PackageTime.h"
 
 
-ETHER_API pause(lua_State * L)
+ETHER_API int pause(lua_State * L)
 {
 	system("pause");
 
 	return 0;
 }
 
-ETHER_API sleep(lua_State * L)
+ETHER_API int sleep(lua_State * L)
 {
 	SDL_Delay(luaL_checknumber(L, 1));
 
 	return 0;
 }
 
-ETHER_API dynamicSleep(lua_State* L)
+ETHER_API int dynamicSleep(lua_State* L)
 {
 	int expected_delay = luaL_checknumber(L, 1);
 	int duration = luaL_checknumber(L, 2);
@@ -27,21 +27,21 @@ ETHER_API dynamicSleep(lua_State* L)
 	return 0;
 }
 
-ETHER_API getInitTime(lua_State * L)
+ETHER_API int getInitTime(lua_State * L)
 {
 	lua_pushnumber(L, SDL_GetTicks());
 
 	return 1;
 }
 
-ETHER_API getAccurateCount(lua_State * L)
+ETHER_API int getAccurateCount(lua_State * L)
 {
 	lua_pushnumber(L, SDL_GetPerformanceCounter());
 
 	return 1;
 }
 
-ETHER_API getCounterFrequency(lua_State * L)
+ETHER_API int getCounterFrequency(lua_State * L)
 {
 	lua_pushnumber(L, SDL_GetPerformanceFrequency());
 

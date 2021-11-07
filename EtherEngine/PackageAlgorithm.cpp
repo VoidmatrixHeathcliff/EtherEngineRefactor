@@ -1,4 +1,4 @@
-#include "ModuleAlgorithm.h"
+#include "PackageAlgorithm.h"
 
 
 double HLS2RGBvalue(double n1, double n2, double hue)
@@ -17,7 +17,7 @@ double HLS2RGBvalue(double n1, double n2, double hue)
 		return n1;
 }
 
-ETHER_API clamp(lua_State * L)
+ETHER_API int clamp(lua_State * L)
 {
 	double checknum = luaL_checknumber(L, 1);
 	double lower = 0, upper = 1;
@@ -41,16 +41,16 @@ ETHER_API clamp(lua_State * L)
 }
 
 
-ETHER_API checkPointInRect(lua_State* L)
+ETHER_API int checkPointInRect(lua_State* L)
 {
 	SDL_Point point;
 	SDL_Rect rect;
 #ifdef _ETHER_DEBUG_
-	luaL_argcheck(L, !GetPointParam(L, 1, point), 1, "table point expected");
-	luaL_argcheck(L, !GetRectParam(L, 2, rect), 2, "table rect expected");
+	luaL_argcheck(L, !EE_CheckPoint(L, 1, point), 1, "table point expected");
+	luaL_argcheck(L, !EE_CheckRect(L, 2, rect), 2, "table rect expected");
 #else
-	GetPointParam(L, 1, point);
-	GetRectParam(L, 2, rect);
+	EE_CheckPoint(L, 1, point);
+	EE_CheckRect(L, 2, rect);
 #endif
 	lua_pushboolean(
 		L,
@@ -63,15 +63,15 @@ ETHER_API checkPointInRect(lua_State* L)
 }
 
 
-ETHER_API checkPointInCircle(lua_State* L)
+ETHER_API int checkPointInCircle(lua_State* L)
 {
 	SDL_Point point, center;
 #ifdef _ETHER_DEBUG_
-	luaL_argcheck(L, !GetPointParam(L, 1, point), 1, "table point expected");
-	luaL_argcheck(L, !GetPointParam(L, 2, center), 2, "table point expected");
+	luaL_argcheck(L, !EE_CheckPoint(L, 1, point), 1, "table point expected");
+	luaL_argcheck(L, !EE_CheckPoint(L, 2, center), 2, "table point expected");
 #else
-	GetPointParam(L, 1, point);
-	GetPointParam(L, 2, center);
+	EE_CheckPoint(L, 1, point);
+	EE_CheckPoint(L, 2, center);
 #endif
 	lua_pushboolean(
 		L, 
@@ -84,15 +84,15 @@ ETHER_API checkPointInCircle(lua_State* L)
 }
 
 
-ETHER_API checkRectsOverlap(lua_State* L)
+ETHER_API int checkRectsOverlap(lua_State* L)
 {
 	SDL_Rect rect_1, rect_2;
 #ifdef _ETHER_DEBUG_
-	luaL_argcheck(L, !GetRectParam(L, 1, rect_1), 1, "table rect expected");
-	luaL_argcheck(L, !GetRectParam(L, 2, rect_2), 2, "table rect expected");
+	luaL_argcheck(L, !EE_CheckRect(L, 1, rect_1), 1, "table rect expected");
+	luaL_argcheck(L, !EE_CheckRect(L, 2, rect_2), 2, "table rect expected");
 #else
-	GetRectParam(L, 1, rect_1);
-	GetRectParam(L, 2, rect_2);
+	EE_CheckRect(L, 1, rect_1);
+	EE_CheckRect(L, 2, rect_2);
 #endif
 	lua_pushboolean(
 		L, 
@@ -105,15 +105,15 @@ ETHER_API checkRectsOverlap(lua_State* L)
 }
 
 
-ETHER_API checkCirclesOverlap(lua_State* L)
+ETHER_API int checkCirclesOverlap(lua_State* L)
 {
 	SDL_Point center_1, center_2;
 #ifdef _ETHER_DEBUG_
-	luaL_argcheck(L, !GetPointParam(L, 1, center_1), 1, "table point expected");
-	luaL_argcheck(L, !GetPointParam(L, 3, center_2), 3, "table point expected");
+	luaL_argcheck(L, !EE_CheckPoint(L, 1, center_1), 1, "table point expected");
+	luaL_argcheck(L, !EE_CheckPoint(L, 3, center_2), 3, "table point expected");
 #else
-	GetPointParam(L, 1, center_1);
-	GetPointParam(L, 2, center_2);
+	EE_CheckPoint(L, 1, center_1);
+	EE_CheckPoint(L, 2, center_2);
 #endif
 	lua_pushboolean(
 		L,
@@ -126,15 +126,15 @@ ETHER_API checkCirclesOverlap(lua_State* L)
 }
 
 
-ETHER_API getPointsDistance(lua_State* L)
+ETHER_API int getPointsDistance(lua_State* L)
 {
 	SDL_Point point_1, point_2;
 #ifdef _ETHER_DEBUG_
-	luaL_argcheck(L, !GetPointParam(L, 1, point_1), 1, "table point expected");
-	luaL_argcheck(L, !GetPointParam(L, 2, point_2), 2, "table point expected");
+	luaL_argcheck(L, !EE_CheckPoint(L, 1, point_1), 1, "table point expected");
+	luaL_argcheck(L, !EE_CheckPoint(L, 2, point_2), 2, "table point expected");
 #else
-	GetPointParam(L, 1, point_1);
-	GetPointParam(L, 2, point_2);
+	EE_CheckPoint(L, 1, point_1);
+	EE_CheckPoint(L, 2, point_2);
 #endif
 	lua_pushnumber(L, sqrt(pow(point_1.x - point_2.x, 2) + pow(point_1.y - point_2.y, 2)));
 
@@ -142,19 +142,19 @@ ETHER_API getPointsDistance(lua_State* L)
 }
 
 
-ETHER_API getLinesDistance(lua_State* L)
+ETHER_API int getLinesDistance(lua_State* L)
 {
 	SDL_Point point_1, point_2, point_3, point_4;
 #ifdef _ETHER_DEBUG_
-	luaL_argcheck(L, !GetPointParam(L, 1, point_1), 1, "table point expected");
-	luaL_argcheck(L, !GetPointParam(L, 2, point_2), 2, "table point expected");
-	luaL_argcheck(L, !GetPointParam(L, 3, point_3), 3, "table point expected");
-	luaL_argcheck(L, !GetPointParam(L, 4, point_4), 4, "table point expected");
+	luaL_argcheck(L, !EE_CheckPoint(L, 1, point_1), 1, "table point expected");
+	luaL_argcheck(L, !EE_CheckPoint(L, 2, point_2), 2, "table point expected");
+	luaL_argcheck(L, !EE_CheckPoint(L, 3, point_3), 3, "table point expected");
+	luaL_argcheck(L, !EE_CheckPoint(L, 4, point_4), 4, "table point expected");
 #else
-	GetPointParam(L, 1, point_1);
-	GetPointParam(L, 2, point_2);
-	GetPointParam(L, 3, point_3);
-	GetPointParam(L, 4, point_4);
+	EE_CheckPoint(L, 1, point_1);
+	EE_CheckPoint(L, 2, point_2);
+	EE_CheckPoint(L, 3, point_3);
+	EE_CheckPoint(L, 4, point_4);
 #endif
 	if (point_1.x == point_2.x && point_3.x == point_4.x)
 		lua_pushnumber(L, abs(point_3.x - point_1.x));
@@ -168,17 +168,17 @@ ETHER_API getLinesDistance(lua_State* L)
 }
 
 
-ETHER_API getPointLineDistance(lua_State* L)
+ETHER_API int getPointLineDistance(lua_State* L)
 {
 	SDL_Point point_0, point_1, point_2;
 #ifdef _ETHER_DEBUG_
-	luaL_argcheck(L, !GetPointParam(L, 1, point_0), 1, "table point expected");
-	luaL_argcheck(L, !GetPointParam(L, 2, point_1), 2, "table point expected");
-	luaL_argcheck(L, !GetPointParam(L, 2, point_2), 3, "table point expected");
+	luaL_argcheck(L, !EE_CheckPoint(L, 1, point_0), 1, "table point expected");
+	luaL_argcheck(L, !EE_CheckPoint(L, 2, point_1), 2, "table point expected");
+	luaL_argcheck(L, !EE_CheckPoint(L, 2, point_2), 3, "table point expected");
 #else
-	GetPointParam(L, 1, point_0);
-	GetPointParam(L, 2, point_1);
-	GetPointParam(L, 2, point_2);
+	EE_CheckPoint(L, 1, point_0);
+	EE_CheckPoint(L, 2, point_1);
+	EE_CheckPoint(L, 2, point_2);
 #endif
 	if (point_1.x == point_2.x)
 		lua_pushnumber(L, abs(point_1.x - point_0.x));
@@ -192,13 +192,13 @@ ETHER_API getPointLineDistance(lua_State* L)
 }
 
 
-ETHER_API rgbaToHSLA(lua_State* L)
+ETHER_API int rgbaToHSLA(lua_State* L)
 {
 	SDL_Color color;
 #ifdef _ETHER_DEBUG_
-	luaL_argcheck(L, !GetColorParam(L, 1, color), 1, "table color expected");
+	luaL_argcheck(L, !EE_CheckColor(L, 1, color), 1, "table color expected");
 #else
-	GetColorParam(L, 1, color);
+	EE_CheckColor(L, 1, color);
 #endif
 
 	double r = (double)color.r / 255;
@@ -246,7 +246,7 @@ ETHER_API rgbaToHSLA(lua_State* L)
 }
 
 
-ETHER_API hslaToRGBA(lua_State* L)
+ETHER_API int hslaToRGBA(lua_State* L)
 {
 	ColorHSLA color;
 
@@ -322,7 +322,7 @@ ETHER_API hslaToRGBA(lua_State* L)
 }
 
 
-ETHER_API encodeBase64(lua_State* L)
+ETHER_API int encodeBase64(lua_State* L)
 {
 	try
 	{
@@ -339,7 +339,7 @@ ETHER_API encodeBase64(lua_State* L)
 }
 
 
-ETHER_API decodeBase64(lua_State* L)
+ETHER_API int decodeBase64(lua_State* L)
 {
 	try
 	{

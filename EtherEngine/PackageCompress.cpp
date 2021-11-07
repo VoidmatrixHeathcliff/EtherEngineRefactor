@@ -1,7 +1,7 @@
-#include "ModuleCompress.h"
+#include "PackageCompress.h"
 
 
-ETHER_API compressData(lua_State* L)
+ETHER_API int compressData(lua_State* L)
 {
 	size_t size;
 	const char* raw_data = luaL_checklstring(L, 1, &size);
@@ -29,7 +29,7 @@ ETHER_API compressData(lua_State* L)
 }
 
 
-ETHER_API decompressData(lua_State* L)
+ETHER_API int decompressData(lua_State* L)
 {
 	size_t size;
 	const char* compress_data = luaL_checklstring(L, 1, &size);

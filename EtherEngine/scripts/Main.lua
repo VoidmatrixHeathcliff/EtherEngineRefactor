@@ -15,18 +15,25 @@ XML             = require("@XML")
 -- comp_result = DSCompiler.CompileFile("scripts/Test.ds")
 -- JSON.DumpJSONToFile(comp_result, "scripts/AST.json")
 
-print(_VERSION_ENGINE)
+-- print(_VERSION_ENGINE)
 
--- Window.CreateWindow(
---     "TestWindow",
---     {
---         x = Window.WINDOW_POSITION_DEFAULT,
---         y = Window.WINDOW_POSITION_DEFAULT,
---         w = 1280,
---         h = 720
---     },
---     {}
--- )
+Window.Create(
+    "HelloWorld",
+    {
+        x = Window.DEFAULT_POSITION,
+        y = Window.DEFAULT_POSITION,
+        w = 1280,
+        h = 720
+    },
+    {
+        Window.RESIZABLE,
+        Window.MAXIMIZED
+    }
+)
+
+print(Window.GetHandle())
+
+while true do end
 
 -- font = Graphic.LoadFontFromFile("whz.ttf", 35)
 -- image = Graphic.CreateUTF8TextImageBlended(font, "中国智造", 
@@ -49,10 +56,10 @@ print(_VERSION_ENGINE)
 -- end
 
 
-image = Graphic.LoadImageFromFile("ACG.GY_18.jpg")
--- texture = Graphic.CreateTexture(123)  -- 期望接收一个 “Graphic.Image” 类型变量
-width, height = image:GetSize()
-print(width, height)
+-- image = Graphic.LoadImageFromFile("ACG.GY_18.jpg")
+-- -- texture = Graphic.CreateTexture(123)  -- 期望接收一个 “Graphic.Image” 类型变量
+-- width, height = image:GetSize()
+-- print(width, height)
 -- image = nil
 
 -- -- 闭包

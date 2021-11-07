@@ -1,4 +1,4 @@
-#include "ModuleJSON.h"
+#include "PackageJSON.h"
 
 
 bool CheckArrary(lua_State* L, int iIndex)
@@ -183,7 +183,7 @@ void CJson2LuaObj(cJSON* pJsonNode, lua_State* L)
 }
 
 
-ETHER_API loadJSON(lua_State* L)
+ETHER_API int loadJSON(lua_State* L)
 {
 	cJSON* pJsonRoot = cJSON_Parse(luaL_checkstring(L, 1));
 	luaL_argcheck(L, pJsonRoot, 1, string("JSON parse error before: ").append(cJSON_GetErrorPtr()).c_str());
@@ -193,7 +193,7 @@ ETHER_API loadJSON(lua_State* L)
 }
 
 
-ETHER_API loadJSONFromFile(lua_State* L)
+ETHER_API int loadJSONFromFile(lua_State* L)
 {
 	ifstream fin(luaL_checkstring(L, 1));
 	luaL_argcheck(L, fin.good(), 1, "no such JSON file");
@@ -207,7 +207,7 @@ ETHER_API loadJSONFromFile(lua_State* L)
 	return 1;
 }
 
-ETHER_API dumpJSON(lua_State* L)
+ETHER_API int dumpJSON(lua_State* L)
 {
 	char* strJSON = LuaVaule2JSONStr(L, lua_gettop(L) > 1 ? lua_toboolean(L, 2) : false);
 	lua_pushstring(L, strJSON);
@@ -215,7 +215,7 @@ ETHER_API dumpJSON(lua_State* L)
 	return 1;
 }
 
-ETHER_API dumpJSONToFile(lua_State* L)
+ETHER_API int dumpJSONToFile(lua_State* L)
 {
 	ofstream fout(luaL_checkstring(L, 2));
 	luaL_argcheck(L, fout.good(), 1, "cannot open or create such JSON file");

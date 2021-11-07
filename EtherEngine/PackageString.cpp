@@ -1,7 +1,7 @@
-#include "ModuleString.h"
+#include "PackageString.h"
 
 
-ETHER_API gbkToUTF8(lua_State* L)
+ETHER_API int gbkToUTF8(lua_State* L)
 {
 	try
 	{
@@ -16,7 +16,7 @@ ETHER_API gbkToUTF8(lua_State* L)
 }
 
 
-ETHER_API utf8ToGBK(lua_State* L)
+ETHER_API int utf8ToGBK(lua_State* L)
 {
 	try
 	{
@@ -31,9 +31,9 @@ ETHER_API utf8ToGBK(lua_State* L)
 }
 
 
-ETHER_API subStrUTF8(lua_State* L)
+ETHER_API int subStrUTF8(lua_State* L)
 {
-	string strRaw = luaL_checkstring(L, 1);
+	std::string strRaw = luaL_checkstring(L, 1);
 
 	size_t idxStrRaw = 0, lenUTF8 = 0;
 	while (strRaw[idxStrRaw++]) lenUTF8 += ((strRaw[idxStrRaw] & 0xc0) != 0x80);
@@ -71,7 +71,7 @@ ETHER_API subStrUTF8(lua_State* L)
 }
 
 
-ETHER_API lenUTF8(lua_State* L)
+ETHER_API int lenUTF8(lua_State* L)
 {
 	const char* strUTF8 = luaL_checkstring(L, 1);
 	size_t idxStr = 0, length = 0;

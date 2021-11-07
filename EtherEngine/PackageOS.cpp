@@ -1,7 +1,7 @@
-#include "ModuleOS.h"
+#include "PackageOS.h"
 
 
-ETHER_API getBasePath(lua_State * L)
+ETHER_API int getBasePath(lua_State * L)
 {
 	lua_pushstring(L, SDL_GetBasePath());
 
@@ -9,7 +9,7 @@ ETHER_API getBasePath(lua_State * L)
 }
 
 
-ETHER_API setClipboardText(lua_State * L)
+ETHER_API int setClipboardText(lua_State * L)
 {
 	const char* text = luaL_checkstring(L, 1);
 	SDL_SetClipboardText(text);
@@ -18,7 +18,7 @@ ETHER_API setClipboardText(lua_State * L)
 }
 
 
-ETHER_API getClipboardText(lua_State * L)
+ETHER_API int getClipboardText(lua_State * L)
 {
 	lua_pushstring(L, SDL_GetClipboardText());
 
@@ -26,7 +26,7 @@ ETHER_API getClipboardText(lua_State * L)
 }
 
 
-ETHER_API getPlatformType(lua_State * L)
+ETHER_API int getPlatformType(lua_State * L)
 {
 	lua_pushstring(L, SDL_GetPlatform());
 
@@ -34,7 +34,7 @@ ETHER_API getPlatformType(lua_State * L)
 }
 
 
-ETHER_API getCPUCount(lua_State* L)
+ETHER_API int getCPUCount(lua_State* L)
 {
 	lua_pushnumber(L, SDL_GetCPUCount());
 
@@ -42,7 +42,7 @@ ETHER_API getCPUCount(lua_State* L)
 }
 
 
-ETHER_API getSystemTotalRAM(lua_State * L)
+ETHER_API int getSystemTotalRAM(lua_State * L)
 {
 	lua_pushnumber(L, SDL_GetSystemRAM());
 
@@ -50,7 +50,7 @@ ETHER_API getSystemTotalRAM(lua_State * L)
 }
 
 
-ETHER_API getAppStorageDirectory(lua_State* L)
+ETHER_API int getAppStorageDirectory(lua_State* L)
 {
 	lua_pushstring(L, SDL_GetPrefPath(luaL_checkstring(L, 1), luaL_checkstring(L, 2)));
 
@@ -58,7 +58,7 @@ ETHER_API getAppStorageDirectory(lua_State* L)
 }
 
 
-ETHER_API getSpecialPath(lua_State* L)
+ETHER_API int getSpecialPath(lua_State* L)
 {
 #ifdef __WINDOWS__
 
@@ -243,7 +243,7 @@ ETHER_API getSpecialPath(lua_State* L)
 }
 
 
-ETHER_API getPowerInfo(lua_State* L)
+ETHER_API int getPowerInfo(lua_State* L)
 {
 	int secs, pct;
 	lua_newtable(L);
@@ -283,7 +283,7 @@ ETHER_API getPowerInfo(lua_State* L)
 }
 
 
-ETHER_API listDirectory(lua_State* L)
+ETHER_API int listDirectory(lua_State* L)
 {
 
 #ifdef __WINDOWS__
@@ -325,7 +325,7 @@ ETHER_API listDirectory(lua_State* L)
 }
 
 
-ETHER_API checkPathExist(lua_State* L)
+ETHER_API int checkPathExist(lua_State* L)
 {
 	int mode = PATHMODE_FILEANDDIR;
 	if (lua_isnumber(L, 2))
@@ -384,7 +384,7 @@ ETHER_API checkPathExist(lua_State* L)
 }
 
 
-ETHER_API getPathInfo(lua_State* L)
+ETHER_API int getPathInfo(lua_State* L)
 {
 
 #ifdef __WINDOWS__
@@ -471,7 +471,7 @@ ETHER_API getPathInfo(lua_State* L)
 }
 
 
-ETHER_API joinPath(lua_State* L)
+ETHER_API int joinPath(lua_State* L)
 {
 	string path_1 = luaL_checkstring(L, 1);
 	string path_2 = luaL_checkstring(L, 2);
@@ -486,7 +486,7 @@ ETHER_API joinPath(lua_State* L)
 }
 
 
-ETHER_API splitPath(lua_State* L)
+ETHER_API int splitPath(lua_State* L)
 {
 	string path = luaL_checkstring(L, 1);
 	string::size_type index_slash = path.find_last_of('/');
