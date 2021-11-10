@@ -4,6 +4,10 @@
 #include <lua.hpp>
 #include <cJSON.h>
 
+#include <map>
+#include <vector>
+#include <string>
+
 #ifndef __WINDOWS__
 extern char** environ;
 #endif	// !__WINDOWS__
@@ -87,7 +91,8 @@ int main(int argc, char** argv)
 			&& (pJSONConfigPath->type == cJSON_Array))
 		{
 			lua_getglobal(pGlobalLuaVM, "package");
-			lua_getfield(pGlobalLuaVM, -1, "path");
+			lua_pushstring(pGlobalLuaVM, "path");
+			lua_rawget(pGlobalLuaVM, -2);
 			std::string _strPath = lua_tostring(pGlobalLuaVM, -1);
 			int _nArraySize = cJSON_GetArraySize(pJSONConfigPackage);
 			for (int i = 0; i < _nArraySize; i++)
@@ -106,7 +111,8 @@ int main(int argc, char** argv)
 			&& pJSONConfigCPath->type == cJSON_Array)
 		{
 			lua_getglobal(pGlobalLuaVM, "package");
-			lua_getfield(pGlobalLuaVM, -1, "cpath");
+			lua_pushstring(pGlobalLuaVM, "cpath");
+			lua_rawget(pGlobalLuaVM, -2);
 			std::string _strCPath = lua_tostring(pGlobalLuaVM, -1);
 			int _nArraySize = cJSON_GetArraySize(pJSONConfigPackage);
 			for (int i = 0; i < _nArraySize; i++)
@@ -128,7 +134,6 @@ int main(int argc, char** argv)
 	if ((pJSONConfigCommand = cJSON_GetObjectItem(pJSONConfigRoot, "command"))
 		&& (pJSONConfigCommand->type == cJSON_Array))
 	{
-		lua_newtable(pGlobalLuaVM);
 		int _nArraySize = cJSON_GetArraySize(pJSONConfigCommand);
 		for (int i = 0; i < _nArraySize; i++)
 		{
@@ -146,45 +151,47 @@ int main(int argc, char** argv)
 	/*
 		传递启动参数和环境变量
 	*/
-	lua_newtable(pGlobalLuaVM);
+	lua_createtable(pGlobalLuaVM, argc, 0);
 	for (int i = 0; i < argc; i++)
 	{
-		lua_pushinteger(pGlobalLuaVM, i + 1);
 		lua_pushstring(pGlobalLuaVM, argv[i]);
-		lua_settable(pGlobalLuaVM, -3);
+		lua_rawseti(pGlobalLuaVM, -2, i + 1);
 	}
 	for (int i = argc; i < vCommandList.size() + argc; i++)
 	{
-		lua_pushinteger(pGlobalLuaVM, i + 1);
-		lua_pushstring(pGlobalLuaVM, vCommandList[i - argc].c_str());
-		lua_settable(pGlobalLuaVM, -3);
+		lua_pushstring(pGlobalLuaVM, vCommandList[(size_t)i - argc].c_str());
+		lua_rawseti(pGlobalLuaVM, -2, i + 1);
 	}
 	lua_setglobal(pGlobalLuaVM, "_ARGV");
 	std::vector<std::string>().swap(vCommandList);
 	
-	lua_newtable(pGlobalLuaVM);
-	for (int i = 0; environ[i]; i++)
+	int lenEnviron = 0; while (environ[lenEnviron]) lenEnviron++;
+	lua_createtable(pGlobalLuaVM, 0, lenEnviron);
+	for (int i = 0; i < lenEnviron; i++)
 	{
 		std::string strEnvp = environ[i];
 		size_t nIndexEqual = strEnvp.find_first_of('=');
 		lua_pushstring(pGlobalLuaVM, strEnvp.substr(0, nIndexEqual).c_str());
 		lua_pushstring(pGlobalLuaVM, strEnvp.substr(nIndexEqual + 1).c_str());
-		lua_settable(pGlobalLuaVM, -3);
+		lua_rawset(pGlobalLuaVM, -3);
 	}
 	lua_setglobal(pGlobalLuaVM, "_ENVP");
 
 	/*
 		设置 Built-in Package 数据
 	*/
-	std::vector<function<void()>> vecOnExitCallback;
+	std::map<const std::string, function<void()>> mapOnExitCallback;
 	lua_getglobal(pGlobalLuaVM, "package");
-	lua_getfield(pGlobalLuaVM, -1, "preload");
+	lua_pushstring(pGlobalLuaVM, "preload");
+	lua_rawget(pGlobalLuaVM, -2);
 	for (const BuiltinPackageData& pkg : BuiltinPackageList)
 	{
 		lua_pushstring(pGlobalLuaVM, pkg.name.c_str());
 		lua_pushcfunction(pGlobalLuaVM, pkg.on_load);
-		lua_settable(pGlobalLuaVM, -3);
-		if (pkg.on_exit) vecOnExitCallback.push_back(pkg.on_exit);
+		lua_rawset(pGlobalLuaVM, -3);
+		if (pkg.on_exit)
+			mapOnExitCallback.insert(std::pair<const std::string, 
+				function<void()>>(pkg.name, pkg.on_exit));
 	}
 	lua_pop(pGlobalLuaVM, 2);
 	std::vector<BuiltinPackageData>().swap(BuiltinPackageList);
@@ -226,7 +233,18 @@ int main(int argc, char** argv)
 	/*
 		释放引擎资源
 	*/
-	for (const OnExitCallBack& cb : vecOnExitCallback) cb();
+	lua_getglobal(pGlobalLuaVM, "package");
+	lua_pushstring(pGlobalLuaVM, "loaded");
+	lua_rawget(pGlobalLuaVM, -2);
+	for (const auto& cb : mapOnExitCallback)
+	{
+		lua_pushstring(pGlobalLuaVM, cb.first.c_str());
+		lua_rawget(pGlobalLuaVM, -2);
+		if (!lua_isnil(pGlobalLuaVM, -1) && cb.second) cb.second();
+		lua_pop(pGlobalLuaVM, 1);
+	}
+	lua_pop(pGlobalLuaVM, 2);
+	lua_close(pGlobalLuaVM);
 
 	SDL_Quit();
 

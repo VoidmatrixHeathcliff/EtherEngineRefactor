@@ -55,38 +55,38 @@ inline void EE_PushBuiltinPackageData(lua_State* pLuaVM,
 		if (!mt.func_list.empty())
 		{
 			lua_pushstring(pLuaVM, "__index");
-			lua_newtable(pLuaVM);
+			lua_createtable(pLuaVM, 0, mt.func_list.size());
 			for (const luaL_Reg& func : mt.func_list)
 			{
 				lua_pushstring(pLuaVM, func.name);
 				lua_pushcfunction(pLuaVM, func.func);
-				lua_settable(pLuaVM, -3);
+				lua_rawset(pLuaVM, -3);
 			}
-			lua_settable(pLuaVM, -3);
+			lua_rawset(pLuaVM, -3);
 		}
 		
 		if (mt.gc_func)
 		{
 			lua_pushstring(pLuaVM, "__gc");
 			lua_pushcfunction(pLuaVM, mt.gc_func);
-			lua_settable(pLuaVM, -3);
+			lua_rawset(pLuaVM, -3);
 		}
 	}
 
-	lua_newtable(pLuaVM);
+	lua_createtable(pLuaVM, 0, func_list.size() + enum_list.size());
 
 	for (const luaL_Reg& func : func_list)
 	{
 		lua_pushstring(pLuaVM, func.name);
 		lua_pushcfunction(pLuaVM, func.func);
-		lua_settable(pLuaVM, -3);
+		lua_rawset(pLuaVM, -3);
 	}
 
 	for (const ParamEnum& pe : enum_list)
 	{
 		lua_pushstring(pLuaVM, pe.name.c_str());
 		lua_pushinteger(pLuaVM, pe.value);
-		lua_settable(pLuaVM, -3);
+		lua_rawset(pLuaVM, -3);
 	}
 }
 
@@ -864,6 +864,13 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 		"@Window",
 		[](lua_State* pLuaVM) -> int
 		{
+			Window_pMsgBoxColorScheme = new SDL_MessageBoxColorScheme();
+			Window_pMsgBoxColorScheme->colors[0] = { 255, 0, 0 };
+			Window_pMsgBoxColorScheme->colors[1] = { 0, 255, 0 };
+			Window_pMsgBoxColorScheme->colors[2] = { 255, 255, 0 };
+			Window_pMsgBoxColorScheme->colors[3] = { 0, 0, 255 };
+			Window_pMsgBoxColorScheme->colors[4] = { 255, 0, 255 };
+
 			std::vector<luaL_Reg> func_list = {
 				{ "GetWindowHandle",	EAPI_Window_GetWindowHandle},
 				{ "GetRendererHandle",	EAPI_Window_GetRendererHandle},
@@ -890,19 +897,19 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 			};
 
 			std::vector<ParamEnum> enum_list = {
-				{ "DEFAULT_POSITION", WINDOW_POSDEFAULT },
+				{ "DEFAULT_POSITION",	WINDOW_POSDEFAULT },
 
-				{ "ERROR",		MSGBOX_ERROR },
-				{ "WARNING",	MSGBOX_WARNING },
-				{ "INFO",		MSGBOX_INFO },
+				{ "MSGBOX_ERROR",		MSGBOX_ERROR },
+				{ "MSGBOX_WARNING",		MSGBOX_WARNING },
+				{ "MSGBOX_INFO",		MSGBOX_INFO },
 
-				{ "FULLSCREEN", WINDOW_FULLSCREEN },
-				{ "BORDERLESS", WINDOW_BORDERLESS },
-				{ "RESIZABLE",	WINDOW_RESIZABLE },
-				{ "MAXIMIZED",	WINDOW_MAXIMIZED },
-				{ "MINIMIZED",	WINDOW_MINIMIZED },
-				{ "WINDOWED",	WINDOW_WINDOWED },
-				{ "FIXED",		WINDOW_FIXED },
+				{ "STYLE_FULLSCREEN",	WINDOW_FULLSCREEN },
+				{ "STYLE_BORDERLESS",	WINDOW_BORDERLESS },
+				{ "STYLE_RESIZABLE",	WINDOW_RESIZABLE },
+				{ "STYLE_MAXIMIZED",	WINDOW_MAXIMIZED },
+				{ "STYLE_MINIMIZED",	WINDOW_MINIMIZED },
+				{ "STYLE_WINDOWED",		WINDOW_WINDOWED },
+				{ "STYLE_FIXED",		WINDOW_FIXED },
 			};
 
 			std::vector<MetaTableData> metatable_list = {
@@ -927,6 +934,9 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 				SDL_DestroyWindow(pGlobalWindow);
 				pGlobalWindow = nullptr;
 			}
+
+			delete Window_pMsgBoxColorScheme;
+			Window_pMsgBoxColorScheme = nullptr;
 		}
 	},
 	{ 

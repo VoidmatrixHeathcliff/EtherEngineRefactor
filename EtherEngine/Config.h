@@ -1,6 +1,8 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
+#pragma warning(disable:26812)
+
 static const char* VERSION_ENGINE = "Ver.202111.0.1(ISE)";
 
 #define ETHER_API extern "C"

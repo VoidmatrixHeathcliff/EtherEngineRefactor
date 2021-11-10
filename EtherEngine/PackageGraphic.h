@@ -1,5 +1,5 @@
-#ifndef _GRAPHIC_H_
-#define _GRAPHIC_H_
+#ifndef _PACKAGE_GRAPHIC_H_
+#define _PACKAGE_GRAPHIC_H_
 
 #include "Config.h"
 #include "Utils.h"
@@ -10,23 +10,17 @@
 #include <SDL_ttf.h>
 #include <SDL2_gfxPrimitives.h>
 
-#define FONT_STYLE_BOLD						1303
-#define FONT_STYLE_ITALIC					1304
-#define FONT_STYLE_UNDERLINE				1305
-#define FONT_STYLE_STRIKETHROUGH			1306
-#define FONT_STYLE_NORMAL					1307
+#include <vector>
 
-#define FLIP_HORIZONTAL						1010
-#define FLIP_VERTICAL						1011
-#define FLIP_NONE							1012	
+static const int FONT_BOLD			= 0;
+static const int FONT_ITALIC		= 1;
+static const int FONT_UNDERLINE		= 2;
+static const int FONT_STRIKETHROUGH	= 3;
+static const int FONT_NORMAL		= 4;
 
-#define GetImageDataAt1stPos()				(SDL_Surface*)(*(void**)luaL_checkudata(L, 1, METANAME_IMAGE))
-#define GetTextureDataAt1stPos()			(SDL_Texture*)(*(void**)luaL_checkudata(L, 1, METANAME_TEXTURE))
-#define GetFontDataAt1stPos()				(TTF_Font*)(*(void**)luaL_checkudata(L, 1, METANAME_FONT))
-
-#define CheckImageDataAt1stPos(surface)		luaL_argcheck(L, surface, 1, "get image data failed")
-#define CheckTextureDataAt1stPos(texture)	luaL_argcheck(L, texture, 1, "get texture data failed")
-#define CheckFontDataAt1stPos(font)			luaL_argcheck(L, font, 1, "get font data failed")
+static const int FLIP_HORIZONTAL	= 0;
+static const int FLIP_VERTICAL		= 1;
+static const int FLIP_NONE			= 2;
 
 extern SDL_Renderer* pGlobalRenderer;
 
@@ -270,4 +264,4 @@ ETHER_API int createTextImageBlended(lua_State* L);
 // 1返回值：成功则返回图像数据（userdata-IMAGE），失败则返回nil
 ETHER_API int createUTF8TextImageBlended(lua_State* L);
 
-#endif // !_GRAPHIC_H_
+#endif // !_PACKAGE_GRAPHIC_H_

@@ -1,16 +1,5 @@
 #include "PackageWindow.h"
 
-static const SDL_MessageBoxColorScheme MsgBoxColorScheme = 
-{
-	{
-		{ 255, 0, 0 },
-		{ 0, 255, 0 },
-		{ 255, 255, 0 },
-		{ 0, 0, 255 },
-		{ 255, 0, 255 }
-	}
-};
-
 ETHER_API int EAPI_Window_GetWindowHandle(lua_State* pLuaVM)
 {
 	EE_PushUserdata<SDL_Window>(pLuaVM, pGlobalWindow, METANAME_HANDLEWINDOW);
@@ -33,9 +22,7 @@ ETHER_API int EAPI_Window_MessageBox(lua_State* pLuaVM)
 	case MSGBOX_ERROR:	_flag = SDL_MESSAGEBOX_ERROR; break;
 	case MSGBOX_WARNING: _flag = SDL_MESSAGEBOX_WARNING; break;
 	case MSGBOX_INFO: _flag = SDL_MESSAGEBOX_INFORMATION; break;
-	default:
-		luaL_argerror(pLuaVM, 1, ERRMSG_INVALIDENUM);
-		break;
+	default: luaL_argerror(pLuaVM, 1, ERRMSG_INVALIDENUM); break;
 	}
 	SDL_ShowSimpleMessageBox(
 		_flag, 
@@ -55,9 +42,7 @@ ETHER_API int EAPI_Window_ConfirmBox(lua_State* pLuaVM)
 	case MSGBOX_ERROR:	_flag = SDL_MESSAGEBOX_ERROR; break;
 	case MSGBOX_WARNING: _flag = SDL_MESSAGEBOX_WARNING; break;
 	case MSGBOX_INFO: _flag = SDL_MESSAGEBOX_INFORMATION; break;
-	default:
-		luaL_argerror(pLuaVM, 1, ERRMSG_INVALIDENUM);
-		break;
+	default: luaL_argerror(pLuaVM, 1, ERRMSG_INVALIDENUM); break;
 	}
 
 	SDL_MessageBoxButtonData _btnData[2] = 
@@ -76,7 +61,7 @@ ETHER_API int EAPI_Window_ConfirmBox(lua_State* pLuaVM)
 		(Uint32)_flag, pGlobalWindow,
 		luaL_checkstring(pLuaVM, 2),
 		luaL_checkstring(pLuaVM, 3),
-		2, _btnData, &MsgBoxColorScheme
+		2, _btnData, Window_pMsgBoxColorScheme
 	};
 
 	int _btnID = 0;

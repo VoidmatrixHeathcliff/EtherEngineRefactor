@@ -11,12 +11,6 @@
 #include <string>
 #include <functional>
 
-#define CheckPointParam(L, index, point)	luaL_argcheck(L, !GetPointParam(L, index, point), index, "table point expected") 
-#define CheckRectParam(L, index, rect)		luaL_argcheck(L, !GetRectParam(L, index, rect), index, "table rect expected") 
-#define CheckColorParam(L, index, color)	luaL_argcheck(L, !GetColorParam(L, index, color), index, "table color expected") 
-
-#define CheckTableParam(L, index)			luaL_argcheck(L, lua_istable(L, index), index, "table expected") 
-
 void EE_CheckPoint(lua_State* pLuaVM, int idx, SDL_Point& point);
 void EE_CheckRect(lua_State* pLuaVM, int idx, SDL_Rect& rect);
 void EE_CheckColor(lua_State* pLuaVM, int idx, SDL_Color& color);
@@ -42,13 +36,13 @@ inline void EE_CheckPoint(lua_State* pLuaVM, int idx, SDL_Point& point)
 {
 	luaL_argexpected(pLuaVM, lua_istable(pLuaVM, idx), idx, LUA_TABLIBNAME);
 
-	lua_getfield(pLuaVM, idx, "x");
+	lua_pushstring(pLuaVM, "x"); lua_rawget(pLuaVM, idx);
 	luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1),
 		idx, std::string(ERRMSG_INVALIDMEMBER).append(":x").c_str());
 	point.x = (int)lua_tointeger(pLuaVM, -1);
 	lua_pop(pLuaVM, 1);
 
-	lua_getfield(pLuaVM, idx, "y");
+	lua_pushstring(pLuaVM, "y"); lua_rawget(pLuaVM, idx);
 	luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1),
 		idx, std::string(ERRMSG_INVALIDMEMBER).append(":y").c_str());
 	point.y = (int)lua_tointeger(pLuaVM, -1);
@@ -59,25 +53,25 @@ inline void EE_CheckRect(lua_State* pLuaVM, int idx, SDL_Rect& rect)
 {
 	luaL_argexpected(pLuaVM, lua_istable(pLuaVM, idx), idx, LUA_TABLIBNAME);
 
-	lua_getfield(pLuaVM, idx, "x");
+	lua_pushstring(pLuaVM, "x"); lua_rawget(pLuaVM, idx);
 	luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1),
 		idx, std::string(ERRMSG_INVALIDMEMBER).append(":x").c_str());
 	rect.x = (int)lua_tointeger(pLuaVM, -1);
 	lua_pop(pLuaVM, 1);
 
-	lua_getfield(pLuaVM, idx, "y");
+	lua_pushstring(pLuaVM, "y"); lua_rawget(pLuaVM, idx);
 	luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1),
 		idx, std::string(ERRMSG_INVALIDMEMBER).append(":y").c_str());
 	rect.y = (int)lua_tointeger(pLuaVM, -1);
 	lua_pop(pLuaVM, 1);
 
-	lua_getfield(pLuaVM, idx, "w");
+	lua_pushstring(pLuaVM, "w"); lua_rawget(pLuaVM, idx);
 	luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1),
 		idx, std::string(ERRMSG_INVALIDMEMBER).append(":w").c_str());
 	rect.w = (int)lua_tointeger(pLuaVM, -1);
 	lua_pop(pLuaVM, 1);
 
-	lua_getfield(pLuaVM, idx, "h");
+	lua_pushstring(pLuaVM, "h"); lua_rawget(pLuaVM, idx);
 	luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1),
 		idx, std::string(ERRMSG_INVALIDMEMBER).append(":h").c_str());
 	rect.h = (int)lua_tointeger(pLuaVM, -1);
@@ -88,25 +82,25 @@ inline void EE_CheckColor(lua_State* pLuaVM, int idx, SDL_Color& color)
 {
 	luaL_argexpected(pLuaVM, lua_istable(pLuaVM, idx), idx, LUA_TABLIBNAME);
 
-	lua_getfield(pLuaVM, idx, "r");
+	lua_pushstring(pLuaVM, "r"); lua_rawget(pLuaVM, idx);
 	luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1),
 		idx, std::string(ERRMSG_INVALIDMEMBER).append(":r").c_str());
 	color.r = (int)lua_tointeger(pLuaVM, -1);
 	lua_pop(pLuaVM, 1);
 
-	lua_getfield(pLuaVM, idx, "g");
+	lua_pushstring(pLuaVM, "g"); lua_rawget(pLuaVM, idx);
 	luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1),
 		idx, std::string(ERRMSG_INVALIDMEMBER).append(":g").c_str());
 	color.g = (int)lua_tointeger(pLuaVM, -1);
 	lua_pop(pLuaVM, 1);
 
-	lua_getfield(pLuaVM, idx, "b");
+	lua_pushstring(pLuaVM, "b"); lua_rawget(pLuaVM, idx);
 	luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1),
 		idx, std::string(ERRMSG_INVALIDMEMBER).append(":b").c_str());
 	color.b = (int)lua_tointeger(pLuaVM, -1);
 	lua_pop(pLuaVM, 1);
 
-	lua_getfield(pLuaVM, idx, "a");
+	lua_pushstring(pLuaVM, "a"); lua_rawget(pLuaVM, idx);
 	luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1),
 		idx, std::string(ERRMSG_INVALIDMEMBER).append(":a").c_str());
 	color.a = (int)lua_tointeger(pLuaVM, -1);
