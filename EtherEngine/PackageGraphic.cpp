@@ -327,13 +327,13 @@ ETHER_API int EAPI_Graphic_DrawPolygon(lua_State* pLuaVM)
 			luaL_argcheck(pLuaVM, lua_istable(pLuaVM, -1), 1, "elements expected table");
 
 			lua_pushstring(pLuaVM, "x"); lua_rawget(pLuaVM, -1);
-			luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1), 1, std::string("element at ")
+			luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1), 1, std::string("point at #")
 				.append(std::to_string(lua_tointeger(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(":x").c_str());
 			_point.x = (int)lua_tointeger(pLuaVM, -1);
 			lua_pop(pLuaVM, 1);
 
 			lua_pushstring(pLuaVM, "y"); lua_rawget(pLuaVM, -1);
-			luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1), 1, std::string("element at ")
+			luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1), 1, std::string("point at #")
 				.append(std::to_string(lua_tointeger(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(":y").c_str());
 			_point.y = (int)lua_tointeger(pLuaVM, -1);
 			lua_pop(pLuaVM, 1);
@@ -346,7 +346,6 @@ ETHER_API int EAPI_Graphic_DrawPolygon(lua_State* pLuaVM)
 
 	SDL_Color _color;
 	SDL_GetRenderDrawColor(pGlobalRenderer, &(_color.r), &(_color.g), &(_color.b), &(_color.a));
-
 	if (!lua_toboolean(pLuaVM, 2))
 		aapolygonRGBA(pGlobalRenderer, &_vecx[0], &_vecy[0], (int)_vecx.size(),
 			_color.r, _color.g, _color.b, _color.a);
@@ -356,6 +355,45 @@ ETHER_API int EAPI_Graphic_DrawPolygon(lua_State* pLuaVM)
 
 	return 0;
 }
+
+ETHER_API int EAPI_Graphic_DrawBezier(lua_State* pLuaVM)
+{
+	std::vector<Sint16> _vecx, _vecy;
+	luaL_argexpected(pLuaVM, lua_istable(pLuaVM, 1), 1, LUA_TABLIBNAME);
+	EE_TraverseTable(
+		pLuaVM, 1,
+		[&]() -> bool
+		{
+			SDL_Point _point;
+
+			luaL_argcheck(pLuaVM, lua_istable(pLuaVM, -1), 1, "elements expected table");
+
+			lua_pushstring(pLuaVM, "x"); lua_rawget(pLuaVM, -1);
+			luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1), 1, std::string("point at #")
+				.append(std::to_string(lua_tointeger(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(":x").c_str());
+			_point.x = (int)lua_tointeger(pLuaVM, -1);
+			lua_pop(pLuaVM, 1);
+
+			lua_pushstring(pLuaVM, "y"); lua_rawget(pLuaVM, -1);
+			luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1), 1, std::string("point at #")
+				.append(std::to_string(lua_tointeger(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(":y").c_str());
+			_point.y = (int)lua_tointeger(pLuaVM, -1);
+			lua_pop(pLuaVM, 1);
+
+			_vecx.push_back(_point.x); _vecy.push_back(_point.y);
+
+			return true;
+		}
+	);
+
+	SDL_Color _color;
+	SDL_GetRenderDrawColor(pGlobalRenderer, &(_color.r), &(_color.g), &(_color.b), &(_color.a));
+	bezierRGBA(pGlobalRenderer, &_vecx[0], &_vecy[0], (int)_vecx.size(), (int)lua_tonumber(pLuaVM, 2),
+		_color.r, _color.g, _color.b, _color.a);
+
+	return 0;
+}
+
 
 
 
