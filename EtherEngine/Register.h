@@ -21,8 +21,6 @@
 #include <string>
 #include <functional>
 
-typedef std::function<void()> OnExitCallBack;
-
 struct ParamEnum
 {
 	std::string name;
@@ -40,7 +38,6 @@ struct BuiltinPackageData
 {
 	std::string name;
 	lua_CFunction on_load;
-	OnExitCallBack on_exit;
 };
 
 inline void EE_PushBuiltinPackageData(lua_State* pLuaVM, 
@@ -88,6 +85,17 @@ inline void EE_PushBuiltinPackageData(lua_State* pLuaVM,
 		lua_pushinteger(pLuaVM, pe.value);
 		lua_rawset(pLuaVM, -3);
 	}
+}
+
+inline void EE_SetPackageGCFunc(lua_State* pLuaVM, lua_CFunction gc)
+{
+	lua_createtable(pLuaVM, 0, 1);
+
+	lua_pushstring(pLuaVM, "__gc");
+	lua_pushcfunction(pLuaVM, gc);
+	lua_rawset(pLuaVM, -3);
+
+	lua_setmetatable(pLuaVM, -2);
 }
 
 static std::vector<BuiltinPackageData> BuiltinPackageList =
@@ -206,12 +214,16 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 
 			EE_PushBuiltinPackageData(pLuaVM, func_list, enum_list, metatable_list);
 
+			EE_SetPackageGCFunc(
+				pLuaVM,
+				[](lua_State* pLuaVM) -> int
+				{
+					TTF_Quit(); IMG_Quit();
+
+					return 0;
+				});
+
 			return 1;
-		},
-		[]() -> void
-		{
-			TTF_Quit(); 
-			IMG_Quit();
 		}
 	},
 	{ 
@@ -600,11 +612,16 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 
 			EE_PushBuiltinPackageData(pLuaVM, func_list, enum_list, metatable_list);
 
+			EE_SetPackageGCFunc(
+				pLuaVM,
+				[](lua_State* pLuaVM) -> int
+				{
+					Mix_CloseAudio(); Mix_Quit();
+
+					return 0;
+				});
+
 			return 1;
-		},
-		[]() -> void
-		{
-			Mix_CloseAudio(); Mix_Quit();
 		}
 	},
 	{ 
@@ -871,9 +888,28 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 			Window_pMsgBoxColorScheme->colors[3] = { 0, 0, 255 };
 			Window_pMsgBoxColorScheme->colors[4] = { 255, 0, 255 };
 
+			Window_mapCursor = {
+				{ WINDOW_CURSOR_ARROW,		SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW) },
+				{ WINDOW_CURSOR_IBEAM,		SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM) },
+				{ WINDOW_CURSOR_WAIT,		SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_WAIT) },
+				{ WINDOW_CURSOR_CROSSHAIR,	SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_CROSSHAIR) },
+				{ WINDOW_CURSOR_WAITARROW,	SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_WAITARROW) },
+				{ WINDOW_CURSOR_SIZENWSE,	SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENWSE) },
+				{ WINDOW_CURSOR_SIZENESW,	SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENESW) },
+				{ WINDOW_CURSOR_SIZEWE,		SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEWE) },
+				{ WINDOW_CURSOR_SIZENS,		SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENS) },
+				{ WINDOW_CURSOR_SIZEALL,	SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL) },
+				{ WINDOW_CURSOR_NO,			SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NO) },
+				{ WINDOW_CURSOR_HAND,		SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND) },
+			};
+
 			std::vector<luaL_Reg> func_list = {
 				{ "GetWindowHandle",	EAPI_Window_GetWindowHandle},
 				{ "GetRendererHandle",	EAPI_Window_GetRendererHandle},
+				{ "SetCursorShown",		EAPI_Window_SetCursorShown},
+				{ "GetCursorShown",		EAPI_Window_GetCursorShown},
+				{ "SetCursorStyle",		EAPI_Window_SetCursorStyle},
+				{ "GetCursorStyle",		EAPI_Window_GetCursorStyle},
 				{ "MessageBox",			EAPI_Window_MessageBox},
 				{ "ConfirmBox",			EAPI_Window_ConfirmBox},
 				{ "Create",				EAPI_Window_Create },
@@ -897,46 +933,74 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 			};
 
 			std::vector<ParamEnum> enum_list = {
-				{ "DEFAULT_POSITION",	WINDOW_POSDEFAULT },
+				{ "DEFAULT_POS",		WINDOW_POSDEFAULT },
 
-				{ "MSGBOX_ERROR",		MSGBOX_ERROR },
-				{ "MSGBOX_WARNING",		MSGBOX_WARNING },
-				{ "MSGBOX_INFO",		MSGBOX_INFO },
+				{ "MSGBOX_ERR",			WINDOW_MSGBOX_ERROR },
+				{ "MSGBOX_WARN",		WINDOW_MSGBOX_WARNING },
+				{ "MSGBOX_INFO",		WINDOW_MSGBOX_INFO },
 
-				{ "STYLE_FULLSCREEN",	WINDOW_FULLSCREEN },
-				{ "STYLE_BORDERLESS",	WINDOW_BORDERLESS },
-				{ "STYLE_RESIZABLE",	WINDOW_RESIZABLE },
-				{ "STYLE_MAXIMIZED",	WINDOW_MAXIMIZED },
-				{ "STYLE_MINIMIZED",	WINDOW_MINIMIZED },
-				{ "STYLE_WINDOWED",		WINDOW_WINDOWED },
-				{ "STYLE_FIXED",		WINDOW_FIXED },
+				{ "FULLSCREEN",			WINDOW_FULLSCREEN },
+				{ "BORDERLESS",			WINDOW_BORDERLESS },
+				{ "RESIZABLE",			WINDOW_RESIZABLE },
+				{ "MAXIMIZED",			WINDOW_MAXIMIZED },
+				{ "MINIMIZED",			WINDOW_MINIMIZED },
+				{ "WINDOWED",			WINDOW_WINDOWED },
+				{ "FIXED",				WINDOW_FIXED },
+
+				{ "CURSOR_ARROW",		WINDOW_CURSOR_ARROW },
+				{ "CURSOR_IBEAM",		WINDOW_CURSOR_IBEAM },
+				{ "CURSOR_WAIT",		WINDOW_CURSOR_WAIT },
+				{ "CURSOR_CROSSHAIR",	WINDOW_CURSOR_CROSSHAIR },
+				{ "CURSOR_WAITARROW",	WINDOW_CURSOR_WAITARROW },
+				{ "CURSOR_SIZENWSE",	WINDOW_CURSOR_SIZENWSE },
+				{ "CURSOR_SIZENESW",	WINDOW_CURSOR_SIZENESW },
+				{ "CURSOR_SIZEWE",		WINDOW_CURSOR_SIZEWE },
+				{ "CURSOR_SIZENS",		WINDOW_CURSOR_SIZENS },
+				{ "CURSOR_SIZEALL",		WINDOW_CURSOR_SIZEALL },
+				{ "CURSOR_NO},",		WINDOW_CURSOR_NO },
+				{ "CURSOR_HAND",		WINDOW_CURSOR_HAND },
 			};
 
 			std::vector<MetaTableData> metatable_list = {
 				{
 					METANAME_HANDLEWINDOW
+				},
+				{
+					METANAME_HANDLERENDERER
 				}
 			};
 
 			EE_PushBuiltinPackageData(pLuaVM, func_list, enum_list, metatable_list);
 
-			return 1;
-		},
-		[]() -> void
-		{
-			if (pGlobalRenderer)
-			{
-				SDL_DestroyRenderer(pGlobalRenderer);
-				pGlobalRenderer = nullptr;
-			}
-			if (pGlobalWindow)
-			{
-				SDL_DestroyWindow(pGlobalWindow);
-				pGlobalWindow = nullptr;
-			}
+			EE_SetPackageGCFunc(
+				pLuaVM,
+				[](lua_State* pLuaVM) -> int
+				{
+					if (pGlobalRenderer)
+					{
+						SDL_DestroyRenderer(pGlobalRenderer);
+						pGlobalRenderer = nullptr;
+					}
+					if (pGlobalWindow)
+					{
+						SDL_DestroyWindow(pGlobalWindow);
+						pGlobalWindow = nullptr;
+					}
 
-			delete Window_pMsgBoxColorScheme;
-			Window_pMsgBoxColorScheme = nullptr;
+					delete Window_pMsgBoxColorScheme;
+					Window_pMsgBoxColorScheme = nullptr;
+
+					for (auto& pair : Window_mapCursor)
+					{
+						SDL_FreeCursor(pair.second);
+						pair.second = nullptr;
+					}
+					std::map<int, SDL_Cursor*>().swap(Window_mapCursor);
+
+					return 0;
+				});
+
+			return 1;
 		}
 	},
 	{ 

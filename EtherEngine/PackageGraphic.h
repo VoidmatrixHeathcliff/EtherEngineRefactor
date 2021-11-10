@@ -24,11 +24,6 @@ static const int FLIP_NONE			= 2;
 
 extern SDL_Renderer* pGlobalRenderer;
 
-// 设置鼠标是否显示
-// 1参数：是否显示（boolean）
-// 0返回值
-ETHER_API int setCursorShow(lua_State* L);
-
 // 从文件中加载图像
 // 1参数：图像文件路径（string）
 // 1返回值：成功则返回图像数据（userdata-IMAGE），失败则返回nil

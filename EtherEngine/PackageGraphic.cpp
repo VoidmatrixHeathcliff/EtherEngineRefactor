@@ -1,12 +1,5 @@
 #include "PackageGraphic.h"
 
-ETHER_API int EAPI_Graphic_SetCursorShown(lua_State* pLuaVM)
-{
-	SDL_ShowCursor(lua_toboolean(pLuaVM, 1));
-
-	return 0;
-}
-
 ETHER_API int EAPI_Graphic_LoadImageFromFile(lua_State* pLuaVM)
 {
 	SDL_Surface* _pSurface = nullptr;
@@ -19,7 +12,7 @@ ETHER_API int EAPI_Graphic_LoadImageFromFile(lua_State* pLuaVM)
 	return 1;
 }
 
-ETHER_API int EAPI_Graphic_LoadImageFromData(lua_State* pLuaVM)
+ETHER_API int EAPI_Graphic_LoadImageFromBuffer(lua_State* pLuaVM)
 {
 	size_t _szData = 0;
 	const char* _pData = luaL_checklstring(pLuaVM, 1, &_szData);
@@ -394,167 +387,125 @@ ETHER_API int EAPI_Graphic_DrawBezier(lua_State* pLuaVM)
 	return 0;
 }
 
-
-
-
-
-
-
-ETHER_API int loadFontFromFile(lua_State* pLuaVM)
+ETHER_API int EAPI_Graphic_LoadFontFromFile(lua_State* pLuaVM)
 {
-	TTF_Font* pFont = TTF_OpenFont(luaL_checkstring(L, 1), luaL_checknumber(L, 2));
-#ifdef _ETHER_DEBUG_
-	luaL_argcheck(L, pFont, 1, "load font failed");
-#endif
-	TTF_Font** uppFont = (TTF_Font**)lua_newuserdata(L, sizeof(TTF_Font*));
-	*uppFont = pFont;
-	luaL_getmetatable(L, METANAME_FONT);
-	lua_setmetatable(L, -2);
+	TTF_Font* _pFont = nullptr;
 
-	return 1;
-}
-
-
-ETHER_API int loadFontFromData(lua_State* pLuaVM)
-{
-	size_t size = 0;
-	TTF_Font* pFont = TTF_OpenFontRW(SDL_RWFromMem((void*)luaL_checklstring(L, 1, &size), size), 1, luaL_checknumber(L, 2));
-#ifdef _ETHER_DEBUG_
-	luaL_argcheck(L, pFont, 1, "load font failed");
-#endif
-	TTF_Font** uppFont = (TTF_Font**)lua_newuserdata(L, sizeof(TTF_Font*));
-	*uppFont = pFont;
-	luaL_getmetatable(L, METANAME_FONT);
-	lua_setmetatable(L, -2);
-
-	return 1;
-}
-
-
-ETHER_API int __gc_Font(lua_State* pLuaVM)
-{
-	TTF_Font* font = GetFontDataAt1stPos();
-#ifdef _ETHER_DEBUG_
-	CheckFontDataAt1stPos(font);
-#endif
-	TTF_CloseFont(font);
-	font = nullptr;
-
-	return 0;
-}
-
-
-ETHER_API int font_GetStyle(lua_State* pLuaVM)
-{
-	TTF_Font* font = GetFontDataAt1stPos();
-#ifdef _ETHER_DEBUG_
-	CheckFontDataAt1stPos(font);
-#endif
-	lua_newtable(L);
-	int style = TTF_GetFontStyle(font);
-	if (style == TTF_STYLE_NORMAL)
-	{
-		lua_pushnumber(L, 1);
-		lua_pushnumber(L, FONT_STYLE_NORMAL);
-		lua_settable(L, -3);
-	}
+	if (_pFont = TTF_OpenFont(luaL_checkstring(pLuaVM, 1), (int)luaL_checknumber(pLuaVM, 2)))
+		EE_PushUserdata<TTF_Font>(pLuaVM, _pFont, METANAME_FONT);
 	else
-	{
-		int index = 1;
-		if (style & TTF_STYLE_BOLD)
-		{
-			lua_pushnumber(L, index);
-			lua_pushnumber(L, FONT_STYLE_BOLD);
-			lua_settable(L, -3);
-			index++;
-		}
-		if (style & TTF_STYLE_ITALIC)
-		{
-			lua_pushnumber(L, index);
-			lua_pushnumber(L, FONT_STYLE_ITALIC);
-			lua_settable(L, -3);
-			index++;
-		}
-		if (style & TTF_STYLE_UNDERLINE)
-		{
-			lua_pushnumber(L, index);
-			lua_pushnumber(L, FONT_STYLE_UNDERLINE);
-			lua_settable(L, -3);
-			index++;
-		}
-		if (style & TTF_STYLE_STRIKETHROUGH)
-		{
-			lua_pushnumber(L, index);
-			lua_pushnumber(L, FONT_STYLE_STRIKETHROUGH);
-			lua_settable(L, -3);
-			index++;
-		}
-	}
+		lua_pushnil(pLuaVM);
 
 	return 1;
 }
 
-
-ETHER_API int font_SetStyle(lua_State* pLuaVM)
+ETHER_API int EAPI_Graphic_LoadFontFromBuffer(lua_State* pLuaVM)
 {
-	TTF_Font* font = GetFontDataAt1stPos();
-#ifdef _ETHER_DEBUG_
-	CheckFontDataAt1stPos(font);
-	CheckTableParam(L, 2);
-#endif
-	int style = 0;
-	lua_pushnil(L);
-	while (lua_next(L, 2))
-	{
-		lua_pushvalue(L, -2);
-		if (!lua_isnumber(L, -2))
-			luaL_error(L, "bad argument #2 to 'SetFontStyle' (table elements must be MACRO number, got %s)", luaL_typename(L, -2));
-		else
-		{
-			switch ((int)lua_tonumber(L, -2))
-			{
-			case FONT_STYLE_BOLD:
-				style |= TTF_STYLE_BOLD;
-				break;
-			case FONT_STYLE_ITALIC:
-				style |= TTF_STYLE_ITALIC;
-				break;
-			case FONT_STYLE_UNDERLINE:
-				style |= TTF_STYLE_UNDERLINE;
-				break;
-			case FONT_STYLE_STRIKETHROUGH:
-				style |= TTF_STYLE_STRIKETHROUGH;
-				break;
-			case FONT_STYLE_NORMAL:
-				style |= TTF_STYLE_NORMAL;
-				break;
-			default:
-				luaL_error(L, "bad argument #2 to 'SetFontStyle' (table elements must be MACRO number, got %s)", luaL_typename(L, -2));
-				break;
-			}
-		}
-		lua_pop(L, 2);
-	}
+	size_t _szData = 0;
+	const char* _pData = luaL_checklstring(pLuaVM, 1, &_szData);
+	TTF_Font* _pFont = nullptr;
+	if (_pFont = TTF_OpenFontRW(SDL_RWFromMem((void*)_pData, _szData), 1, (int)luaL_checknumber(pLuaVM, 2)))
+		EE_PushUserdata<TTF_Font>(pLuaVM, _pFont, METANAME_FONT);
+	else
+		lua_pushnil(pLuaVM);
 
-	TTF_SetFontStyle(font, style);
+	return 1;
+}
+
+ETHER_API int EAPI_Graphic_Font_GC(lua_State* pLuaVM)
+{
+	TTF_Font* _pFont = EE_ToUserdata<TTF_Font>(pLuaVM, 1, METANAME_FONT);
+
+	TTF_CloseFont(_pFont); _pFont = nullptr;
 
 	return 0;
 }
 
-
-ETHER_API int font_GetOutlineWidth(lua_State* pLuaVM)
+ETHER_API int EAPI_Graphic_Font_GetStyle(lua_State* pLuaVM)
 {
-	TTF_Font* font = GetFontDataAt1stPos();
-#ifdef _ETHER_DEBUG_
-	CheckFontDataAt1stPos(font);
-#endif
-	lua_pushnumber(L, TTF_GetFontOutline(font));
+	TTF_Font* _pFont = EE_ToUserdata<TTF_Font>(pLuaVM, 1, METANAME_FONT);
+
+	lua_createtable(pLuaVM, 4, 0);
+	int _style = TTF_GetFontStyle(_pFont);
+
+	if (_style == TTF_STYLE_NORMAL)
+	{
+		lua_pushnumber(pLuaVM, FONT_NORMAL);
+		lua_rawseti(pLuaVM, -2, 1);
+
+		return 1;
+	}
+	
+	int _index = 1;
+	if (_style & TTF_STYLE_BOLD)
+	{
+		lua_pushnumber(pLuaVM, FONT_BOLD);
+		lua_rawseti(pLuaVM, -2, _index); _index++;
+	}
+	if (_style & TTF_STYLE_ITALIC)
+	{
+		lua_pushnumber(pLuaVM, FONT_ITALIC);
+		lua_rawseti(pLuaVM, -2, _index); _index++;
+	}
+	if (_style & TTF_STYLE_UNDERLINE)
+	{
+		lua_pushnumber(pLuaVM, FONT_UNDERLINE);
+		lua_rawseti(pLuaVM, -2, _index); _index++;
+	}
+	if (_style & TTF_STYLE_STRIKETHROUGH)
+	{
+		lua_pushnumber(pLuaVM, FONT_STRIKETHROUGH);
+		lua_rawseti(pLuaVM, -2, _index); _index++;
+	}
+
+	return 1;
+}
+
+ETHER_API int EAPI_Graphic_Font_SetStyle(lua_State* pLuaVM)
+{
+	TTF_Font* _pFont = EE_ToUserdata<TTF_Font>(pLuaVM, 1, METANAME_FONT);
+
+	int _style = TTF_STYLE_NORMAL;
+
+	luaL_argexpected(pLuaVM, lua_istable(pLuaVM, 1), 1, LUA_TABLIBNAME);
+	EE_TraverseTable(
+		pLuaVM, 1,
+		[&]() -> bool
+		{
+			switch ((int)lua_tointeger(pLuaVM, -1))
+			{
+			case FONT_BOLD:				_style |= TTF_STYLE_BOLD; break;
+			case FONT_ITALIC:			_style |= TTF_STYLE_ITALIC; break;
+			case FONT_UNDERLINE:		_style |= TTF_STYLE_UNDERLINE; break;
+			case FONT_STRIKETHROUGH:	_style |= TTF_STYLE_STRIKETHROUGH; break;
+			case FONT_NORMAL:			_style |= TTF_STYLE_NORMAL; break;
+			default:					luaL_argerror(pLuaVM, 1, ERRMSG_INVALIDENUM); break;
+			}
+			return true;
+		}
+	);
+
+	TTF_SetFontStyle(_pFont, _style);
+
+	return 0;
+}
+
+ETHER_API int EAPI_Graphic_Font_GetOutlineWidth(lua_State* pLuaVM)
+{
+	TTF_Font* _pFont = EE_ToUserdata<TTF_Font>(pLuaVM, 1, METANAME_FONT);
+
+	lua_pushinteger(pLuaVM, TTF_GetFontOutline(_pFont));
 
 	return 1;
 }
 
 
-ETHER_API int font_SetOutlineWidth(lua_State* pLuaVM)
+
+
+
+
+
+ETHER_API int EAPI_Graphic_Font_SetOutlineWidth(lua_State* pLuaVM)
 {
 	TTF_Font* font = GetFontDataAt1stPos();
 #ifdef _ETHER_DEBUG_

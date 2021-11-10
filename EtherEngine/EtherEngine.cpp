@@ -4,7 +4,6 @@
 #include <lua.hpp>
 #include <cJSON.h>
 
-#include <map>
 #include <vector>
 #include <string>
 
@@ -180,7 +179,6 @@ int main(int argc, char** argv)
 	/*
 		设置 Built-in Package 数据
 	*/
-	std::map<const std::string, function<void()>> mapOnExitCallback;
 	lua_getglobal(pGlobalLuaVM, "package");
 	lua_pushstring(pGlobalLuaVM, "preload");
 	lua_rawget(pGlobalLuaVM, -2);
@@ -189,9 +187,6 @@ int main(int argc, char** argv)
 		lua_pushstring(pGlobalLuaVM, pkg.name.c_str());
 		lua_pushcfunction(pGlobalLuaVM, pkg.on_load);
 		lua_rawset(pGlobalLuaVM, -3);
-		if (pkg.on_exit)
-			mapOnExitCallback.insert(std::pair<const std::string, 
-				function<void()>>(pkg.name, pkg.on_exit));
 	}
 	lua_pop(pGlobalLuaVM, 2);
 	std::vector<BuiltinPackageData>().swap(BuiltinPackageList);
@@ -233,17 +228,6 @@ int main(int argc, char** argv)
 	/*
 		释放引擎资源
 	*/
-	lua_getglobal(pGlobalLuaVM, "package");
-	lua_pushstring(pGlobalLuaVM, "loaded");
-	lua_rawget(pGlobalLuaVM, -2);
-	for (const auto& cb : mapOnExitCallback)
-	{
-		lua_pushstring(pGlobalLuaVM, cb.first.c_str());
-		lua_rawget(pGlobalLuaVM, -2);
-		if (!lua_isnil(pGlobalLuaVM, -1) && cb.second) cb.second();
-		lua_pop(pGlobalLuaVM, 1);
-	}
-	lua_pop(pGlobalLuaVM, 2);
 	lua_close(pGlobalLuaVM);
 
 	SDL_Quit();

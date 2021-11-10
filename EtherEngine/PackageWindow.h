@@ -8,29 +8,57 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
+#include <map>
+
 static const int WINDOW_POSDEFAULT = SDL_WINDOWPOS_UNDEFINED;
 
-static const int MSGBOX_ERROR		= 0;
-static const int MSGBOX_WARNING		= 1;
-static const int MSGBOX_INFO		= 2;
+static const int WINDOW_MSGBOX_ERROR		= 0;
+static const int WINDOW_MSGBOX_WARNING		= 1;
+static const int WINDOW_MSGBOX_INFO			= 2;
 
-static const int WINDOW_FULLSCREEN	= 0;
-static const int WINDOW_BORDERLESS	= 1;
-static const int WINDOW_RESIZABLE	= 2;
-static const int WINDOW_MAXIMIZED	= 3;
-static const int WINDOW_MINIMIZED	= 4;
-static const int WINDOW_WINDOWED	= 5;
-static const int WINDOW_FIXED		= 6;
-static const int WINDOW_BORDERED	= 7;
+static const int WINDOW_FULLSCREEN			= 0;
+static const int WINDOW_BORDERLESS			= 1;
+static const int WINDOW_RESIZABLE			= 2;
+static const int WINDOW_MAXIMIZED			= 3;
+static const int WINDOW_MINIMIZED			= 4;
+static const int WINDOW_WINDOWED			= 5;
+static const int WINDOW_FIXED				= 6;
+static const int WINDOW_BORDERED			= 7;
 
-extern SDL_Window* pGlobalWindow;
-extern SDL_Renderer* pGlobalRenderer;
+static const int WINDOW_CURSOR_ARROW		= 0;
+static const int WINDOW_CURSOR_IBEAM		= 1;
+static const int WINDOW_CURSOR_WAIT			= 2;
+static const int WINDOW_CURSOR_CROSSHAIR	= 3;
+static const int WINDOW_CURSOR_WAITARROW	= 4;
+static const int WINDOW_CURSOR_SIZENWSE		= 5;
+static const int WINDOW_CURSOR_SIZENESW		= 6;
+static const int WINDOW_CURSOR_SIZEWE		= 7;
+static const int WINDOW_CURSOR_SIZENS		= 8;
+static const int WINDOW_CURSOR_SIZEALL		= 9;
+static const int WINDOW_CURSOR_NO			= 10;
+static const int WINDOW_CURSOR_HAND			= 11;
+
+extern SDL_Window*		pGlobalWindow;
+extern SDL_Renderer*	pGlobalRenderer;
 
 static SDL_MessageBoxColorScheme* Window_pMsgBoxColorScheme = nullptr;
+
+static std::map<int, SDL_Cursor*> Window_mapCursor;
 
 ETHER_API int EAPI_Window_GetWindowHandle(lua_State* pLuaVM);
 
 ETHER_API int EAPI_Window_GetRendererHandle(lua_State* pLuaVM);
+
+// 设置鼠标是否显示
+// 1参数：是否显示（boolean）
+// 0返回值
+ETHER_API int EAPI_Window_SetCursorShown(lua_State* L);
+
+ETHER_API int EAPI_Window_GetCursorShown(lua_State* pLuaVM);
+
+ETHER_API int EAPI_Window_SetCursorStyle(lua_State* pLuaVM);
+
+ETHER_API int EAPI_Window_GetCursorStyle(lua_State* pLuaVM);
 
 // 显示模态的提示信息窗口
 // 3参数：窗口类型（Macro number），提示窗口标题（string），提示信息内容（string）

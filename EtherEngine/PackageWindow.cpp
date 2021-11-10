@@ -14,14 +14,57 @@ ETHER_API int EAPI_Window_GetRendererHandle(lua_State* pLuaVM)
 	return 1;
 }
 
+ETHER_API int EAPI_Window_SetCursorShown(lua_State* pLuaVM)
+{
+	SDL_ShowCursor(lua_toboolean(pLuaVM, 1));
+
+	return 0;
+}
+
+ETHER_API int EAPI_Window_GetCursorShown(lua_State* pLuaVM)
+{
+	lua_pushboolean(pLuaVM, SDL_ShowCursor(SDL_QUERY));
+
+	return 1;
+}
+
+ETHER_API int EAPI_Window_SetCursorStyle(lua_State* pLuaVM)
+{
+	auto _itor = Window_mapCursor.find((int)luaL_checknumber(pLuaVM, 1));
+	luaL_argcheck(pLuaVM, _itor != Window_mapCursor.end(), 1, ERRMSG_INVALIDENUM);
+	
+	SDL_SetCursor(_itor->second);	
+
+	return 0;
+}
+
+ETHER_API int EAPI_Window_GetCursorStyle(lua_State* pLuaVM)
+{
+	SDL_Cursor* pCursor = SDL_GetCursor();
+
+	int _style = WINDOW_CURSOR_ARROW;
+	for (const auto& pair : Window_mapCursor)
+	{
+		if (pair.second == pCursor)
+		{
+			_style = pair.first;
+			break;
+		}
+	}
+
+	lua_pushinteger(pLuaVM, _style);
+
+	return 1;
+}
+
 ETHER_API int EAPI_Window_MessageBox(lua_State* pLuaVM)
 {
 	SDL_MessageBoxFlags _flag = SDL_MESSAGEBOX_INFORMATION;
 	switch ((int)luaL_checkinteger(pLuaVM, 1))
 	{
-	case MSGBOX_ERROR:	_flag = SDL_MESSAGEBOX_ERROR; break;
-	case MSGBOX_WARNING: _flag = SDL_MESSAGEBOX_WARNING; break;
-	case MSGBOX_INFO: _flag = SDL_MESSAGEBOX_INFORMATION; break;
+	case WINDOW_MSGBOX_ERROR:	_flag = SDL_MESSAGEBOX_ERROR; break;
+	case WINDOW_MSGBOX_WARNING: _flag = SDL_MESSAGEBOX_WARNING; break;
+	case WINDOW_MSGBOX_INFO:	_flag = SDL_MESSAGEBOX_INFORMATION; break;
 	default: luaL_argerror(pLuaVM, 1, ERRMSG_INVALIDENUM); break;
 	}
 	SDL_ShowSimpleMessageBox(
@@ -39,9 +82,9 @@ ETHER_API int EAPI_Window_ConfirmBox(lua_State* pLuaVM)
 	SDL_MessageBoxFlags _flag = SDL_MESSAGEBOX_INFORMATION;
 	switch ((int)luaL_checkinteger(pLuaVM, 1))
 	{
-	case MSGBOX_ERROR:	_flag = SDL_MESSAGEBOX_ERROR; break;
-	case MSGBOX_WARNING: _flag = SDL_MESSAGEBOX_WARNING; break;
-	case MSGBOX_INFO: _flag = SDL_MESSAGEBOX_INFORMATION; break;
+	case WINDOW_MSGBOX_ERROR:	_flag = SDL_MESSAGEBOX_ERROR; break;
+	case WINDOW_MSGBOX_WARNING: _flag = SDL_MESSAGEBOX_WARNING; break;
+	case WINDOW_MSGBOX_INFO:	_flag = SDL_MESSAGEBOX_INFORMATION; break;
 	default: luaL_argerror(pLuaVM, 1, ERRMSG_INVALIDENUM); break;
 	}
 
