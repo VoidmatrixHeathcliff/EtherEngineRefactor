@@ -1,5 +1,17 @@
 #include "PackageGraphic.h"
 
+ETHER_API int EAPI_Graphic_SetRenderMode(lua_State* pLuaState)
+{
+	switch ((int)luaL_checkinteger(pLuaState, 1))
+	{
+	case RENDER_NEAREST:	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest"); break;
+	case RENDER_LINEAR:		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear"); break;
+	default:				luaL_argerror(pLuaState, 1, ERRMSG_INVALIDENUM); break;
+	}
+
+	return 0;
+}
+
 ETHER_API int EAPI_Graphic_LoadImageFromFile(lua_State* pLuaVM)
 {
 	SDL_Surface* _pSurface = nullptr;
@@ -25,6 +37,15 @@ ETHER_API int EAPI_Graphic_LoadImageFromBuffer(lua_State* pLuaVM)
 	return 1;
 }
 
+ETHER_API int EAPI_Graphic_Image_GC(lua_State* pLuaVM)
+{
+	SDL_Surface* _pSurface = EE_ToUserdata<SDL_Surface>(pLuaVM, 1, METANAME_IMAGE);
+
+	SDL_FreeSurface(_pSurface); _pSurface = nullptr;
+
+	return 0;
+}
+
 ETHER_API int EAPI_Graphic_Image_SetColorKey(lua_State* pLuaVM)
 {
 	SDL_Surface* _pSurface = EE_ToUserdata<SDL_Surface>(pLuaVM, 1, METANAME_IMAGE);
@@ -36,6 +57,16 @@ ETHER_API int EAPI_Graphic_Image_SetColorKey(lua_State* pLuaVM)
 		SDL_MapRGBA(_pSurface->format, _color.r, _color.g, _color.b, _color.a));
 
 	return 0;
+}
+
+ETHER_API int EAPI_Graphic_Image_Size(lua_State* pLuaVM)
+{
+	SDL_Surface* _pSurface = EE_ToUserdata<SDL_Surface>(pLuaVM, 1, METANAME_IMAGE);
+
+	lua_pushnumber(pLuaVM, _pSurface->w);
+	lua_pushnumber(pLuaVM, _pSurface->h);
+
+	return 2;
 }
 
 ETHER_API int EAPI_Graphic_Image_Texture(lua_State* pLuaVM)
@@ -51,21 +82,11 @@ ETHER_API int EAPI_Graphic_Image_Texture(lua_State* pLuaVM)
 	return 1;
 }
 
-ETHER_API int EAPI_Graphic_Image_size(lua_State* pLuaVM)
+ETHER_API int EAPI_Graphic_Texture_GC(lua_State* pLuaVM)
 {
-	SDL_Surface* _pSurface = EE_ToUserdata<SDL_Surface>(pLuaVM, 1, METANAME_IMAGE);
+	SDL_Texture* _pTexture = EE_ToUserdata<SDL_Texture>(pLuaVM, 1, METANAME_TEXTURE);
 
-	lua_pushnumber(pLuaVM, _pSurface->w);
-	lua_pushnumber(pLuaVM, _pSurface->h);
-
-	return 2;
-}
-
-ETHER_API int EAPI_Graphic_Image_GC(lua_State* pLuaVM)
-{
-	SDL_Surface* _pSurface = EE_ToUserdata<SDL_Surface>(pLuaVM, 1, METANAME_IMAGE);
-
-	SDL_FreeSurface(_pSurface); _pSurface = nullptr;
+	SDL_DestroyTexture(_pTexture); _pTexture = nullptr;
 
 	return 0;
 }
@@ -80,7 +101,7 @@ ETHER_API int EAPI_Graphic_Texture_SetAlpha(lua_State* pLuaVM)
 	return 0;
 }
 
-ETHER_API int EAPI_Graphic_Texture_size(lua_State* pLuaVM)
+ETHER_API int EAPI_Graphic_Texture_Size(lua_State* pLuaVM)
 {
 	SDL_Texture* _pTexture = EE_ToUserdata<SDL_Texture>(pLuaVM, 1, METANAME_TEXTURE);
 
@@ -91,15 +112,6 @@ ETHER_API int EAPI_Graphic_Texture_size(lua_State* pLuaVM)
 	lua_pushinteger(pLuaVM, _height);
 
 	return 2;
-}
-
-ETHER_API int EAPI_Graphic_Texture_GC(lua_State* pLuaVM)
-{
-	SDL_Texture* _pTexture = EE_ToUserdata<SDL_Texture>(pLuaVM, 1, METANAME_TEXTURE);
-
-	SDL_DestroyTexture(_pTexture); _pTexture = nullptr;
-
-	return 0;
 }
 
 ETHER_API int EAPI_Graphic_RenderTexture(lua_State* pLuaVM)
@@ -499,239 +511,92 @@ ETHER_API int EAPI_Graphic_Font_GetOutlineWidth(lua_State* pLuaVM)
 	return 1;
 }
 
-
-
-
-
-
-
 ETHER_API int EAPI_Graphic_Font_SetOutlineWidth(lua_State* pLuaVM)
 {
-	TTF_Font* font = GetFontDataAt1stPos();
-#ifdef _ETHER_DEBUG_
-	CheckFontDataAt1stPos(font);
-#endif
-	TTF_SetFontOutline(font, luaL_checknumber(L, 2));
+	TTF_Font* _pFont = EE_ToUserdata<TTF_Font>(pLuaVM, 1, METANAME_FONT);
+
+	TTF_SetFontOutline(_pFont, (int)luaL_checknumber(pLuaVM, 2));
 
 	return 0;
 }
 
-
-ETHER_API int font_GetKerning(lua_State* pLuaVM)
+ETHER_API int EAPI_Graphic_Font_GetKerning(lua_State* pLuaVM)
 {
-	TTF_Font* font = GetFontDataAt1stPos();
-#ifdef _ETHER_DEBUG_
-	CheckFontDataAt1stPos(font);
-#endif
-	lua_pushnumber(L, TTF_GetFontKerning(font));
+	TTF_Font* _pFont = EE_ToUserdata<TTF_Font>(pLuaVM, 1, METANAME_FONT);
+
+	lua_pushinteger(pLuaVM, TTF_GetFontKerning(_pFont));
 
 	return 1;
 }
 
-
-ETHER_API int font_SetKerning(lua_State* pLuaVM)
+ETHER_API int EAPI_Graphic_Font_SetKerning(lua_State* pLuaVM)
 {
-	TTF_Font* font = GetFontDataAt1stPos();
-#ifdef _ETHER_DEBUG_
-	CheckFontDataAt1stPos(font);
-#endif
-	TTF_SetFontKerning(font, luaL_checknumber(L, 2));
+	TTF_Font* _pFont = EE_ToUserdata<TTF_Font>(pLuaVM, 1, METANAME_FONT);
+
+	TTF_SetFontKerning(_pFont, (int)luaL_checknumber(pLuaVM, 2));
 
 	return 0;
 }
 
-
-ETHER_API int font_GetHeight(lua_State* pLuaVM)
+ETHER_API int EAPI_Graphic_Font_Height(lua_State* pLuaVM)
 {
-	TTF_Font* font = GetFontDataAt1stPos();
-#ifdef _ETHER_DEBUG_
-	CheckFontDataAt1stPos(font);
-#endif
-	lua_pushnumber(L, TTF_FontHeight(font));
+	TTF_Font* _pFont = EE_ToUserdata<TTF_Font>(pLuaVM, 1, METANAME_FONT);
+
+	lua_pushinteger(pLuaVM, TTF_FontHeight(_pFont));
 
 	return 1;
 }
 
-
-ETHER_API int getTextSize(lua_State* pLuaVM)
+ETHER_API int EAPI_Graphic_GetTextSize(lua_State* pLuaVM)
 {
-	TTF_Font* font = GetFontDataAt1stPos();
-#ifdef _ETHER_DEBUG_
-	CheckFontDataAt1stPos(font);
-#endif
-	int width, height;
-	TTF_SizeText(font, luaL_checkstring(L, 2), &width, &height);
-	lua_pushnumber(L, width);
-	lua_pushnumber(L, height);
+	TTF_Font* _pFont = EE_ToUserdata<TTF_Font>(pLuaVM, 1, METANAME_FONT);
+
+	int _width, _height;
+	TTF_SizeUTF8(_pFont, luaL_checkstring(pLuaVM, 2), &_width, &_height);
+	lua_pushinteger(pLuaVM, _width); lua_pushinteger(pLuaVM, _height);
 
 	return 2;
 }
 
-
-ETHER_API int getUTF8TextSize(lua_State* pLuaVM)
+ETHER_API int EAPI_Graphic_TextImageFast(lua_State* pLuaVM)
 {
-	TTF_Font* font = GetFontDataAt1stPos();
-#ifdef _ETHER_DEBUG_
-	CheckFontDataAt1stPos(font);
-#endif
-	int width, height;
-	TTF_SizeUTF8(font, luaL_checkstring(L, 2), &width, &height);
-	lua_pushnumber(L, width);
-	lua_pushnumber(L, height);
+	TTF_Font* _pFont = EE_ToUserdata<TTF_Font>(pLuaVM, 1, METANAME_FONT);
+	SDL_Color _color; EE_CheckColor(pLuaVM, 3, _color);
 
-	return 2;
-}
-
-
-ETHER_API int createTextImageSolid(lua_State* pLuaVM)
-{
-	TTF_Font* font = GetFontDataAt1stPos();
-#ifdef _ETHER_DEBUG_
-	CheckFontDataAt1stPos(font);
-#endif
-	SDL_Color color;
-#ifdef _ETHER_DEBUG_
-	CheckColorParam(L, 3, color);
-#else
-	EE_CheckColor(L, 3, color);
-#endif
-	SDL_Surface* pSurface = TTF_RenderText_Solid(font, luaL_checkstring(L, 2), color);
-#ifdef _ETHER_DEBUG_
-	luaL_argcheck(L, pSurface, 1, "create text image failed");
-#endif
-	SDL_Surface** uppSurface = (SDL_Surface**)lua_newuserdata(L, sizeof(SDL_Surface*));
-	*uppSurface = pSurface;
-	luaL_getmetatable(L, METANAME_IMAGE);
-	lua_setmetatable(L, -2);
+	SDL_Surface* _pSurface = nullptr;
+	if (_pSurface = TTF_RenderUTF8_Solid(_pFont, luaL_checkstring(pLuaVM, 2), _color))
+		EE_PushUserdata<SDL_Surface>(pLuaVM, _pSurface, METANAME_IMAGE);
+	else
+		lua_pushnil(pLuaVM);
 
 	return 1;
 }
 
-
-ETHER_API int createUTF8TextImageSolid(lua_State* pLuaVM)
+ETHER_API int EAPI_Graphic_TextImageQuality(lua_State* pLuaVM)
 {
-	TTF_Font* font = GetFontDataAt1stPos();
-#ifdef _ETHER_DEBUG_
-	CheckFontDataAt1stPos(font);
-#endif
-	SDL_Color color;
-#ifdef _ETHER_DEBUG_
-	CheckColorParam(L, 3, color);
-#else
-	EE_CheckColor(L, 3, color);
-#endif
-	SDL_Surface* pSurface = TTF_RenderUTF8_Solid(font, luaL_checkstring(L, 2), color);
-#ifdef _ETHER_DEBUG_
-	luaL_argcheck(L, pSurface, 1, "create text image failed");
-#endif
-	SDL_Surface** uppSurface = (SDL_Surface**)lua_newuserdata(L, sizeof(SDL_Surface*));
-	*uppSurface = pSurface;
-	luaL_getmetatable(L, METANAME_IMAGE);
-	lua_setmetatable(L, -2);
+	TTF_Font* _pFont = EE_ToUserdata<TTF_Font>(pLuaVM, 1, METANAME_FONT);
+	SDL_Color _color; EE_CheckColor(pLuaVM, 3, _color);
+
+	SDL_Surface* _pSurface = nullptr;
+	if (_pSurface = TTF_RenderUTF8_Blended(_pFont, luaL_checkstring(pLuaVM, 2), _color))
+		EE_PushUserdata<SDL_Surface>(pLuaVM, _pSurface, METANAME_IMAGE);
+	else
+		lua_pushnil(pLuaVM);
 
 	return 1;
 }
 
-
-ETHER_API int createTextImageShaded(lua_State* pLuaVM)
+ETHER_API int EAPI_Graphic_TextImageShaded(lua_State* pLuaVM)
 {
-	TTF_Font* font = GetFontDataAt1stPos();
-#ifdef _ETHER_DEBUG_
-	CheckFontDataAt1stPos(font);
-#endif
-	SDL_Color fgColor, bgColor;
-#ifdef _ETHER_DEBUG_
-	CheckColorParam(L, 3, fgColor);
-	CheckColorParam(L, 4, bgColor);
-#else
-	EE_CheckColor(L, 3, fgColor);
-	EE_CheckColor(L, 4, bgColor);
-#endif
-	SDL_Surface* pSurface = TTF_RenderText_Shaded(font, luaL_checkstring(L, 2), fgColor, bgColor);
-#ifdef _ETHER_DEBUG_
-	luaL_argcheck(L, pSurface, 1, "create text image failed");
-#endif
-	SDL_Surface** uppSurface = (SDL_Surface**)lua_newuserdata(L, sizeof(SDL_Surface*));
-	*uppSurface = pSurface;
-	luaL_getmetatable(L, METANAME_IMAGE);
-	lua_setmetatable(L, -2);
+	TTF_Font* _pFont = EE_ToUserdata<TTF_Font>(pLuaVM, 1, METANAME_FONT);
+	SDL_Color _color_fg; EE_CheckColor(pLuaVM, 3, _color_fg);
+	SDL_Color _color_bg; EE_CheckColor(pLuaVM, 4, _color_bg);
 
-	return 1;
-}
-
-
-ETHER_API int createUTF8TextImageShaded(lua_State* pLuaVM)
-{
-	TTF_Font* font = GetFontDataAt1stPos();
-#ifdef _ETHER_DEBUG_
-	CheckFontDataAt1stPos(font);
-#endif
-	SDL_Color fgColor, bgColor;
-#ifdef _ETHER_DEBUG_
-	CheckColorParam(L, 3, fgColor);
-	CheckColorParam(L, 4, bgColor);
-#else
-	EE_CheckColor(L, 3, fgColor);
-	EE_CheckColor(L, 4, bgColor);
-#endif
-	SDL_Surface* pSurface = TTF_RenderUTF8_Shaded(font, luaL_checkstring(L, 2), fgColor, bgColor);
-#ifdef _ETHER_DEBUG_
-	luaL_argcheck(L, pSurface, 1, "create text image failed");
-#endif
-	SDL_Surface** uppSurface = (SDL_Surface**)lua_newuserdata(L, sizeof(SDL_Surface*));
-	*uppSurface = pSurface;
-	luaL_getmetatable(L, METANAME_IMAGE);
-	lua_setmetatable(L, -2);
-
-	return 1;
-}
-
-
-ETHER_API int createTextImageBlended(lua_State* pLuaVM)
-{
-	TTF_Font* font = GetFontDataAt1stPos();
-#ifdef _ETHER_DEBUG_
-	CheckFontDataAt1stPos(font);
-#endif
-	SDL_Color color;
-#ifdef _ETHER_DEBUG_
-	CheckColorParam(L, 3, color);
-#else
-	EE_CheckColor(L, 3, color);
-#endif
-	SDL_Surface* pSurface = TTF_RenderText_Blended(font, luaL_checkstring(L, 2), color);
-#ifdef _ETHER_DEBUG_
-	luaL_argcheck(L, pSurface, 1, "create text image failed");
-#endif
-	SDL_Surface** uppSurface = (SDL_Surface**)lua_newuserdata(L, sizeof(SDL_Surface*));
-	*uppSurface = pSurface;
-	luaL_getmetatable(L, METANAME_IMAGE);
-	lua_setmetatable(L, -2);
-
-	return 1;
-}
-
-
-ETHER_API int createUTF8TextImageBlended(lua_State* pLuaVM)
-{
-	TTF_Font* font = GetFontDataAt1stPos();
-#ifdef _ETHER_DEBUG_
-	CheckFontDataAt1stPos(font);
-#endif
-	SDL_Color color;
-#ifdef _ETHER_DEBUG_
-	CheckColorParam(L, 3, color);
-#else
-	EE_CheckColor(L, 3, color);
-#endif
-	SDL_Surface* pSurface = TTF_RenderUTF8_Blended(font, luaL_checkstring(L, 2), color);
-#ifdef _ETHER_DEBUG_
-	luaL_argcheck(L, pSurface, 1, "create text image failed");
-#endif
-	SDL_Surface** uppSurface = (SDL_Surface**)lua_newuserdata(L, sizeof(SDL_Surface*));
-	*uppSurface = pSurface;
-	luaL_getmetatable(L, METANAME_IMAGE);
-	lua_setmetatable(L, -2);
+	SDL_Surface* _pSurface = nullptr;
+	if (_pSurface = TTF_RenderUTF8_Shaded(_pFont, luaL_checkstring(pLuaVM, 2), _color_fg, _color_bg))
+		EE_PushUserdata<SDL_Surface>(pLuaVM, _pSurface, METANAME_IMAGE);
+	else
+		lua_pushnil(pLuaVM);
 
 	return 1;
 }

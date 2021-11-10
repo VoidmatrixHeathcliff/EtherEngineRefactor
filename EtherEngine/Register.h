@@ -52,7 +52,7 @@ inline void EE_PushBuiltinPackageData(lua_State* pLuaVM,
 		if (!mt.func_list.empty())
 		{
 			lua_pushstring(pLuaVM, "__index");
-			lua_createtable(pLuaVM, 0, mt.func_list.size());
+			lua_createtable(pLuaVM, 0, (int)mt.func_list.size());
 			for (const luaL_Reg& func : mt.func_list)
 			{
 				lua_pushstring(pLuaVM, func.name);
@@ -70,7 +70,7 @@ inline void EE_PushBuiltinPackageData(lua_State* pLuaVM,
 		}
 	}
 
-	lua_createtable(pLuaVM, 0, func_list.size() + enum_list.size());
+	lua_createtable(pLuaVM, 0, (int)(func_list.size() + enum_list.size()));
 
 	for (const luaL_Reg& func : func_list)
 	{
@@ -132,83 +132,76 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 			IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP);
 
 			std::vector<luaL_Reg> func_list = {
-				{ "SetCursorShow", setCursorShow },
-				{ "LoadImageFromFile", loadImageFromFile },
-				{ "LoadImageFromData", loadImageFromData },
-				{ "CreateTexture", createTexture },
-				{ "CopyTexture", copyTexture },
-				{ "CopyRotateTexture", copyRotateTexture },
-				{ "CopyReshapeTexture", copyReshapeTexture },
-				{ "CopyRotateReshapeTexture", copyRotateReshapeTexture },
-				{ "SetDrawColor", setDrawColor },
-				{ "GetDrawColor", getDrawColor },
-				{ "DrawPoint", drawPoint },
-				{ "DrawLine", drawLine },
-				{ "DrawThickLine", drawThickLine },
-				{ "DrawRectangle", drawRectangle },
-				{ "DrawFillRectangle", drawFillRectangle },
-				{ "DrawRoundRectangle", drawRoundRectangle },
-				{ "DrawFillRoundRectangle", drawFillRoundRectangle },
-				{ "DrawCircle", drawCircle },
-				{ "DrawFillCircle", drawFillCircle },
-				{ "DrawEllipse", drawEllipse },
-				{ "DrawFillEllipse", drawFillEllipse },
-				{ "DrawPie", drawPie },
-				{ "DrawFillPie", drawFillPie },
-				{ "DrawTriangle", drawTriangle },
-				{ "DrawFillTriangle", drawFillTriangle },
-				{ "LoadFontFromFile", loadFontFromFile },
-				{ "LoadFontFromData", loadFontFromData },
-				{ "GetTextSize", getTextSize },
-				{ "GetUTF8TextSize", getUTF8TextSize },
-				{ "CreateTextImageSolid", createTextImageSolid },
-				{ "CreateUTF8TextImageSolid", createUTF8TextImageSolid },
-				{ "CreateTextImageShaded", createTextImageShaded },
-				{ "CreateUTF8TextImageShaded", createUTF8TextImageShaded },
-				{ "CreateTextImageBlended", createTextImageBlended },
-				{ "CreateUTF8TextImageBlended", createUTF8TextImageBlended },
+				{ "SetRenderMode",		EAPI_Graphic_SetRenderMode },
+				{ "ImageFile",			EAPI_Graphic_LoadImageFromFile },
+				{ "ImageBuffer",		EAPI_Graphic_LoadImageFromBuffer },
+				{ "RenderTexture",		EAPI_Graphic_RenderTexture },
+				{ "RenderTextureEx",	EAPI_Graphic_RenderTextureEx },
+				{ "SetDrawColor",		EAPI_Graphic_SetDrawColor },
+				{ "GetDrawColor",		EAPI_Graphic_GetDrawColor },
+				{ "DrawPoint",			EAPI_Graphic_DrawPoint },
+				{ "DrawLine",			EAPI_Graphic_DrawLine },
+				{ "DrawRectangle",		EAPI_Graphic_DrawRectangle },
+				{ "DrawRoundRectangle", EAPI_Graphic_DrawRoundRectangle },
+				{ "DrawCircle",			EAPI_Graphic_DrawCircle },
+				{ "DrawEllipse",		EAPI_Graphic_DrawEllipse },
+				{ "DrawPie",			EAPI_Graphic_DrawPie },
+				{ "DrawTriangle",		EAPI_Graphic_DrawTriangle },
+				{ "DrawPolygon",		EAPI_Graphic_DrawPolygon },
+				{ "DrawBezier",			EAPI_Graphic_DrawBezier },
+				{ "FontFile",			EAPI_Graphic_LoadFontFromFile },
+				{ "FontBuffer",			EAPI_Graphic_LoadFontFromBuffer },
+				{ "GetTextSize",		EAPI_Graphic_GetTextSize },
+				{ "TextImageFast",		EAPI_Graphic_TextImageFast },
+				{ "TextImageQuality",	EAPI_Graphic_TextImageQuality },
+				{ "TextImageShaded",	EAPI_Graphic_TextImageShaded },
 			};
 
 			std::vector<ParamEnum> enum_list = {
-				{ "FLIP_HORIZONTAL", FLIP_HORIZONTAL },
-				{ "FLIP_VERTICAL", FLIP_VERTICAL },
-				{ "FLIP_NONE", FLIP_NONE },
+				{ "FLIP_HORIZONTAL",	FLIP_HORIZONTAL },
+				{ "FLIP_VERTICAL",		FLIP_VERTICAL },
+				{ "FLIP_NONE",			FLIP_NONE },
 
-				{ "FONT_STYLE_BOLD", FONT_STYLE_BOLD },
-				{ "FONT_STYLE_ITALIC", FONT_STYLE_ITALIC },
-				{ "FONT_STYLE_UNDERLINE", FONT_STYLE_UNDERLINE },
-				{ "FONT_STYLE_STRIKETHROUGH", FONT_STYLE_STRIKETHROUGH },
-				{ "FONT_STYLE_NORMAL", FONT_STYLE_NORMAL },
+				{ "FONT_BOLD",			FONT_BOLD },
+				{ "FONT_ITALIC",		FONT_ITALIC },
+				{ "FONT_UNDERLINE",		FONT_UNDERLINE },
+				{ "FONT_STRIKETHROUGH", FONT_STRIKETHROUGH },
+				{ "FONT_NORMAL",		FONT_NORMAL },
+
+				{ "RENDER_NEAREST",		RENDER_NEAREST },
+				{ "RENDER_LINEAR",		RENDER_LINEAR },
 			};
 
 			std::vector<MetaTableData> metatable_list = {
 				{
 					METANAME_IMAGE,
 					{
-						{ "SetColorKey", image_SetColorKey },
-						{ "GetSize", image_GetSize },
+						{ "SetColorKey",		EAPI_Graphic_Image_SetColorKey },
+						{ "Texture",			EAPI_Graphic_Image_Texture },
+						{ "Size",				EAPI_Graphic_Image_Size },
 					},
-					__gc_Image
+					EAPI_Graphic_Image_GC
 				},
 				{
 					METANAME_TEXTURE,
 					{
-						{ "SetAlpha", texture_SetAlpha },
+						{ "SetAlpha",			EAPI_Graphic_Texture_SetAlpha },
+						{ "Size",				EAPI_Graphic_Texture_Size },
 					},
-					__gc_Texture
+					EAPI_Graphic_Texture_GC
 				},
 				{
 					METANAME_FONT,
 					{
-						{ "GetStyle", font_GetStyle },
-						{ "SetStyle", font_SetStyle },
-						{ "GetOutlineWidth", font_GetOutlineWidth },
-						{ "SetOutlineWidth", font_SetOutlineWidth },
-						{ "GetKerning", font_GetKerning },
-						{ "SetKerning", font_SetKerning },
-						{ "GetHeight", font_GetHeight },
+						{ "GetStyle",			EAPI_Graphic_Font_GetStyle },
+						{ "SetStyle",			EAPI_Graphic_Font_SetStyle },
+						{ "GetOutlineWidth",	EAPI_Graphic_Font_GetOutlineWidth },
+						{ "SetOutlineWidth",	EAPI_Graphic_Font_SetOutlineWidth },
+						{ "GetKerning",			EAPI_Graphic_Font_GetKerning },
+						{ "SetKerning",			EAPI_Graphic_Font_SetKerning },
+						{ "Height",				EAPI_Graphic_Font_Height },
 					},
-					__gc_Font
+					EAPI_Graphic_Font_GC
 				},
 			};
 

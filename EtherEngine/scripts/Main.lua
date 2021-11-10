@@ -20,16 +20,41 @@ XML             = require("@XML")
 Window.Create(
     "HelloWorld",
     {
-        x = Window.DEFAULT_POSITION,
-        y = Window.DEFAULT_POSITION,
+        x = Window.DEFAULT_POS,
+        y = Window.DEFAULT_POS,
         w = 1280,
         h = 720
     }
 )
 
-print(Window.GetWindowHandle())
+isQuit = false
 
-while true do end
+while not isQuit do
+
+    local _start_time = Time.GetInitTime()
+
+    Graphic.SetDrawColor({r = 0, g = 0, b = 0, a = 255})
+    Window.Clear()
+
+    while Interactivity.UpdateEvent() do
+        local _event = Interactivity.GetEventType()
+        if _event == Interactivity.EVENT_QUIT then
+            isQuit = true
+        end
+    end
+
+    Graphic.SetDrawColor({r = 125, g = 200, b = 79, a = 255})
+    Graphic.DrawCircle({x = 150, y = 150}, 100, true)
+
+    Window.Update()
+
+    local _end_time = Time.GetInitTime()
+
+    if _end_time > _start_time then
+        print(1000 / (_end_time - _start_time))
+    end
+
+end
 
 -- font = Graphic.LoadFontFromFile("whz.ttf", 35)
 -- image = Graphic.CreateUTF8TextImageBlended(font, "中国智造", 
