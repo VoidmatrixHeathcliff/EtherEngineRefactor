@@ -7,9 +7,16 @@ ETHER_API int EAPI_Input_UpdateEvent(lua_State* pLuaVM)
 	return 1;
 }
 
-ETHER_API int EAPI_Input_SetTextInput(lua_State* pLuaVM)
+ETHER_API int EAPI_Input_StartTextInput(lua_State* pLuaVM)
 {
-	lua_toboolean(pLuaVM, 1) ? SDL_StartTextInput() : SDL_StopTextInput();
+	SDL_StartTextInput();
+
+	return 0;
+}
+
+ETHER_API int EAPI_Input_StopTextInput(lua_State* pLuaVM)
+{
+	SDL_StopTextInput();
 
 	return 0;
 }
@@ -50,6 +57,13 @@ ETHER_API int EAPI_Input_GetWheelScroll(lua_State* pLuaVM)
 ETHER_API int EAPI_Input_GetText(lua_State* pLuaVM)
 {
 	lua_pushstring(pLuaVM, pGlobalEvent->text.text);
+
+	return 1;
+}
+
+ETHER_API int EAPI_Input_GetDropFile(lua_State* pLuaVM)
+{
+	lua_pushstring(pLuaVM, pGlobalEvent->drop.file);
 
 	return 1;
 }

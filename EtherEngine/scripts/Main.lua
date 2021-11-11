@@ -17,6 +17,8 @@ XML             = require("@XML")
 
 -- print(_VERSION_ENGINE)
 
+os.execute("chcp 65001")
+
 Window.Create(
     "HelloWorld",
     {
@@ -38,8 +40,15 @@ while not isQuit do
     Window.Clear()
 
     while Input.UpdateEvent() do
-        if Input.GetType() == Input.EVENT_QUIT then
+        local _event_type = Input.GetEventType()
+        if _event_type == Input.EVENT_QUIT then
             isQuit = true
+        elseif _event_type == Input.EVENT_DROPFILE then
+            print("drop file: "..Input.GetDropFile())
+        elseif _event_type == Input.EVENT_DROPBEGIN then
+            print("drop begin")
+        elseif _event_type == Input.EVENT_DROPCOMPLETE then
+            print("drop complete")
         end
     end
 
@@ -66,8 +75,8 @@ while not isQuit do
 
     local _end_time = Time.GetInitTime()
 
-    if _end_time > _start_time then
-        print(1000 / (_end_time - _start_time))
+    if _end_time - _start_time < 1000 / 144 then
+        Time.Sleep(1000 / 144 - (_end_time - _start_time))
     end
 
 end

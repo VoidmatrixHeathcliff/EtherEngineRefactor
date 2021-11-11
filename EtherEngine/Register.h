@@ -234,12 +234,14 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 
 			std::vector<luaL_Reg> func_list = {
 				{ "UpdateEvent",		EAPI_Input_UpdateEvent },
-				{ "SetTextInput",		EAPI_Input_SetTextInput },
-				{ "GetType",			EAPI_Input_GetType },
+				{ "StartTextInput",		EAPI_Input_StartTextInput },
+				{ "StartTextInput",		EAPI_Input_StopTextInput },
+				{ "GetEventType",		EAPI_Input_GetType },
 				{ "GetKeyCode",			EAPI_Input_GetKeyCode },
 				{ "GetCursorPosition",	EAPI_Input_GetCursorPosition },
 				{ "GetWheelScroll",		EAPI_Input_GetWheelScroll },
-				{ "GetText",			EAPI_Input_GetText },
+				{ "GetInputText",		EAPI_Input_GetText },
+				{ "GetDropFile",		EAPI_Input_GetDropFile },
 			};
 
 			std::vector<ParamEnum> enum_list = {
@@ -249,7 +251,9 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 				{ "EVENT_TEXTINPUT",		SDL_TEXTINPUT },
 				{ "EVENT_KEYDOWN",			SDL_KEYDOWN },
 				{ "EVENT_KEYUP",			SDL_KEYUP },
-				{ "EVENT_WINDOWEVENT",		SDL_WINDOWEVENT },
+				{ "EVENT_DROPFILE",			SDL_DROPFILE },
+				{ "EVENT_DROPBEGIN",		SDL_DROPBEGIN },
+				{ "EVENT_DROPCOMPLETE",		SDL_DROPCOMPLETE },
 
 				{ "EVENT_WINDOWSHOWN",		SDL_WINDOWEVENT_SHOWN },
 				{ "EVENT_WINDOWHIDDEN",		SDL_WINDOWEVENT_HIDDEN },
