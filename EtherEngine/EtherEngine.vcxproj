@@ -160,39 +160,39 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ModuleCompress.cpp" />
-    <ClCompile Include="ModuleGraphic.cpp" />
-    <ClCompile Include="ModuleXML.cpp" />
-    <ClCompile Include="ModuleJSON.cpp" />
+    <ClCompile Include="PackageCompress.cpp" />
+    <ClCompile Include="PackageGraphic.cpp" />
+    <ClCompile Include="PackageXML.cpp" />
+    <ClCompile Include="PackageJSON.cpp" />
     <ClCompile Include="EtherEngine.cpp" />
-    <ClCompile Include="ModuleInteractivity.cpp" />
-    <ClCompile Include="ModuleAlgorithm.cpp" />
-    <ClCompile Include="ModuleMedia.cpp" />
-    <ClCompile Include="ModuleNetwork.cpp" />
-    <ClCompile Include="ModuleOS.cpp" />
-    <ClCompile Include="ModuleString.cpp" />
-    <ClCompile Include="ModuleTime.cpp" />
-    <ClCompile Include="ModuleWindow.cpp" />
+    <ClCompile Include="PackageInput.cpp" />
+    <ClCompile Include="PackageAlgorithm.cpp" />
+    <ClCompile Include="PackageMedia.cpp" />
+    <ClCompile Include="PackageNetwork.cpp" />
+    <ClCompile Include="PackageOS.cpp" />
+    <ClCompile Include="PackageString.cpp" />
+    <ClCompile Include="PackageTime.cpp" />
+    <ClCompile Include="PackageWindow.cpp" />
+    <ClCompile Include="PackageDebug.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ModuleCompress.h" />
-    <ClInclude Include="ModuleGraphic.h" />
-    <ClInclude Include="ModuleXML.h" />
-    <ClInclude Include="ModuleJSON.h" />
-    <ClInclude Include="Macros.h" />
-    <ClInclude Include="EtherEngine.h" />
-    <ClInclude Include="ModuleInteractivity.h" />
-    <ClInclude Include="ModuleAlgorithm.h" />
-    <ClInclude Include="ModuleMedia.h" />
-    <ClInclude Include="Module.h" />
-    <ClInclude Include="ModuleNetwork.h" />
-    <ClInclude Include="ModuleOS.h" />
-    <ClInclude Include="ModuleString.h" />
-    <ClInclude Include="ModuleTime.h" />
+    <ClInclude Include="PackageCompress.h" />
+    <ClInclude Include="PackageGraphic.h" />
+    <ClInclude Include="PackageXML.h" />
+    <ClInclude Include="PackageJSON.h" />
+    <ClInclude Include="Config.h" />
+    <ClInclude Include="PackageInput.h" />
+    <ClInclude Include="PackageAlgorithm.h" />
+    <ClInclude Include="PackageMedia.h" />
+    <ClInclude Include="PackageNetwork.h" />
+    <ClInclude Include="PackageOS.h" />
+    <ClInclude Include="PackageString.h" />
+    <ClInclude Include="PackageTime.h" />
+    <ClInclude Include="PackageDebug.h" />
     <ClInclude Include="Register.h" />
     <ClInclude Include="Utils.h" />
-    <ClInclude Include="ModuleWindow.h" />
+    <ClInclude Include="PackageWindow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

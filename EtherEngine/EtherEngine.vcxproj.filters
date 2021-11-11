@@ -18,96 +18,96 @@
     <ClCompile Include="EtherEngine.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleInteractivity.cpp">
+    <ClCompile Include="PackageInput.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleMedia.cpp">
+    <ClCompile Include="PackageMedia.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleTime.cpp">
+    <ClCompile Include="PackageTime.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleWindow.cpp">
+    <ClCompile Include="PackageWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Utils.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleAlgorithm.cpp">
+    <ClCompile Include="PackageAlgorithm.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleNetwork.cpp">
+    <ClCompile Include="PackageNetwork.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleOS.cpp">
+    <ClCompile Include="PackageOS.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleGraphic.cpp">
+    <ClCompile Include="PackageGraphic.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleString.cpp">
+    <ClCompile Include="PackageString.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleJSON.cpp">
+    <ClCompile Include="PackageJSON.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleCompress.cpp">
+    <ClCompile Include="PackageCompress.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleXML.cpp">
+    <ClCompile Include="PackageXML.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PackageDebug.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="EtherEngine.h">
+    <ClInclude Include="PackageInput.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleInteractivity.h">
+    <ClInclude Include="PackageMedia.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleMedia.h">
+    <ClInclude Include="PackageTime.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleTime.h">
+    <ClInclude Include="PackageWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleWindow.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Macros.h">
+    <ClInclude Include="Config.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Utils.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleAlgorithm.h">
+    <ClInclude Include="PackageAlgorithm.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleNetwork.h">
+    <ClInclude Include="PackageNetwork.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleOS.h">
+    <ClInclude Include="PackageOS.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Module.h">
+    <ClInclude Include="PackageGraphic.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleGraphic.h">
+    <ClInclude Include="PackageString.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleString.h">
+    <ClInclude Include="PackageJSON.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleJSON.h">
+    <ClInclude Include="PackageCompress.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleCompress.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="ModuleXML.h">
+    <ClInclude Include="PackageXML.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Register.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PackageDebug.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
