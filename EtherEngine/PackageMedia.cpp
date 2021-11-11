@@ -2,33 +2,28 @@
 
 ETHER_API int EAPI_Media_LoadMusicFromFile(lua_State* pLuaVM)
 {
-	Mix_Music* _pMusic = nullptr;
-	if (_pMusic = Mix_LoadMUS(luaL_checkstring(pLuaVM, 1)))
-		EE_PushUserdata<Mix_Music>(pLuaVM, _pMusic, METANAME_MUSIC);
+	EE_Media_Music* _pMusic = new EE_Media_Music();
+
+	if (_pMusic->music = Mix_LoadMUS(luaL_checkstring(pLuaVM, 1)))
+		EE_PushUserdata<EE_Media_Music>(pLuaVM, _pMusic, METANAME_MUSIC);
 	else
+	{
 		lua_pushnil(pLuaVM);
+		delete _pMusic;
+	}
 
 	return 1;
 }
 
-//ETHER_API int EAPI_Media_LoadMusicFromFile(lua_State* pLuaVM)
-//{
-//	EE_Media_Music* _pMusic = new EE_Media_Music();
-//	if (_pMusic->music = Mix_LoadMUS(luaL_checkstring(pLuaVM, 1)))
-//		EE_PushUserdata<EE_Media_Music>(pLuaVM, _pMusic, METANAME_MUSIC);
-//	else
-//		lua_pushnil(pLuaVM);
-//
-//	return 1;
-//}
-
 ETHER_API int EAPI_Media_LoadMusicFromBuffer(lua_State* pLuaVM)
 {
+	EE_Media_Music* _pMusic = new EE_Media_Music();
+
 	size_t _szData = 0;
 	const char* _pData = luaL_checklstring(pLuaVM, 1, &_szData);
-	Mix_Music* _pMusic = nullptr;
-	if (_pMusic = Mix_LoadMUS_RW(SDL_RWFromMem((void*)_pData, (int)_szData), 1))
-		EE_PushUserdata<Mix_Music>(pLuaVM, _pMusic, METANAME_MUSIC);
+	_pMusic->buffer = std::string(_pData, _szData);
+	if (_pMusic->music = Mix_LoadMUS_RW(SDL_RWFromMem((void*)_pMusic->buffer.c_str(), (int)_szData), 1))
+		EE_PushUserdata<EE_Media_Music>(pLuaVM, _pMusic, METANAME_MUSIC);
 	else
 		lua_pushnil(pLuaVM);
 
@@ -37,18 +32,19 @@ ETHER_API int EAPI_Media_LoadMusicFromBuffer(lua_State* pLuaVM)
 
 ETHER_API int EAPI_Media_Music_GC(lua_State* pLuaVM)
 {
-	Mix_Music* _pMusic = EE_ToUserdata<Mix_Music>(pLuaVM, 1, METANAME_MUSIC);
+	EE_Media_Music* _pMusic = EE_ToUserdata<EE_Media_Music>(pLuaVM, 1, METANAME_MUSIC);
 
-	Mix_FreeMusic(_pMusic); _pMusic = nullptr;
+	Mix_FreeMusic(_pMusic->music); _pMusic->music = nullptr;
+	delete _pMusic; _pMusic = nullptr;
 
 	return 0;
 }
 
 ETHER_API int EAPI_Media_Music_Type(lua_State* pLuaVM)
 {
-	Mix_Music* _pMusic = EE_ToUserdata<Mix_Music>(pLuaVM, 1, METANAME_MUSIC);
+	EE_Media_Music* _pMusic = EE_ToUserdata<EE_Media_Music>(pLuaVM, 1, METANAME_MUSIC);
 
-	switch (Mix_GetMusicType(_pMusic))
+	switch (Mix_GetMusicType(_pMusic->music))
 	{
 	case MUS_WAV:	lua_pushinteger(pLuaVM, MEDIA_MUSIC_WAV); break;
 	case MUS_MP3:	lua_pushinteger(pLuaVM, MEDIA_MUSIC_MP3); break;
@@ -64,12 +60,12 @@ ETHER_API int EAPI_Media_Music_Type(lua_State* pLuaVM)
 
 ETHER_API int EAPI_Media_PlayMusic(lua_State* pLuaVM)
 {
-	Mix_Music* _pMusic = EE_ToUserdata<Mix_Music>(pLuaVM, 1, METANAME_MUSIC);
+	EE_Media_Music* _pMusic = EE_ToUserdata<EE_Media_Music>(pLuaVM, 1, METANAME_MUSIC);
 
 	if (lua_gettop(pLuaVM) < 3)
-		Mix_PlayMusic(_pMusic, (int)luaL_checknumber(pLuaVM, 2));
+		Mix_PlayMusic(_pMusic->music, (int)luaL_checknumber(pLuaVM, 2));
 	else
-		Mix_FadeInMusic(_pMusic, (int)luaL_checknumber(pLuaVM, 2), 
+		Mix_FadeInMusic(_pMusic->music, (int)luaL_checknumber(pLuaVM, 2), 
 			(int)luaL_checknumber(pLuaVM, 3));
 
 	return 0;

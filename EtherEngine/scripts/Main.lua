@@ -30,6 +30,21 @@ Window.Create(
     {Window.WINDOW_MAXIMIZED}
 )
 
+Graphic.SetRenderMode(Graphic.RENDER_NEAREST)
+
+file = io.open("test.mp3", "rb")
+
+-- sound = Media.SoundBuffer(file:read("*a"))
+
+-- sound:Play(-1)
+
+-- sound = nil
+
+-- music = Media.MusicBuffer(file:read("*a"))
+music = Media.MusicFile("test.mp3")
+
+Media.PlayMusic(music, -1)
+
 isQuit = false
 
 while not isQuit do
