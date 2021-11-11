@@ -17,6 +17,9 @@ static const char* METANAME_IMAGE			= "@Graphic.Image";
 static const char* METANAME_TEXTURE			= "@Graphic.Texture";
 static const char* METANAME_FONT			= "@Graphic.Font";
 
+static const char* METANAME_MUSIC			= "@Media.Music";
+static const char* METANAME_SOUND			= "@Media.Sound";
+
 static const char* METANAME_EVENT			= "@Input.Event";
 
 #endif // !_CONFIG_H_

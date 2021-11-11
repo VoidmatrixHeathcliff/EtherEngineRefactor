@@ -165,18 +165,18 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 			};
 
 			std::vector<ParamEnum> enum_list = {
-				{ "FLIP_HORIZONTAL",	FLIP_HORIZONTAL },
-				{ "FLIP_VERTICAL",		FLIP_VERTICAL },
-				{ "FLIP_NONE",			FLIP_NONE },
+				{ "FLIP_HORIZONTAL",	GRAPHIC_FLIP_HORIZONTAL },
+				{ "FLIP_VERTICAL",		GRAPHIC_FLIP_VERTICAL },
+				{ "FLIP_NONE",			GRAPHIC_FLIP_NONE },
 
-				{ "FONT_BOLD",			FONT_BOLD },
-				{ "FONT_ITALIC",		FONT_ITALIC },
-				{ "FONT_UNDERLINE",		FONT_UNDERLINE },
-				{ "FONT_STRIKETHROUGH", FONT_STRIKETHROUGH },
-				{ "FONT_NORMAL",		FONT_NORMAL },
+				{ "FONT_BOLD",			GRAPHIC_FONT_BOLD },
+				{ "FONT_ITALIC",		GRAPHIC_FONT_ITALIC },
+				{ "FONT_UNDERLINE",		GRAPHIC_FONT_UNDERLINE },
+				{ "FONT_STRIKETHROUGH", GRAPHIC_FONT_STRIKETHROUGH },
+				{ "FONT_NORMAL",		GRAPHIC_FONT_NORMAL },
 
-				{ "RENDER_NEAREST",		RENDER_NEAREST },
-				{ "RENDER_LINEAR",		RENDER_LINEAR },
+				{ "RENDER_NEAREST",		GRAPHIC_RENDER_NEAREST },
+				{ "RENDER_LINEAR",		GRAPHIC_RENDER_LINEAR },
 			};
 
 			std::vector<MetaTableData> metatable_list = {
@@ -470,49 +470,48 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 			Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
 
 			std::vector<luaL_Reg> func_list = {
-				{ "LoadMusic", loadMusic },
-				{ "PlayMusic", playMusic },
-				{ "PlayMusicWithFadeIn", playMusicWithFadeIn },
-				{ "SetMusicPosition", setMusicPosition },
-				{ "SetMusicVolume", setMusicVolume },
-				{ "GetMusicVolume", getMusicVolume },
-				{ "StopMusic", stopMusic },
-				{ "StopMusicWithFadeOut", stopMusicWithFadeOut },
-				{ "PauseMusic", pauseMusic },
-				{ "ResumeMusic", resumeMusic },
-				{ "RewindMusic", rewindMusic },
-				{ "CheckMusicPlaying", checkMusicPlaying },
-				{ "CheckMusicPaused", checkMusicPaused },
-				{ "GetMusicFadingType", getMusicFadingType },
-				{ "LoadSoundFromFile", loadSoundFromFile },
-				{ "LoadSoundFromData", loadSoundFromData },
+				{ "MusicFile",			EAPI_Media_LoadMusicFromFile },
+				{ "MusicBuffer",		EAPI_Media_LoadMusicFromBuffer },
+				{ "PlayMusic",			EAPI_Media_PlayMusic },
+				{ "StopMusic",			EAPI_Media_StopMusic },
+				{ "SetMusicPosition",	EAPI_Media_SetMusicPosition },
+				{ "GetMusicVolume",		EAPI_Media_GetMusicVolume },
+				{ "PauseMusic",			EAPI_Media_PauseMusic },
+				{ "ResumeMusic",		EAPI_Media_ResumeMusic },
+				{ "RewindMusic",		EAPI_Media_RewindMusic },
+				{ "CheckMusicPlaying",	EAPI_Media_CheckMusicPlaying },
+				{ "CheckMusicPaused",	EAPI_Media_CheckMusicPaused },
+				{ "GetMusicFadingType",	EAPI_Media_GetMusicFadingType },
+				{ "SoundFile",			EAPI_Media_LoadSoundFromFile },
+				{ "SoundBuffer",		EAPI_Media_LoadSoundFromBuffer },
 			};
 
 			std::vector<ParamEnum> enum_list = {
-				{ "MUSIC_TYPE_WAV", MUSIC_TYPE_WAV },
-				{ "MUSIC_TYPE_MP3", MUSIC_TYPE_MP3 },
-				{ "MUSIC_TYPE_OGG", MUSIC_TYPE_OGG },
-				{ "MUSIC_TYPE_CMD", MUSIC_TYPE_CMD },
-				{ "MUSIC_TYPE_MOD", MUSIC_TYPE_MOD },
-				{ "MUSIC_TYPE_MID", MUSIC_TYPE_MID },
-				{ "MUSIC_TYPE_UNKONWN", MUSIC_TYPE_UNKONWN },
+				{ "MUSIC_WAV",		MEDIA_MUSIC_WAV },
+				{ "MUSIC_MP3",		MEDIA_MUSIC_MP3 },
+				{ "MUSIC_OGG",		MEDIA_MUSIC_OGG },
+				{ "MUSIC_CMD",		MEDIA_MUSIC_CMD },
+				{ "MUSIC_MOD",		MEDIA_MUSIC_MOD },
+				{ "MUSIC_MID",		MEDIA_MUSIC_MID },
+				{ "MUSIC_UNKNOWN",	MEDIA_MUSIC_UNKNOWN },
 			};
 
 			std::vector<MetaTableData> metatable_list = {
 				{
 					METANAME_MUSIC,
 					{
-						{ "GetType", music_GetType },
+						{ "Type",		EAPI_Media_Music_Type },
 					},
-					__gc_Music
+					EAPI_Media_Music_GC
 				},
 				{
 					METANAME_SOUND,
 					{
-						{ "Play", sound_Play },
-						{ "SetVolume", sound_SetVolume },
+						{ "Play",		EAPI_Media_Sound_Play },
+						{ "SetVolume",	EAPI_Media_Sound_SetVolume },
+						{ "GetVolume",	EAPI_Media_Sound_GetVolume },
 					},
-					__gc_Sound
+					EAPI_Media_Sound_GC
 				},
 			};
 

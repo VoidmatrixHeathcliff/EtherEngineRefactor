@@ -4,9 +4,12 @@ ETHER_API int EAPI_Graphic_SetRenderMode(lua_State* pLuaState)
 {
 	switch ((int)luaL_checkinteger(pLuaState, 1))
 	{
-	case RENDER_NEAREST:	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest"); break;
-	case RENDER_LINEAR:		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear"); break;
-	default:				luaL_argerror(pLuaState, 1, ERRMSG_INVALIDENUM); break;
+	case GRAPHIC_RENDER_NEAREST:	
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest"); break;
+	case GRAPHIC_RENDER_LINEAR:		
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear"); break;
+	default:						
+		luaL_argerror(pLuaState, 1, ERRMSG_INVALIDENUM); break;
 	}
 
 	return 0;
@@ -160,10 +163,14 @@ ETHER_API int EAPI_Graphic_RenderTextureEx(lua_State* pLuaVM)
 			{
 				switch ((int)lua_tointeger(pLuaVM, -1))
 				{
-				case FLIP_HORIZONTAL:	_flags = (SDL_RendererFlip)(_flags | SDL_FLIP_HORIZONTAL); break;
-				case FLIP_VERTICAL:		_flags = (SDL_RendererFlip)(_flags | SDL_FLIP_VERTICAL); break;
-				case FLIP_NONE:			_flags = (SDL_RendererFlip)(_flags | SDL_FLIP_NONE); break;
-				default:				luaL_argerror(pLuaVM, 6, ERRMSG_INVALIDENUM); break;
+				case GRAPHIC_FLIP_HORIZONTAL:	
+					_flags = (SDL_RendererFlip)(_flags | SDL_FLIP_HORIZONTAL); break;
+				case GRAPHIC_FLIP_VERTICAL:		
+					_flags = (SDL_RendererFlip)(_flags | SDL_FLIP_VERTICAL); break;
+				case GRAPHIC_FLIP_NONE:			
+					_flags = (SDL_RendererFlip)(_flags | SDL_FLIP_NONE); break;
+				default:				
+					luaL_argerror(pLuaVM, 6, ERRMSG_INVALIDENUM); break;
 				}
 				return true;
 			}
@@ -442,7 +449,7 @@ ETHER_API int EAPI_Graphic_Font_GetStyle(lua_State* pLuaVM)
 
 	if (_style == TTF_STYLE_NORMAL)
 	{
-		lua_pushnumber(pLuaVM, FONT_NORMAL);
+		lua_pushnumber(pLuaVM, GRAPHIC_FONT_NORMAL);
 		lua_rawseti(pLuaVM, -2, 1);
 
 		return 1;
@@ -451,22 +458,22 @@ ETHER_API int EAPI_Graphic_Font_GetStyle(lua_State* pLuaVM)
 	int _index = 1;
 	if (_style & TTF_STYLE_BOLD)
 	{
-		lua_pushnumber(pLuaVM, FONT_BOLD);
+		lua_pushnumber(pLuaVM, GRAPHIC_FONT_BOLD);
 		lua_rawseti(pLuaVM, -2, _index); _index++;
 	}
 	if (_style & TTF_STYLE_ITALIC)
 	{
-		lua_pushnumber(pLuaVM, FONT_ITALIC);
+		lua_pushnumber(pLuaVM, GRAPHIC_FONT_ITALIC);
 		lua_rawseti(pLuaVM, -2, _index); _index++;
 	}
 	if (_style & TTF_STYLE_UNDERLINE)
 	{
-		lua_pushnumber(pLuaVM, FONT_UNDERLINE);
+		lua_pushnumber(pLuaVM, GRAPHIC_FONT_UNDERLINE);
 		lua_rawseti(pLuaVM, -2, _index); _index++;
 	}
 	if (_style & TTF_STYLE_STRIKETHROUGH)
 	{
-		lua_pushnumber(pLuaVM, FONT_STRIKETHROUGH);
+		lua_pushnumber(pLuaVM, GRAPHIC_FONT_STRIKETHROUGH);
 		lua_rawseti(pLuaVM, -2, _index); _index++;
 	}
 
@@ -486,11 +493,11 @@ ETHER_API int EAPI_Graphic_Font_SetStyle(lua_State* pLuaVM)
 		{
 			switch ((int)lua_tointeger(pLuaVM, -1))
 			{
-			case FONT_BOLD:				_style |= TTF_STYLE_BOLD; break;
-			case FONT_ITALIC:			_style |= TTF_STYLE_ITALIC; break;
-			case FONT_UNDERLINE:		_style |= TTF_STYLE_UNDERLINE; break;
-			case FONT_STRIKETHROUGH:	_style |= TTF_STYLE_STRIKETHROUGH; break;
-			case FONT_NORMAL:			_style |= TTF_STYLE_NORMAL; break;
+			case GRAPHIC_FONT_BOLD:				_style |= TTF_STYLE_BOLD; break;
+			case GRAPHIC_FONT_ITALIC:			_style |= TTF_STYLE_ITALIC; break;
+			case GRAPHIC_FONT_UNDERLINE:		_style |= TTF_STYLE_UNDERLINE; break;
+			case GRAPHIC_FONT_STRIKETHROUGH:	_style |= TTF_STYLE_STRIKETHROUGH; break;
+			case GRAPHIC_FONT_NORMAL:			_style |= TTF_STYLE_NORMAL; break;
 			default:					luaL_argerror(pLuaVM, 1, ERRMSG_INVALIDENUM); break;
 			}
 			return true;

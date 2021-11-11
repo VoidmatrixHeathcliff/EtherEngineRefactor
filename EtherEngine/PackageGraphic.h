@@ -12,18 +12,18 @@
 
 #include <vector>
 
-static const int FONT_BOLD			= 0;
-static const int FONT_ITALIC		= 1;
-static const int FONT_UNDERLINE		= 2;
-static const int FONT_STRIKETHROUGH	= 3;
-static const int FONT_NORMAL		= 4;
+static const int GRAPHIC_FONT_BOLD			= 0;
+static const int GRAPHIC_FONT_ITALIC		= 1;
+static const int GRAPHIC_FONT_UNDERLINE		= 2;
+static const int GRAPHIC_FONT_STRIKETHROUGH	= 3;
+static const int GRAPHIC_FONT_NORMAL		= 4;
 
-static const int FLIP_HORIZONTAL	= 0;
-static const int FLIP_VERTICAL		= 1;
-static const int FLIP_NONE			= 2;
+static const int GRAPHIC_FLIP_HORIZONTAL	= 0;
+static const int GRAPHIC_FLIP_VERTICAL		= 1;
+static const int GRAPHIC_FLIP_NONE			= 2;
 
-static const int RENDER_NEAREST		= 0;
-static const int RENDER_LINEAR		= 1;
+static const int GRAPHIC_RENDER_NEAREST		= 0;
+static const int GRAPHIC_RENDER_LINEAR		= 1;
 
 extern SDL_Renderer* pGlobalRenderer;
 

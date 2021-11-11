@@ -6,8 +6,6 @@
 #include <lua.hpp>
 #include <SDL.h>
 
-#include <vector>
-
 extern SDL_Event* pGlobalEvent;
 
 ETHER_API int EAPI_Input_UpdateEvent(lua_State* pLuaVM);
