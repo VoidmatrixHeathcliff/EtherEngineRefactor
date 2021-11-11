@@ -331,13 +331,13 @@ ETHER_API int EAPI_Graphic_DrawPolygon(lua_State* pLuaVM)
 
 			luaL_argcheck(pLuaVM, lua_istable(pLuaVM, -1), 1, "elements expected table");
 
-			lua_pushstring(pLuaVM, "x"); lua_rawget(pLuaVM, -1);
+			lua_pushstring(pLuaVM, "x"); lua_rawget(pLuaVM, -2);
 			luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1), 1, std::string("point at #")
 				.append(std::to_string(lua_tointeger(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(":x").c_str());
 			_point.x = (int)lua_tointeger(pLuaVM, -1);
 			lua_pop(pLuaVM, 1);
 
-			lua_pushstring(pLuaVM, "y"); lua_rawget(pLuaVM, -1);
+			lua_pushstring(pLuaVM, "y"); lua_rawget(pLuaVM, -2);
 			luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1), 1, std::string("point at #")
 				.append(std::to_string(lua_tointeger(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(":y").c_str());
 			_point.y = (int)lua_tointeger(pLuaVM, -1);
@@ -373,13 +373,13 @@ ETHER_API int EAPI_Graphic_DrawBezier(lua_State* pLuaVM)
 
 			luaL_argcheck(pLuaVM, lua_istable(pLuaVM, -1), 1, "elements expected table");
 
-			lua_pushstring(pLuaVM, "x"); lua_rawget(pLuaVM, -1);
+			lua_pushstring(pLuaVM, "x"); lua_rawget(pLuaVM, -2);
 			luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1), 1, std::string("point at #")
 				.append(std::to_string(lua_tointeger(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(":x").c_str());
 			_point.x = (int)lua_tointeger(pLuaVM, -1);
 			lua_pop(pLuaVM, 1);
 
-			lua_pushstring(pLuaVM, "y"); lua_rawget(pLuaVM, -1);
+			lua_pushstring(pLuaVM, "y"); lua_rawget(pLuaVM, -2);
 			luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1), 1, std::string("point at #")
 				.append(std::to_string(lua_tointeger(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(":y").c_str());
 			_point.y = (int)lua_tointeger(pLuaVM, -1);
@@ -416,7 +416,7 @@ ETHER_API int EAPI_Graphic_LoadFontFromBuffer(lua_State* pLuaVM)
 	size_t _szData = 0;
 	const char* _pData = luaL_checklstring(pLuaVM, 1, &_szData);
 	TTF_Font* _pFont = nullptr;
-	if (_pFont = TTF_OpenFontRW(SDL_RWFromMem((void*)_pData, _szData), 1, (int)luaL_checknumber(pLuaVM, 2)))
+	if (_pFont = TTF_OpenFontRW(SDL_RWFromMem((void*)_pData, (int)_szData), 1, (int)luaL_checknumber(pLuaVM, 2)))
 		EE_PushUserdata<TTF_Font>(pLuaVM, _pFont, METANAME_FONT);
 	else
 		lua_pushnil(pLuaVM);

@@ -24,7 +24,8 @@ Window.Create(
         y = Window.DEFAULT_POS,
         w = 1280,
         h = 720
-    }
+    },
+    {Window.WINDOW_MAXIMIZED}
 )
 
 isQuit = false
@@ -42,11 +43,24 @@ while not isQuit do
         end
     end
 
-    local _x, _y = Input.GetCursorPosition()
-    print(_x, _y)
-
     Graphic.SetDrawColor({r = 125, g = 200, b = 79, a = 255})
     Graphic.DrawCircle({x = 150, y = 150}, 100, true)
+
+    Graphic.SetDrawColor({r = 200, g = 175, b = 125, a = 255})
+    Graphic.DrawPolygon({
+        {x = 350, y = 100},
+        {x = 750, y = 175},
+        {x = 750, y = 375},
+        {x = 425, y = 375},
+    }, true)
+
+    Graphic.SetDrawColor({r = 125, g = 100, b = 215, a = 255})
+    Graphic.DrawBezier({
+        {x = 1100, y = 625},
+        {x = 975, y = 400},
+        {x = 1050, y = 575},
+        {x = 1050, y = 500},
+    }, 4)
 
     Window.Update()
 
