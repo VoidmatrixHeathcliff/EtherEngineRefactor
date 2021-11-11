@@ -147,14 +147,19 @@ ETHER_API int EAPI_Graphic_RenderTextureEx(lua_State* pLuaVM)
 	}
 	else if (lua_gettop(pLuaVM) < 6)
 	{
-		SDL_Rect _rect_src; EE_CheckRect(pLuaVM, 3, _rect_src);
 		SDL_Point _point_center; EE_CheckPoint(pLuaVM, 4, _point_center);
-		SDL_RenderCopyEx(pGlobalRenderer, _pTexture, &_rect_src, &_rect_dst,
-			luaL_checknumber(pLuaVM, 5), &_point_center, SDL_FLIP_NONE);
+		if (lua_isnil(pLuaVM, 3))
+			SDL_RenderCopyEx(pGlobalRenderer, _pTexture, nullptr, &_rect_dst,
+				luaL_checknumber(pLuaVM, 5), &_point_center, SDL_FLIP_NONE);
+		else
+		{
+			SDL_Rect _rect_src; EE_CheckRect(pLuaVM, 3, _rect_src);
+			SDL_RenderCopyEx(pGlobalRenderer, _pTexture, &_rect_src, &_rect_dst,
+				luaL_checknumber(pLuaVM, 5), &_point_center, SDL_FLIP_NONE);
+		}
 	}
 	else
 	{
-		SDL_Rect _rect_src; EE_CheckRect(pLuaVM, 3, _rect_src);
 		SDL_Point _point_center; EE_CheckPoint(pLuaVM, 4, _point_center);
 		luaL_argexpected(pLuaVM, lua_istable(pLuaVM, 6), 6, LUA_TABLIBNAME);
 		SDL_RendererFlip _flags = SDL_FLIP_NONE; EE_TraverseTable(
@@ -175,8 +180,15 @@ ETHER_API int EAPI_Graphic_RenderTextureEx(lua_State* pLuaVM)
 				return true;
 			}
 		);
-		SDL_RenderCopyEx(pGlobalRenderer, _pTexture, &_rect_src, &_rect_dst,
-			luaL_checknumber(pLuaVM, 5), &_point_center, _flags);
+		if (lua_isnil(pLuaVM, 3))
+			SDL_RenderCopyEx(pGlobalRenderer, _pTexture, nullptr, &_rect_dst,
+				luaL_checknumber(pLuaVM, 5), &_point_center, _flags);
+		else
+		{
+			SDL_Rect _rect_src; EE_CheckRect(pLuaVM, 3, _rect_src);
+			SDL_RenderCopyEx(pGlobalRenderer, _pTexture, &_rect_src, &_rect_dst,
+				luaL_checknumber(pLuaVM, 5), &_point_center, _flags);
+		}
 	}
 
 	return 0;
@@ -340,13 +352,13 @@ ETHER_API int EAPI_Graphic_DrawPolygon(lua_State* pLuaVM)
 
 			lua_pushstring(pLuaVM, "x"); lua_rawget(pLuaVM, -2);
 			luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1), 1, std::string("point at #")
-				.append(std::to_string(lua_tointeger(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(":x").c_str());
+				.append(std::to_string(lua_tointeger(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(" : x").c_str());
 			_point.x = (int)lua_tointeger(pLuaVM, -1);
 			lua_pop(pLuaVM, 1);
 
 			lua_pushstring(pLuaVM, "y"); lua_rawget(pLuaVM, -2);
 			luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1), 1, std::string("point at #")
-				.append(std::to_string(lua_tointeger(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(":y").c_str());
+				.append(std::to_string(lua_tointeger(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(" : y").c_str());
 			_point.y = (int)lua_tointeger(pLuaVM, -1);
 			lua_pop(pLuaVM, 1);
 			
@@ -382,13 +394,13 @@ ETHER_API int EAPI_Graphic_DrawBezier(lua_State* pLuaVM)
 
 			lua_pushstring(pLuaVM, "x"); lua_rawget(pLuaVM, -2);
 			luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1), 1, std::string("point at #")
-				.append(std::to_string(lua_tointeger(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(":x").c_str());
+				.append(std::to_string(lua_tointeger(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(" : x").c_str());
 			_point.x = (int)lua_tointeger(pLuaVM, -1);
 			lua_pop(pLuaVM, 1);
 
 			lua_pushstring(pLuaVM, "y"); lua_rawget(pLuaVM, -2);
 			luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1), 1, std::string("point at #")
-				.append(std::to_string(lua_tointeger(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(":y").c_str());
+				.append(std::to_string(lua_tointeger(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(" : y").c_str());
 			_point.y = (int)lua_tointeger(pLuaVM, -1);
 			lua_pop(pLuaVM, 1);
 
