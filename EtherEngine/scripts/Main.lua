@@ -1,6 +1,6 @@
 Algorithm       = require("@Algorithm")
 Graphic         = require("@Graphic")
-Interactivity   = require("@Interactivity")
+Input           = require("@Input")
 JSON            = require("@JSON")
 Media           = require("@Media")
 Network         = require("@Network")
@@ -36,12 +36,14 @@ while not isQuit do
     Graphic.SetDrawColor({r = 0, g = 0, b = 0, a = 255})
     Window.Clear()
 
-    while Interactivity.UpdateEvent() do
-        local _event = Interactivity.GetEventType()
-        if _event == Interactivity.EVENT_QUIT then
+    while Input.UpdateEvent() do
+        if Input.GetType() == Input.EVENT_QUIT then
             isQuit = true
         end
     end
+
+    local _x, _y = Input.GetCursorPosition()
+    print(_x, _y)
 
     Graphic.SetDrawColor({r = 125, g = 200, b = 79, a = 255})
     Graphic.DrawCircle({x = 150, y = 150}, 100, true)

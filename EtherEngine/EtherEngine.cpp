@@ -11,12 +11,7 @@
 extern char** environ;
 #endif	// !__WINDOWS__
 
-SDL_Event event;
-
-SDL_Window*   pGlobalWindow = nullptr;
-SDL_Renderer* pGlobalRenderer = nullptr;
-
-struct SDL_Point pointCursorPos;
+extern SDL_Window* pGlobalWindow;
 
 #undef main
 int main(int argc, char** argv)

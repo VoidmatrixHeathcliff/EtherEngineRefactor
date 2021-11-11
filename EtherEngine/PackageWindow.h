@@ -10,7 +10,7 @@
 
 #include <map>
 
-static const int WINDOW_POSDEFAULT = SDL_WINDOWPOS_UNDEFINED;
+static const int WINDOW_POSDEFAULT			= SDL_WINDOWPOS_UNDEFINED;
 
 static const int WINDOW_MSGBOX_ERROR		= 0;
 static const int WINDOW_MSGBOX_WARNING		= 1;
@@ -38,12 +38,12 @@ static const int WINDOW_CURSOR_SIZEALL		= 9;
 static const int WINDOW_CURSOR_NO			= 10;
 static const int WINDOW_CURSOR_HAND			= 11;
 
-extern SDL_Window*		pGlobalWindow;
-extern SDL_Renderer*	pGlobalRenderer;
+extern SDL_Window*					pGlobalWindow;
+extern SDL_Renderer*				pGlobalRenderer;
 
-static SDL_MessageBoxColorScheme* Window_pMsgBoxColorScheme = nullptr;
+static SDL_MessageBoxColorScheme*	Window_pMsgBoxColorScheme = nullptr;
 
-static std::map<int, SDL_Cursor*> Window_mapCursor;
+static std::map<int, SDL_Cursor*>	Window_mapCursor;
 
 ETHER_API int EAPI_Window_GetWindowHandle(lua_State* pLuaVM);
 
