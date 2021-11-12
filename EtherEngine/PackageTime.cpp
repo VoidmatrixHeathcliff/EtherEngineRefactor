@@ -1,49 +1,29 @@
 #include "PackageTime.h"
 
-
-ETHER_API int pause(lua_State * L)
+ETHER_API int EAPI_Time_Sleep(lua_State* pLuaVM)
 {
-	system("pause");
+	SDL_Delay((Uint32)luaL_checknumber(pLuaVM, 1));
 
 	return 0;
 }
 
-ETHER_API int sleep(lua_State * L)
+ETHER_API int EAPI_Time_GetInitTime(lua_State* pLuaVM)
 {
-	SDL_Delay(luaL_checknumber(L, 1));
-
-	return 0;
-}
-
-ETHER_API int dynamicSleep(lua_State* L)
-{
-	int expected_delay = luaL_checknumber(L, 1);
-	int duration = luaL_checknumber(L, 2);
-	if (duration < expected_delay)
-	{
-		SDL_Delay(expected_delay - duration);
-	}
-
-	return 0;
-}
-
-ETHER_API int getInitTime(lua_State * L)
-{
-	lua_pushnumber(L, SDL_GetTicks());
+	lua_pushinteger(pLuaVM, SDL_GetTicks());
 
 	return 1;
 }
 
-ETHER_API int getAccurateCount(lua_State * L)
+ETHER_API int EAPI_Time_GetPerformanceCounter(lua_State* pLuaVM)
 {
-	lua_pushnumber(L, SDL_GetPerformanceCounter());
+	lua_pushinteger(pLuaVM, SDL_GetPerformanceCounter());
 
 	return 1;
 }
 
-ETHER_API int getCounterFrequency(lua_State * L)
+ETHER_API int EAPI_Time_GetPerformanceFrequency(lua_State* pLuaVM)
 {
-	lua_pushnumber(L, SDL_GetPerformanceFrequency());
+	lua_pushinteger(pLuaVM, SDL_GetPerformanceFrequency());
 
 	return 1;
 }

@@ -226,7 +226,7 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 			return 1;
 		}
 	},
-	{ 
+	{
 		"@Input",
 		[](lua_State* pLuaVM) -> int
 		{
@@ -753,10 +753,13 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 		[](lua_State* pLuaVM) -> int
 		{
 			std::vector<luaL_Reg> func_list = {
-				{ "GBKToUTF8", gbkToUTF8 },
-				{ "UTF8ToGBK", utf8ToGBK },
-				{ "SubStrUTF8", subStrUTF8 },
-				{ "LenUTF8", lenUTF8 },
+				{ "GBKToUTF8",	EAPI_String_GBKToUTF8 },
+				{ "UTF8ToGBK",	EAPI_String_UTF8ToGBK },
+				{ "UTF8Len",	EAPI_String_UTF8Len },
+				{ "UTF8Sub",	EAPI_String_UTF8Sub },
+				{ "UTF8Find",	EAPI_String_UTF8Find },
+				{ "UTF8RFind",	EAPI_String_UTF8RFind },
+				{ "UTF8Insert", EAPI_String_UTF8Insert },
 			};
 
 			EE_PushBuiltinPackageData(pLuaVM, func_list);
@@ -765,16 +768,14 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 		}
 	},
 	{ 
-		"@Time",			
+		"@Time",
 		[](lua_State* pLuaVM) -> int
 		{
 			std::vector<luaL_Reg> func_list = {
-				{ "Pause", pause },
-				{ "Sleep", sleep },
-				{ "DynamicSleep", dynamicSleep },
-				{ "GetInitTime", getInitTime },
-				{ "GetAccurateCount", getAccurateCount },
-				{ "GetCounterFrequency", getCounterFrequency },
+				{ "Sleep",						EAPI_Time_Sleep },
+				{ "GetInitTime",				EAPI_Time_GetInitTime },
+				{ "GetPerformanceCounter",		EAPI_Time_GetPerformanceCounter },
+				{ "GetPerformanceFrequency",	EAPI_Time_GetPerformanceFrequency },
 			};
 
 			EE_PushBuiltinPackageData(pLuaVM, func_list);

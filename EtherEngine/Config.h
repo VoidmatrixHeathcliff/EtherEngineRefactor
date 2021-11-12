@@ -2,6 +2,7 @@
 #define _CONFIG_H_
 
 #pragma warning(disable:26812)
+#pragma warning(disable:26451)
 
 #define ETHER_API extern "C"
 

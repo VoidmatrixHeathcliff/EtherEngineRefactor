@@ -170,7 +170,7 @@ ETHER_API int EAPI_Graphic_RenderTextureEx(lua_State* pLuaVM)
 				{
 				case GRAPHIC_FLIP_HORIZONTAL:	
 					_flags = (SDL_RendererFlip)(_flags | SDL_FLIP_HORIZONTAL); break;
-				case GRAPHIC_FLIP_VERTICAL:		
+				case GRAPHIC_FLIP_VERTICAL:
 					_flags = (SDL_RendererFlip)(_flags | SDL_FLIP_VERTICAL); break;
 				case GRAPHIC_FLIP_NONE:			
 					_flags = (SDL_RendererFlip)(_flags | SDL_FLIP_NONE); break;
