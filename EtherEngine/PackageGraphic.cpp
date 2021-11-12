@@ -72,7 +72,7 @@ ETHER_API int EAPI_Graphic_Image_Size(lua_State* pLuaVM)
 	return 2;
 }
 
-ETHER_API int EAPI_Graphic_Image_Texture(lua_State* pLuaVM)
+ETHER_API int EAPI_Graphic_CreateTexture(lua_State* pLuaVM)
 {
 	SDL_Surface* _pSurface = EE_ToUserdata<SDL_Surface>(pLuaVM, 1, METANAME_IMAGE);
 

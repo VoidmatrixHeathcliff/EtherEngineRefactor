@@ -57,7 +57,7 @@ ETHER_API int EAPI_Graphic_Image_Size(lua_State* pLuaVM);
 // 从图像数据创建属于窗口的可渲染纹理
 // 1参数：图像数据（userdata-IMAGE）
 // 1返回值：纹理数据（userdata-TEXTURE）
-ETHER_API int EAPI_Graphic_Image_Texture(lua_State* pLuaVM);
+ETHER_API int EAPI_Graphic_CreateTexture(lua_State* pLuaVM);
 
 // 纹理数据GC函数
 // 1参数：纹理数据（userdata-TEXTURE）

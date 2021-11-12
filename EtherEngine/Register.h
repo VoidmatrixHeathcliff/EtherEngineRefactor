@@ -142,6 +142,7 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 				{ "SetRenderMode",		EAPI_Graphic_SetRenderMode },
 				{ "ImageFile",			EAPI_Graphic_LoadImageFromFile },
 				{ "ImageBuffer",		EAPI_Graphic_LoadImageFromBuffer },
+				{ "CreateTexture",		EAPI_Graphic_CreateTexture },
 				{ "RenderTexture",		EAPI_Graphic_RenderTexture },
 				{ "RenderTextureEx",	EAPI_Graphic_RenderTextureEx },
 				{ "SetDrawColor",		EAPI_Graphic_SetDrawColor },
@@ -184,7 +185,6 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 					METANAME_IMAGE,
 					{
 						{ "SetColorKey",		EAPI_Graphic_Image_SetColorKey },
-						{ "Texture",			EAPI_Graphic_Image_Texture },
 						{ "Size",				EAPI_Graphic_Image_Size },
 					},
 					EAPI_Graphic_Image_GC
