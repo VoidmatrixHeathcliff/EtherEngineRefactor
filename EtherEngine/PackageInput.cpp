@@ -21,12 +21,23 @@ ETHER_API int EAPI_Input_StopTextInput(lua_State* pLuaVM)
 	return 0;
 }
 
-ETHER_API int EAPI_Input_GetType(lua_State* pLuaVM)
+ETHER_API int EAPI_Input_GetEventType(lua_State* pLuaVM)
 {
-	if (pGlobalEvent->type != SDL_WINDOWEVENT)
-		lua_pushinteger(pLuaVM, pGlobalEvent->type);
-	else
-		lua_pushinteger(pLuaVM, pGlobalEvent->window.event);
+	lua_pushinteger(pLuaVM, pGlobalEvent->type);
+
+	return 1;
+}
+
+ETHER_API int EAPI_Input_GetWindowEventType(lua_State* pLuaVM)
+{
+	lua_pushinteger(pLuaVM, pGlobalEvent->window.event);		
+
+	return 1;
+}
+
+ETHER_API int EAPI_Input_GetMouseButtonID(lua_State* pLuaVM)
+{
+	lua_pushinteger(pLuaVM, pGlobalEvent->button.button);
 
 	return 1;
 }

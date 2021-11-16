@@ -166,7 +166,7 @@ ETHER_API int EAPI_Graphic_RenderTextureEx(lua_State* pLuaVM)
 			pLuaVM, 6,
 			[&]() -> bool
 			{
-				switch ((int)lua_tointeger(pLuaVM, -1))
+				switch ((int)lua_tonumber(pLuaVM, -1))
 				{
 				case GRAPHIC_FLIP_HORIZONTAL:	
 					_flags = (SDL_RendererFlip)(_flags | SDL_FLIP_HORIZONTAL); break;
@@ -352,14 +352,14 @@ ETHER_API int EAPI_Graphic_DrawPolygon(lua_State* pLuaVM)
 
 			lua_pushstring(pLuaVM, "x"); lua_rawget(pLuaVM, -2);
 			luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1), 1, std::string("point at #")
-				.append(std::to_string(lua_tointeger(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(" : x").c_str());
-			_point.x = (int)lua_tointeger(pLuaVM, -1);
+				.append(std::to_string(lua_tonumber(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(" : x").c_str());
+			_point.x = (int)lua_tonumber(pLuaVM, -1);
 			lua_pop(pLuaVM, 1);
 
 			lua_pushstring(pLuaVM, "y"); lua_rawget(pLuaVM, -2);
 			luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1), 1, std::string("point at #")
-				.append(std::to_string(lua_tointeger(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(" : y").c_str());
-			_point.y = (int)lua_tointeger(pLuaVM, -1);
+				.append(std::to_string(lua_tonumber(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(" : y").c_str());
+			_point.y = (int)lua_tonumber(pLuaVM, -1);
 			lua_pop(pLuaVM, 1);
 			
 			_vecx.push_back(_point.x); _vecy.push_back(_point.y);
@@ -394,14 +394,14 @@ ETHER_API int EAPI_Graphic_DrawBezier(lua_State* pLuaVM)
 
 			lua_pushstring(pLuaVM, "x"); lua_rawget(pLuaVM, -2);
 			luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1), 1, std::string("point at #")
-				.append(std::to_string(lua_tointeger(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(" : x").c_str());
-			_point.x = (int)lua_tointeger(pLuaVM, -1);
+				.append(std::to_string(lua_tonumber(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(" : x").c_str());
+			_point.x = (int)lua_tonumber(pLuaVM, -1);
 			lua_pop(pLuaVM, 1);
 
 			lua_pushstring(pLuaVM, "y"); lua_rawget(pLuaVM, -2);
 			luaL_argcheck(pLuaVM, lua_isnumber(pLuaVM, -1), 1, std::string("point at #")
-				.append(std::to_string(lua_tointeger(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(" : y").c_str());
-			_point.y = (int)lua_tointeger(pLuaVM, -1);
+				.append(std::to_string(lua_tonumber(pLuaVM, -2))).append(" ").append(ERRMSG_INVALIDMEMBER).append(" : y").c_str());
+			_point.y = (int)lua_tonumber(pLuaVM, -1);
 			lua_pop(pLuaVM, 1);
 
 			_vecx.push_back(_point.x); _vecy.push_back(_point.y);
@@ -498,19 +498,19 @@ ETHER_API int EAPI_Graphic_Font_SetStyle(lua_State* pLuaVM)
 
 	int _style = TTF_STYLE_NORMAL;
 
-	luaL_argexpected(pLuaVM, lua_istable(pLuaVM, 1), 1, LUA_TABLIBNAME);
+	luaL_argexpected(pLuaVM, lua_istable(pLuaVM, 2), 2, LUA_TABLIBNAME);
 	EE_TraverseTable(
-		pLuaVM, 1,
+		pLuaVM, 2,
 		[&]() -> bool
 		{
-			switch ((int)lua_tointeger(pLuaVM, -1))
+			switch ((int)lua_tonumber(pLuaVM, -1))
 			{
 			case GRAPHIC_FONT_BOLD:				_style |= TTF_STYLE_BOLD; break;
 			case GRAPHIC_FONT_ITALIC:			_style |= TTF_STYLE_ITALIC; break;
 			case GRAPHIC_FONT_UNDERLINE:		_style |= TTF_STYLE_UNDERLINE; break;
 			case GRAPHIC_FONT_STRIKETHROUGH:	_style |= TTF_STYLE_STRIKETHROUGH; break;
 			case GRAPHIC_FONT_NORMAL:			_style |= TTF_STYLE_NORMAL; break;
-			default:					luaL_argerror(pLuaVM, 1, ERRMSG_INVALIDENUM); break;
+			default:							luaL_argerror(pLuaVM, 2, ERRMSG_INVALIDENUM); break;
 			}
 			return true;
 		}

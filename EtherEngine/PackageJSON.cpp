@@ -67,7 +67,7 @@ void LuaTable2CJson(cJSON*& pJsonNode, int iIndex, lua_State* L)
 			if (lua_type(L, -2) == LUA_TSTRING)
 				strKey = lua_tostring(L, -2);
 			else
-				strKey = to_string(lua_tointeger(L, -2));
+				strKey = to_string(lua_tonumber(L, -2));
 			switch (lua_type(L, -1))
 			{
 			case LUA_TNIL:

@@ -21,6 +21,7 @@
 
 #include <vector>
 #include <string>
+#include <utility>
 #include <functional>
 
 SDL_Window*		pGlobalWindow = nullptr;
@@ -236,7 +237,8 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 				{ "UpdateEvent",		EAPI_Input_UpdateEvent },
 				{ "StartTextInput",		EAPI_Input_StartTextInput },
 				{ "StartTextInput",		EAPI_Input_StopTextInput },
-				{ "GetEventType",		EAPI_Input_GetType },
+				{ "GetEventType",		EAPI_Input_GetEventType },
+				{ "GetMouseButtonID",	EAPI_Input_GetMouseButtonID },
 				{ "GetKeyCode",			EAPI_Input_GetKeyCode },
 				{ "GetCursorPosition",	EAPI_Input_GetCursorPosition },
 				{ "GetWheelScroll",		EAPI_Input_GetWheelScroll },
@@ -254,19 +256,26 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 				{ "EVENT_DROPFILE",			SDL_DROPFILE },
 				{ "EVENT_DROPBEGIN",		SDL_DROPBEGIN },
 				{ "EVENT_DROPCOMPLETE",		SDL_DROPCOMPLETE },
+				{ "EVENT_WINDOW",			SDL_WINDOWEVENT },
+				{ "EVENT_MOUSEBTNDOWN",		SDL_MOUSEBUTTONDOWN },
+				{ "EVENT_MOUSEBTNUP",		SDL_MOUSEBUTTONUP },
 
-				{ "EVENT_WINDOWSHOWN",		SDL_WINDOWEVENT_SHOWN },
-				{ "EVENT_WINDOWHIDDEN",		SDL_WINDOWEVENT_HIDDEN },
-				{ "EVENT_WINDOWEXPOSED",	SDL_WINDOWEVENT_EXPOSED },
-				{ "EVENT_WINDOWMOVED",		SDL_WINDOWEVENT_MOVED },
-				{ "EVENT_WINDOWRESIZED",	SDL_WINDOWEVENT_RESIZED },
-				{ "EVENT_WINDOWMINIMIZED",	SDL_WINDOWEVENT_MINIMIZED },
-				{ "EVENT_WINDOWMAXIMIZED",	SDL_WINDOWEVENT_MAXIMIZED },
-				{ "EVENT_WINDOWENTER",		SDL_WINDOWEVENT_ENTER },
-				{ "EVENT_WINDOWLEAVE",		SDL_WINDOWEVENT_LEAVE },
-				{ "EVENT_WINDOWFOCUSGOT ",	SDL_WINDOWEVENT_FOCUS_GAINED },
-				{ "EVENT_WINDOWFOCUSLOST",	SDL_WINDOWEVENT_FOCUS_LOST },
-				{ "EVENT_WINDOWCLOSE",		SDL_WINDOWEVENT_CLOSE },
+				{ "WINDOWEVENT_SHOWN",		SDL_WINDOWEVENT_SHOWN },
+				{ "WINDOWEVENT_HIDDEN",		SDL_WINDOWEVENT_HIDDEN },
+				{ "WINDOWEVENT_EXPOSED",	SDL_WINDOWEVENT_EXPOSED },
+				{ "WINDOWEVENT_MOVED",		SDL_WINDOWEVENT_MOVED },
+				{ "WINDOWEVENT_RESIZED",	SDL_WINDOWEVENT_RESIZED },
+				{ "WINDOWEVENT_MINIMIZED",	SDL_WINDOWEVENT_MINIMIZED },
+				{ "WINDOWEVENT_MAXIMIZED",	SDL_WINDOWEVENT_MAXIMIZED },
+				{ "WINDOWEVENT_ENTER",		SDL_WINDOWEVENT_ENTER },
+				{ "WINDOWEVENT_LEAVE",		SDL_WINDOWEVENT_LEAVE },
+				{ "WINDOWEVENT_FOCUSGOT ",	SDL_WINDOWEVENT_FOCUS_GAINED },
+				{ "WINDOWEVENT_FOCUSLOST",	SDL_WINDOWEVENT_FOCUS_LOST },
+				{ "WINDOWEVENT_CLOSE",		SDL_WINDOWEVENT_CLOSE },
+
+				{ "MOUSEBTN_LEFT",			SDL_BUTTON_LEFT },
+				{ "MOUSEBTN_RIGHT",			SDL_BUTTON_RIGHT },
+				{ "MOUSEBTN_MIDDLE",		SDL_BUTTON_MIDDLE },
 
 				{ "KEY_0",					SDLK_0 },
 				{ "KEY_1",					SDLK_1 },
@@ -794,20 +803,18 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 			Window_pMsgBoxColorScheme->colors[3] = { 0, 0, 255 };
 			Window_pMsgBoxColorScheme->colors[4] = { 255, 0, 255 };
 
-			Window_mapCursor = {
-				{ WINDOW_CURSOR_ARROW,		SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW) },
-				{ WINDOW_CURSOR_IBEAM,		SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM) },
-				{ WINDOW_CURSOR_WAIT,		SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_WAIT) },
-				{ WINDOW_CURSOR_CROSSHAIR,	SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_CROSSHAIR) },
-				{ WINDOW_CURSOR_WAITARROW,	SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_WAITARROW) },
-				{ WINDOW_CURSOR_SIZENWSE,	SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENWSE) },
-				{ WINDOW_CURSOR_SIZENESW,	SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENESW) },
-				{ WINDOW_CURSOR_SIZEWE,		SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEWE) },
-				{ WINDOW_CURSOR_SIZENS,		SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENS) },
-				{ WINDOW_CURSOR_SIZEALL,	SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL) },
-				{ WINDOW_CURSOR_NO,			SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NO) },
-				{ WINDOW_CURSOR_HAND,		SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND) },
-			};
+			Window_pMapCursor = new std::map<int, SDL_Cursor*>();
+			Window_pMapCursor->insert(std::make_pair(WINDOW_CURSOR_ARROW, SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW)));
+			Window_pMapCursor->insert(std::make_pair(WINDOW_CURSOR_IBEAM, SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM)));
+			Window_pMapCursor->insert(std::make_pair(WINDOW_CURSOR_WAIT, SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_WAIT)));
+			Window_pMapCursor->insert(std::make_pair(WINDOW_CURSOR_CROSSHAIR, SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_WAITARROW)));
+			Window_pMapCursor->insert(std::make_pair(WINDOW_CURSOR_SIZENWSE, SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENWSE)));
+			Window_pMapCursor->insert(std::make_pair(WINDOW_CURSOR_SIZENESW, SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENESW)));
+			Window_pMapCursor->insert(std::make_pair(WINDOW_CURSOR_SIZEWE, SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEWE)));
+			Window_pMapCursor->insert(std::make_pair(WINDOW_CURSOR_SIZENS, SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENS)));
+			Window_pMapCursor->insert(std::make_pair(WINDOW_CURSOR_SIZEALL, SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL)));
+			Window_pMapCursor->insert(std::make_pair(WINDOW_CURSOR_NO, SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NO)));
+			Window_pMapCursor->insert(std::make_pair(WINDOW_CURSOR_HAND, SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND)));
 
 			std::vector<luaL_Reg> func_list = {
 				{ "GetWindowHandle",	EAPI_Window_GetWindowHandle},
@@ -863,7 +870,7 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 				{ "CURSOR_SIZEWE",		WINDOW_CURSOR_SIZEWE },
 				{ "CURSOR_SIZENS",		WINDOW_CURSOR_SIZENS },
 				{ "CURSOR_SIZEALL",		WINDOW_CURSOR_SIZEALL },
-				{ "CURSOR_NO},",		WINDOW_CURSOR_NO },
+				{ "CURSOR_NO",			WINDOW_CURSOR_NO },
 				{ "CURSOR_HAND",		WINDOW_CURSOR_HAND },
 			};
 
@@ -896,12 +903,12 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 					delete Window_pMsgBoxColorScheme;
 					Window_pMsgBoxColorScheme = nullptr;
 
-					for (auto& pair : Window_mapCursor)
+					for (auto& pair : *Window_pMapCursor)
 					{
 						SDL_FreeCursor(pair.second);
 						pair.second = nullptr;
 					}
-					std::map<int, SDL_Cursor*>().swap(Window_mapCursor);
+					delete Window_pMapCursor;
 
 					return 0;
 				});

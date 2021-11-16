@@ -1,5 +1,9 @@
 #include "PackageWindow.h"
 
+std::map<int, SDL_Cursor*>* Window_pMapCursor = nullptr;
+
+SDL_MessageBoxColorScheme* Window_pMsgBoxColorScheme = nullptr;
+
 ETHER_API int EAPI_Window_GetWindowHandle(lua_State* pLuaVM)
 {
 	EE_PushUserdata<SDL_Window>(pLuaVM, pGlobalWindow, METANAME_HANDLEWINDOW);
@@ -30,10 +34,10 @@ ETHER_API int EAPI_Window_GetCursorShown(lua_State* pLuaVM)
 
 ETHER_API int EAPI_Window_SetCursorStyle(lua_State* pLuaVM)
 {
-	auto _itor = Window_mapCursor.find((int)luaL_checknumber(pLuaVM, 1));
-	luaL_argcheck(pLuaVM, _itor != Window_mapCursor.end(), 1, ERRMSG_INVALIDENUM);
+	auto _itor = Window_pMapCursor->find((int)luaL_checknumber(pLuaVM, 1));
+	luaL_argcheck(pLuaVM, _itor != Window_pMapCursor->end(), 1, ERRMSG_INVALIDENUM);
 	
-	SDL_SetCursor(_itor->second);	
+	SDL_SetCursor(_itor->second);
 
 	return 0;
 }
@@ -43,7 +47,7 @@ ETHER_API int EAPI_Window_GetCursorStyle(lua_State* pLuaVM)
 	SDL_Cursor* pCursor = SDL_GetCursor();
 
 	int _style = WINDOW_CURSOR_ARROW;
-	for (const auto& pair : Window_mapCursor)
+	for (const auto& pair : *Window_pMapCursor)
 	{
 		if (pair.second == pCursor)
 		{
@@ -130,7 +134,7 @@ ETHER_API int EAPI_Window_Create(lua_State* pLuaVM)
 			pLuaVM, 3,
 			[&]() -> bool
 			{
-				switch ((int)lua_tointeger(pLuaVM, -1))
+				switch ((int)lua_tonumber(pLuaVM, -1))
 				{
 				case WINDOW_FULLSCREEN: _flags |= SDL_WINDOW_FULLSCREEN_DESKTOP; break;
 				case WINDOW_RESIZABLE:	_flags |= SDL_WINDOW_RESIZABLE; break;

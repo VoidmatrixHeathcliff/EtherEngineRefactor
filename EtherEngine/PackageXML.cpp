@@ -107,7 +107,7 @@ ETHER_API int attribute_SetIntegerValue(lua_State* L)
 #ifdef _ETHER_DEBUG_
 	CheckAttributeData(attribute, 1);
 #endif
-	if (!attribute->set_value(lua_tointeger(L, 2)))
+	if (!attribute->set_value(lua_tonumber(L, 2)))
 		luaL_error(L, "set attribute value failed");
 
 	return 1;
@@ -122,7 +122,7 @@ ETHER_API int attribute_SetNumberValue(lua_State* L)
 #endif
 	if (lua_gettop(L) > 2
 		? (!attribute->set_value(lua_tonumber(L, 2)))
-		: (!attribute->set_value(lua_tonumber(L, 2), lua_tointeger(L, 3))))
+		: (!attribute->set_value(lua_tonumber(L, 2), lua_tonumber(L, 3))))
 		luaL_error(L, "set attribute value failed");
 
 	return 1;

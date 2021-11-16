@@ -14,7 +14,9 @@ ETHER_API int EAPI_Input_StartTextInput(lua_State* pLuaVM);
 
 ETHER_API int EAPI_Input_StopTextInput(lua_State* pLuaVM);
 
-ETHER_API int EAPI_Input_GetType(lua_State* pLuaVM);
+ETHER_API int EAPI_Input_GetEventType(lua_State* pLuaVM);
+
+ETHER_API int EAPI_Input_GetMouseButtonID(lua_State* pLuaVM);
 
 ETHER_API int EAPI_Input_GetKeyCode(lua_State* pLuaVM);
 

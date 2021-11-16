@@ -41,9 +41,9 @@ static const int WINDOW_CURSOR_HAND			= 11;
 extern SDL_Window*					pGlobalWindow;
 extern SDL_Renderer*				pGlobalRenderer;
 
-static SDL_MessageBoxColorScheme*	Window_pMsgBoxColorScheme = nullptr;
+extern SDL_MessageBoxColorScheme*	Window_pMsgBoxColorScheme;
 
-static std::map<int, SDL_Cursor*>	Window_mapCursor;
+extern std::map<int, SDL_Cursor*>*	Window_pMapCursor;
 
 ETHER_API int EAPI_Window_GetWindowHandle(lua_State* pLuaVM);
 

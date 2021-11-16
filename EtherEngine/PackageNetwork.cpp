@@ -417,7 +417,7 @@ ETHER_API int client_SetProxy(lua_State* L)
 	CheckClientDataAt1stPos(client);
 #endif
 
-	client->set_proxy(luaL_checkstring(L, 2), lua_tointeger(L, 3));
+	client->set_proxy(luaL_checkstring(L, 2), (int)lua_tonumber(L, 3));
 
 	return 0;
 }
