@@ -459,11 +459,13 @@ static std::vector<BuiltinPackageData> BuiltinPackageList =
 		"@JSON",			
 		[](lua_State* pLuaVM) -> int
 		{
+			JSON_bStrictArray = false;
+
 			std::vector<luaL_Reg> func_list = {
-				{ "LoadJSON", loadJSON },
-				{ "LoadJSONFromFile", loadJSONFromFile },
-				{ "DumpJSON", dumpJSON },
-				{ "DumpJSONToFile", dumpJSONToFile },
+				{ "Load", EAPI_JSON_Load },
+				{ "Dump", EAPI_JSON_Dump },
+				{ "SetStrictArrayMode", EAPI_JSON_SetStrictArrayMode },
+				{ "GetStrictArrayMode", EAPI_JSON_GetStrictArrayMode },
 			};
 
 			EE_PushBuiltinPackageData(pLuaVM, func_list);
