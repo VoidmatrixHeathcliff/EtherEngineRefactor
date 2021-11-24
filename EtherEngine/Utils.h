@@ -115,6 +115,7 @@ inline void EE_TraverseTable(lua_State* pLuaVM, int idx,
 	lua_pushnil(pLuaVM);
 	while (_flag && lua_next(pLuaVM, idx)) {
 		_flag = callback();
+		if (!_flag) lua_pop(pLuaVM, 1);
 		lua_pop(pLuaVM, 1);
 	}
 }

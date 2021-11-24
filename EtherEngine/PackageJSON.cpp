@@ -80,11 +80,12 @@ cJSON* EE_ConvertLuaObjectToJSON(int idx, lua_State* pLuaVM)
 		}
 		else
 			_pJSONNode = cJSON_CreateObject();
+
 		if (_pJSONNode->type == cJSON_Array)
 			EE_TraverseTable(
 				pLuaVM, idx,
 				[&]()->bool {
-					cJSON_AddItemToArray(_pJSONNode, EE_ConvertLuaObjectToJSON(-1, pLuaVM));
+					cJSON_AddItemToArray(_pJSONNode, EE_ConvertLuaObjectToJSON(lua_gettop(pLuaVM), pLuaVM));
 					return true;
 				}
 		);
@@ -99,14 +100,19 @@ cJSON* EE_ConvertLuaObjectToJSON(int idx, lua_State* pLuaVM)
 						_key = lua_tostring(pLuaVM, -2);
 						break;
 					case LUA_TNUMBER:
-						_key = lua_isinteger(pLuaVM, -2) ? std::to_string(lua_tointeger(pLuaVM, -2)) : std::to_string(lua_tonumber(pLuaVM, -2));
+						if (lua_isinteger(pLuaVM, -2))
+							_key = std::to_string(lua_tointeger(pLuaVM, -2));
+						else
+						{
+							_key = std::to_string(lua_tonumber(pLuaVM, -2));
+							_key = _key.substr(0, _key.find_last_not_of('0') + 1);
+						}
 						break;
 					default:
 						luaL_argerror(pLuaVM, 1, std::string("JSON dump failed key type: ").append(lua_typename(pLuaVM, -2)).c_str());
 						break;
 					}
-						
-					cJSON_AddItemToObject(_pJSONNode, _key.c_str(), EE_ConvertLuaObjectToJSON(-1, pLuaVM));
+					cJSON_AddItemToObject(_pJSONNode, _key.c_str(), EE_ConvertLuaObjectToJSON(lua_gettop(pLuaVM), pLuaVM));
 					return true;
 				}
 			);
