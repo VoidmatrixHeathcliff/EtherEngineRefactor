@@ -112,7 +112,7 @@ int main(int argc, char** argv)
 			for (int i = 0; i < _nArraySize; i++)
 			{
 				cJSON* _pJSONPathItem = nullptr;
-				if ((_pJSONPathItem = cJSON_GetArrayItem(pJSONConfigPath, i))
+				if ((_pJSONPathItem = cJSON_GetArrayItem(pJSONConfigCPath, i))
 					&& (_pJSONPathItem->type == cJSON_String))
 					_strCPath.append(";").append(_pJSONPathItem->valuestring);
 			}
